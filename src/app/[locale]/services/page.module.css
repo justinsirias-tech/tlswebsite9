@@ -1,0 +1,82 @@
+.header {
+  padding: 8rem 0 4rem 0;
+  background: var(--primary);
+  color: white;
+  text-align: center;
+}
+
+.serviceGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 4rem;
+  margin-top: -3rem;
+}
+
+.serviceCard {
+  display: flex;
+  flex-direction: column;
+  background: white;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-premium);
+  transition: var(--transition);
+}
+
+@media (min-width: 992px) {
+  .serviceCard {
+    flex-direction: row;
+    align-items: stretch;
+  }
+  .serviceCard:nth-child(even) {
+    flex-direction: row-reverse;
+  }
+}
+
+.serviceImage {
+  flex: 1;
+  min-height: 300px;
+  position: relative;
+  background: var(--background);
+}
+
+.serviceContent {
+  flex: 1;
+  padding: 4rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.serviceTitle {
+  font-size: 2.5rem;
+  color: var(--primary);
+  margin-bottom: 1rem;
+}
+
+.serviceDesc {
+  color: var(--text-light);
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+}
+
+.featureList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+}
+
+.featureList li {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-weight: 500;
+  color: var(--text-dark);
+}
+
+.featureList i {
+  color: var(--accent);
+  background: rgba(71, 85, 105, 0.1);
+  padding: 0.5rem;
+  border-radius: 50%;
+}

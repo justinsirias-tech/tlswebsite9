@@ -1,0 +1,94 @@
+.header {
+  padding: 8rem 0 4rem 0;
+  background: var(--background);
+  text-align: center;
+}
+
+.hotelsContainer {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4rem;
+  padding: 2rem 0;
+}
+
+.citySection {
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: 3rem;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+.cityTitle {
+  font-size: 2.5rem;
+  color: var(--primary);
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border-bottom: 2px solid rgba(0,0,0,0.05);
+  padding-bottom: 1rem;
+}
+
+.cityTitle i {
+  color: var(--accent);
+}
+
+.hotelGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.hotelCard {
+  background: var(--background);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-decoration: none;
+  color: var(--text-dark);
+  transition: var(--transition);
+  border: 1px solid transparent;
+}
+
+.hotelCard:hover {
+  background: white;
+  transform: translateY(-3px);
+  box-shadow: var(--shadow);
+  border-color: var(--accent);
+  color: var(--primary);
+}
+
+.hotelName {
+  font-weight: 600;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.hotelIcon {
+  color: var(--accent);
+}
+
+.mapIcon {
+  color: var(--text-light);
+  transition: var(--transition);
+}
+
+.hotelCard:hover .mapIcon {
+  color: var(--primary);
+}
+
+@media (max-width: 768px) {
+  .citySection {
+    padding: 2rem;
+  }
+  .hotelGrid {
+    grid-template-columns: 1fr;
+  }
+}

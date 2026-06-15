@@ -1,0 +1,884 @@
+[
+  {
+    "slug": "marriott-marquis-queens-park",
+    "name": "Marriott Marquis Queen's Park",
+    "city": "Bangkok",
+    "type": "hotel",
+    "stars": 5,
+    "totalRooms": 1388,
+    "averagePrice": "฿4,500",
+    "transport": "600m to Phrom Phong BTS",
+    "nearbyAmenities": [
+      "Benchasiri Park",
+      "EmQuartier",
+      "Emporium"
+    ],
+    "image": "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1200&q=80",
+    "mapLink": "https://maps.app.goo.gl/placeholder",
+    "website": "https://www.marriott.com"
+  },
+  {
+    "slug": "hilton-sukhumvit-bangkok",
+    "name": "Hilton Sukhumvit Bangkok",
+    "city": "Bangkok",
+    "type": "hotel",
+    "stars": 5,
+    "totalRooms": 280,
+    "averagePrice": "฿5,200",
+    "transport": "300m to Phrom Phong BTS",
+    "nearbyAmenities": [
+      "Emporium",
+      "Terminal 21",
+      "Dinosaur Planet"
+    ],
+    "image": "https://images.unsplash.com/photo-1551882547-ff40c0d12c56?w=1200&q=80",
+    "mapLink": "https://maps.app.goo.gl/placeholder",
+    "website": "https://www.hilton.com"
+  },
+  {
+    "slug": "sofitel-bangkok-sukhumvit",
+    "name": "Sofitel Bangkok Sukhumvit",
+    "city": "Bangkok",
+    "type": "hotel",
+    "stars": 5,
+    "totalRooms": 345,
+    "averagePrice": "฿5,800",
+    "transport": "250m to Nana BTS",
+    "nearbyAmenities": [
+      "Terminal 21",
+      "Benjakitti Park",
+      "Nana Plaza"
+    ],
+    "image": "https://images.unsplash.com/photo-1542314831-c6a4d14d837e?w=1200&q=80",
+    "mapLink": "https://maps.app.goo.gl/placeholder",
+    "website": "https://www.sofitel-bangkok-sukhumvit.com"
+  },
+  {
+    "slug": "intercontinental-bangkok",
+    "name": "InterContinental Bangkok",
+    "city": "Bangkok",
+    "type": "hotel",
+    "stars": 5,
+    "totalRooms": 381,
+    "averagePrice": "฿6,500",
+    "transport": "100m to Chit Lom BTS",
+    "nearbyAmenities": [
+      "CentralWorld",
+      "Erawan Shrine",
+      "Siam Paragon"
+    ],
+    "image": "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=1200&q=80",
+    "mapLink": "https://maps.app.goo.gl/placeholder",
+    "website": "https://www.ihg.com"
+  },
+  {
+    "slug": "banyan-tree-bangkok",
+    "name": "Banyan Tree Bangkok",
+    "city": "Bangkok",
+    "type": "hotel",
+    "stars": 5,
+    "totalRooms": 327,
+    "averagePrice": "฿5,500",
+    "transport": "800m to Sala Daeng BTS",
+    "nearbyAmenities": [
+      "Lumphini Park",
+      "Silom Complex",
+      "Patpong Night Market"
+    ],
+    "image": "https://images.unsplash.com/photo-1542314831-c6a4d14d837e?w=1200&q=80",
+    "mapLink": "https://maps.app.goo.gl/placeholder",
+    "website": "https://www.banyantree.com"
+  },
+  {
+    "slug": "the-siam",
+    "name": "The Siam Hotel",
+    "city": "Bangkok",
+    "type": "hotel",
+    "stars": 5,
+    "totalRooms": 39,
+    "averagePrice": "฿15,000",
+    "transport": "Riverside Boat Access",
+    "nearbyAmenities": [
+      "Vimanmek Mansion",
+      "Dusit Zoo",
+      "Chao Phraya River"
+    ],
+    "image": "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1200&q=80",
+    "mapLink": "https://maps.app.goo.gl/placeholder",
+    "website": "https://www.thesiamhotel.com"
+  },
+  {
+    "slug": "mandarin-oriental-bangkok",
+    "name": "Mandarin Oriental Bangkok",
+    "city": "Bangkok",
+    "type": "hotel",
+    "stars": 5,
+    "totalRooms": 331,
+    "averagePrice": "฿12,000",
+    "transport": "Saphan Taksin BTS (via boat)",
+    "nearbyAmenities": [
+      "Chao Phraya River",
+      "Iconsiam",
+      "Asiatique"
+    ],
+    "image": "https://images.unsplash.com/photo-1551882547-ff40c0d12c56?w=1200&q=80",
+    "mapLink": "https://maps.app.goo.gl/placeholder",
+    "website": "https://www.mandarinoriental.com"
+  },
+  {
+    "slug": "shangri-la-bangkok",
+    "name": "Shangri-La Bangkok",
+    "city": "Bangkok",
+    "type": "hotel",
+    "stars": 5,
+    "totalRooms": 802,
+    "averagePrice": "฿6,000",
+    "transport": "200m to Saphan Taksin BTS",
+    "nearbyAmenities": [
+      "Iconsiam",
+      "Bangrak Bazaar",
+      "Asiatique"
+    ],
+    "image": "https://images.unsplash.com/photo-1542314831-c6a4d14d837e?w=1200&q=80",
+    "mapLink": "https://maps.app.goo.gl/placeholder",
+    "website": "https://www.shangri-la.com"
+  },
+  {
+    "slug": "waldorf-astoria-bangkok",
+    "name": "Waldorf Astoria Bangkok",
+    "city": "Bangkok",
+    "type": "hotel",
+    "stars": 5,
+    "totalRooms": 171,
+    "averagePrice": "฿9,500",
+    "transport": "300m to Ratchadamri BTS",
+    "nearbyAmenities": [
+      "Erawan Shrine",
+      "CentralWorld",
+      "Lumphini Park"
+    ],
+    "image": "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=1200&q=80",
+    "mapLink": "https://maps.app.goo.gl/placeholder",
+    "website": "https://www.hilton.com/en/waldorf-astoria/"
+  },
+  {
+    "slug": "siam-kempinski",
+    "name": "Siam Kempinski Hotel Bangkok",
+    "city": "Bangkok",
+    "type": "hotel",
+    "stars": 5,
+    "totalRooms": 397,
+    "averagePrice": "฿8,000",
+    "transport": "Direct access to Siam BTS",
+    "nearbyAmenities": [
+      "Siam Paragon",
+      "Siam Center",
+      "MBK Center"
+    ],
+    "image": "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1200&q=80",
+    "mapLink": "https://maps.app.goo.gl/placeholder",
+    "website": "https://www.kempinski.com"
+  },
+  {
+    "slug": "the-peninsula-bangkok",
+    "name": "The Peninsula Bangkok",
+    "city": "Bangkok",
+    "type": "hotel",
+    "stars": 5,
+    "totalRooms": 370,
+    "averagePrice": "฿8,500",
+    "transport": "Riverside Boat to Saphan Taksin",
+    "nearbyAmenities": [
+      "Iconsiam",
+      "Chao Phraya River",
+      "Wat Arun"
+    ],
+    "image": "https://images.unsplash.com/photo-1551882547-ff40c0d12c56?w=1200&q=80",
+    "mapLink": "https://maps.app.goo.gl/placeholder",
+    "website": "https://www.peninsula.com"
+  },
+  {
+    "slug": "okura-prestige-bangkok",
+    "name": "The Okura Prestige Bangkok",
+    "city": "Bangkok",
+    "type": "hotel",
+    "stars": 5,
+    "totalRooms": 240,
+    "averagePrice": "฿6,800",
+    "transport": "Direct access to Phloen Chit BTS",
+    "nearbyAmenities": [
+      "Central Embassy",
+      "All Seasons Place",
+      "Nana Plaza"
+    ],
+    "image": "https://images.unsplash.com/photo-1542314831-c6a4d14d837e?w=1200&q=80",
+    "mapLink": "https://maps.app.goo.gl/placeholder",
+    "website": "https://www.okurabangkok.com"
+  },
+  {
+    "slug": "st-regis-bangkok",
+    "name": "The St. Regis Bangkok",
+    "city": "Bangkok",
+    "type": "hotel",
+    "stars": 5,
+    "totalRooms": 228,
+    "averagePrice": "฿8,200",
+    "transport": "Direct access to Ratchadamri BTS",
+    "nearbyAmenities": [
+      "Lumphini Park",
+      "Erawan Shrine",
+      "CentralWorld"
+    ],
+    "image": "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=1200&q=80",
+    "mapLink": "https://maps.app.goo.gl/placeholder",
+    "website": "https://www.marriott.com"
+  },
+  {
+    "slug": "hyatt-regency-bangkok",
+    "name": "Hyatt Regency Bangkok Sukhumvit",
+    "city": "Bangkok",
+    "type": "hotel",
+    "stars": 5,
+    "totalRooms": 273,
+    "averagePrice": "฿5,900",
+    "transport": "Direct access to Nana BTS",
+    "nearbyAmenities": [
+      "Nana Plaza",
+      "Terminal 21",
+      "Korea Town"
+    ],
+    "image": "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1200&q=80",
+    "mapLink": "https://maps.app.goo.gl/placeholder",
+    "website": "https://www.hyatt.com"
+  },
+  {
+    "slug": "pullman-bangkok-king-power",
+    "name": "Pullman Bangkok King Power",
+    "city": "Bangkok",
+    "type": "hotel",
+    "stars": 5,
+    "totalRooms": 354,
+    "averagePrice": "฿4,200",
+    "transport": "500m to Victory Monument BTS",
+    "nearbyAmenities": [
+      "King Power Duty Free",
+      "Victory Monument",
+      "Chatuchak Market (via BTS)"
+    ],
+    "image": "https://images.unsplash.com/photo-1551882547-ff40c0d12c56?w=1200&q=80",
+    "mapLink": "https://maps.app.goo.gl/placeholder",
+    "website": "https://www.pullmanbangkokkingpower.com"
+  },
+  {
+    "slug": "somerset-maison-asoke",
+    "name": "Somerset Maison Asoke",
+    "city": "Bangkok",
+    "type": "apartment",
+    "stars": 4,
+    "totalRooms": 125,
+    "averagePrice": "฿3,200",
+    "transport": "400m to Asok BTS",
+    "nearbyAmenities": [
+      "Terminal 21",
+      "Benjakitti Park",
+      "Sukhumvit Soi 23"
+    ],
+    "image": "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=1200&q=80",
+    "mapLink": "https://maps.app.goo.gl/placeholder",
+    "website": "https://www.discoverasr.com"
+  },
+  {
+    "slug": "ascott-sathorn-bangkok",
+    "name": "Ascott Sathorn Bangkok",
+    "city": "Bangkok",
+    "type": "apartment",
+    "stars": 5,
+    "totalRooms": 177,
+    "averagePrice": "฿4,800",
+    "transport": "150m to Chong Nonsi BTS",
+    "nearbyAmenities": [
+      "Mahanakhon SkyWalk",
+      "Silom District",
+      "Health Land Spa"
+    ],
+    "image": "https://images.unsplash.com/photo-1502672260266-1c1de2d9d00c?w=1200&q=80",
+    "mapLink": "https://maps.app.goo.gl/placeholder",
+    "website": "https://www.discoverasr.com"
+  },
+  {
+    "slug": "marriott-executive-apartments-sukhumvit-24",
+    "name": "Marriott Executive Apartments Sukhumvit 24",
+    "city": "Bangkok",
+    "type": "apartment",
+    "stars": 5,
+    "totalRooms": 161,
+    "averagePrice": "฿5,900",
+    "transport": "300m to Phrom Phong BTS",
+    "nearbyAmenities": [
+      "Emporium",
+      "EmQuartier",
+      "Benchasiri Park"
+    ],
+    "image": "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1200&q=80",
+    "mapLink": "https://maps.app.goo.gl/placeholder",
+    "website": "https://www.marriott.com"
+  },
+  {
+    "slug": "shama-lakeview-asoke",
+    "name": "Shama Lakeview Asoke",
+    "city": "Bangkok",
+    "type": "apartment",
+    "stars": 4,
+    "totalRooms": 429,
+    "averagePrice": "฿3,500",
+    "transport": "800m to Asok BTS",
+    "nearbyAmenities": [
+      "Benjakitti Park",
+      "Terminal 21",
+      "Queen Sirikit Convention Center"
+    ],
+    "image": "https://images.unsplash.com/photo-1493809842364-78817add7ff6?w=1200&q=80",
+    "mapLink": "https://maps.app.goo.gl/placeholder",
+    "website": "https://www.shama.com"
+  },
+  {
+    "slug": "centre-point-silom",
+    "name": "Centre Point Hotel Silom",
+    "city": "Bangkok",
+    "type": "apartment",
+    "stars": 4,
+    "totalRooms": 214,
+    "averagePrice": "฿2,900",
+    "transport": "200m to Saphan Taksin BTS",
+    "nearbyAmenities": [
+      "Robinson Bangrak",
+      "Sathorn Pier",
+      "Asiatique"
+    ],
+    "image": "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=1200&q=80",
+    "mapLink": "https://maps.app.goo.gl/placeholder",
+    "website": "https://www.centrepoint.com"
+  },
+  {
+    "slug": "somerset-park-suanplu",
+    "name": "Somerset Park Suanplu",
+    "city": "Bangkok",
+    "type": "apartment",
+    "stars": 4,
+    "totalRooms": 235,
+    "averagePrice": "฿2,800",
+    "transport": "800m to Sala Daeng BTS",
+    "nearbyAmenities": [
+      "Lumphini Park",
+      "Sathorn Business District",
+      "Silom Complex"
+    ],
+    "image": "https://images.unsplash.com/photo-1502672260266-1c1de2d9d00c?w=1200&q=80",
+    "mapLink": "https://maps.app.goo.gl/placeholder",
+    "website": "https://www.discoverasr.com"
+  },
+  {
+    "slug": "cape-house-langsuan",
+    "name": "Cape House Langsuan",
+    "city": "Bangkok",
+    "type": "apartment",
+    "stars": 5,
+    "totalRooms": 117,
+    "averagePrice": "฿4,200",
+    "transport": "300m to Chit Lom BTS",
+    "nearbyAmenities": [
+      "CentralWorld",
+      "Erawan Shrine",
+      "Lumphini Park"
+    ],
+    "image": "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1200&q=80",
+    "mapLink": "https://maps.app.goo.gl/placeholder",
+    "website": "https://www.capehouse.com"
+  },
+  {
+    "slug": "chatrium-residence-sathon",
+    "name": "Chatrium Residence Sathon",
+    "city": "Bangkok",
+    "type": "apartment",
+    "stars": 4,
+    "totalRooms": 560,
+    "averagePrice": "฿3,100",
+    "transport": "15 min to Chong Nonsi BTS",
+    "nearbyAmenities": [
+      "Central Rama 3",
+      "Asiatique",
+      "Sathorn District"
+    ],
+    "image": "https://images.unsplash.com/photo-1493809842364-78817add7ff6?w=1200&q=80",
+    "mapLink": "https://maps.app.goo.gl/placeholder",
+    "website": "https://www.chatrium.com"
+  },
+  {
+    "slug": "the-ascott-embassy-sathorn",
+    "name": "Ascott Embassy Sathorn",
+    "city": "Bangkok",
+    "type": "apartment",
+    "stars": 5,
+    "totalRooms": 393,
+    "averagePrice": "฿5,200",
+    "transport": "500m to Sala Daeng BTS",
+    "nearbyAmenities": [
+      "Lumphini Park",
+      "Silom Complex",
+      "Patpong Market"
+    ],
+    "image": "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=1200&q=80",
+    "mapLink": "https://maps.app.goo.gl/placeholder",
+    "website": "https://www.discoverasr.com"
+  },
+  {
+    "slug": "oakwood-studios-sukhumvit",
+    "name": "Oakwood Studios Sukhumvit",
+    "city": "Bangkok",
+    "type": "apartment",
+    "stars": 4,
+    "totalRooms": 177,
+    "averagePrice": "฿2,500",
+    "transport": "600m to Thong Lo BTS",
+    "nearbyAmenities": [
+      "Thong Lo Nightlife",
+      "EmQuartier",
+      "Gateway Ekamai"
+    ],
+    "image": "https://images.unsplash.com/photo-1502672260266-1c1de2d9d00c?w=1200&q=80",
+    "mapLink": "https://maps.app.goo.gl/placeholder",
+    "website": "https://www.oakwood.com"
+  },
+  {
+    "slug": "hilton-pattaya",
+    "name": "Hilton Pattaya",
+    "city": "Pattaya",
+    "type": "hotel",
+    "stars": 5,
+    "totalRooms": 303,
+    "averagePrice": "฿6,200",
+    "transport": "Direct access to CentralFestival",
+    "nearbyAmenities": [
+      "Pattaya Beach",
+      "Walking Street",
+      "CentralFestival Pattaya Beach"
+    ],
+    "image": "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=1200&q=80",
+    "mapLink": "https://maps.app.goo.gl/placeholder",
+    "website": "https://www.hilton.com"
+  },
+  {
+    "slug": "hard-rock-hotel-pattaya",
+    "name": "Hard Rock Hotel Pattaya",
+    "city": "Pattaya",
+    "type": "hotel",
+    "stars": 4,
+    "totalRooms": 323,
+    "averagePrice": "฿3,500",
+    "transport": "Beachfront Road",
+    "nearbyAmenities": [
+      "Pattaya Beach",
+      "Alcazar Cabaret",
+      "Art in Paradise"
+    ],
+    "image": "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=1200&q=80",
+    "mapLink": "https://maps.app.goo.gl/placeholder",
+    "website": "https://hotel.hardrock.com/pattaya"
+  },
+  {
+    "slug": "centara-grand-mirage",
+    "name": "Centara Grand Mirage Beach Resort",
+    "city": "Pattaya",
+    "type": "hotel",
+    "stars": 5,
+    "totalRooms": 555,
+    "averagePrice": "฿5,500",
+    "transport": "Wong Amat Beach",
+    "nearbyAmenities": [
+      "Sanctuary of Truth",
+      "Wong Amat Beach",
+      "Mini Siam"
+    ],
+    "image": "https://images.unsplash.com/photo-1496417263034-38ec4f0b665a?w=1200&q=80",
+    "mapLink": "https://maps.app.goo.gl/placeholder",
+    "website": "https://www.centarahotelsresorts.com"
+  },
+  {
+    "slug": "royal-cliff-beach-hotel",
+    "name": "Royal Cliff Beach Hotel",
+    "city": "Pattaya",
+    "type": "hotel",
+    "stars": 5,
+    "totalRooms": 474,
+    "averagePrice": "฿4,800",
+    "transport": "Phra Tamnak Hill",
+    "nearbyAmenities": [
+      "Pattaya Viewpoint",
+      "Walking Street",
+      "Bali Hai Pier"
+    ],
+    "image": "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=1200&q=80",
+    "mapLink": "https://maps.app.goo.gl/placeholder",
+    "website": "https://www.royalcliff.com"
+  },
+  {
+    "slug": "dusit-thani-pattaya",
+    "name": "Dusit Thani Pattaya",
+    "city": "Pattaya",
+    "type": "hotel",
+    "stars": 5,
+    "totalRooms": 457,
+    "averagePrice": "฿4,000",
+    "transport": "North Pattaya Beach",
+    "nearbyAmenities": [
+      "Terminal 21 Pattaya",
+      "Pattaya Beach",
+      "Tiffany's Show"
+    ],
+    "image": "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=1200&q=80",
+    "mapLink": "https://maps.app.goo.gl/placeholder",
+    "website": "https://www.dusit.com"
+  },
+  {
+    "slug": "cape-dara-resort",
+    "name": "Cape Dara Resort",
+    "city": "Pattaya",
+    "type": "hotel",
+    "stars": 5,
+    "totalRooms": 264,
+    "averagePrice": "฿5,800",
+    "transport": "Wong Amat Beach",
+    "nearbyAmenities": [
+      "Sanctuary of Truth",
+      "Wong Amat Beach",
+      "Terminal 21 Pattaya"
+    ],
+    "image": "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=1200&q=80",
+    "mapLink": "https://maps.app.goo.gl/placeholder",
+    "website": "https://www.capedarapattaya.com"
+  },
+  {
+    "slug": "pullman-pattaya-hotel-g",
+    "name": "Pullman Pattaya Hotel G",
+    "city": "Pattaya",
+    "type": "hotel",
+    "stars": 5,
+    "totalRooms": 353,
+    "averagePrice": "฿4,500",
+    "transport": "Wong Amat Beach",
+    "nearbyAmenities": [
+      "Sanctuary of Truth",
+      "Wong Amat Beach",
+      "Mini Siam"
+    ],
+    "image": "https://images.unsplash.com/photo-1496417263034-38ec4f0b665a?w=1200&q=80",
+    "mapLink": "https://maps.app.goo.gl/placeholder",
+    "website": "https://www.pullmanpattayahotelg.com"
+  },
+  {
+    "slug": "holiday-inn-pattaya",
+    "name": "Holiday Inn Pattaya",
+    "city": "Pattaya",
+    "type": "hotel",
+    "stars": 4,
+    "totalRooms": 567,
+    "averagePrice": "฿3,800",
+    "transport": "Beach Road",
+    "nearbyAmenities": [
+      "Pattaya Beach",
+      "Terminal 21 Pattaya",
+      "Art in Paradise"
+    ],
+    "image": "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=1200&q=80",
+    "mapLink": "https://maps.app.goo.gl/placeholder",
+    "website": "https://www.ihg.com"
+  },
+  {
+    "slug": "amari-pattaya",
+    "name": "Amari Pattaya",
+    "city": "Pattaya",
+    "type": "hotel",
+    "stars": 5,
+    "totalRooms": 346,
+    "averagePrice": "฿5,000",
+    "transport": "North Pattaya Beach Road",
+    "nearbyAmenities": [
+      "Terminal 21 Pattaya",
+      "Pattaya Beach",
+      "Tiffany's Show"
+    ],
+    "image": "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=1200&q=80",
+    "mapLink": "https://maps.app.goo.gl/placeholder",
+    "website": "https://www.amari.com"
+  },
+  {
+    "slug": "siam-bayshore-resort",
+    "name": "Siam Bayshore Resort Pattaya",
+    "city": "Pattaya",
+    "type": "hotel",
+    "stars": 4,
+    "totalRooms": 270,
+    "averagePrice": "฿3,200",
+    "transport": "Bali Hai Pier",
+    "nearbyAmenities": [
+      "Walking Street",
+      "Bali Hai Pier",
+      "Pattaya Viewpoint"
+    ],
+    "image": "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=1200&q=80",
+    "mapLink": "https://maps.app.goo.gl/placeholder",
+    "website": "https://www.sukosolhotels.com"
+  },
+  {
+    "slug": "citadines-north-pattaya",
+    "name": "Citadines North Pattaya",
+    "city": "Pattaya",
+    "type": "apartment",
+    "stars": 4,
+    "totalRooms": 150,
+    "averagePrice": "฿2,200",
+    "transport": "10 min to Terminal 21 Pattaya",
+    "nearbyAmenities": [
+      "Terminal 21 Pattaya",
+      "Art in Paradise",
+      "Tiffany's Show"
+    ],
+    "image": "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=1200&q=80",
+    "mapLink": "https://maps.app.goo.gl/placeholder",
+    "website": "https://www.discoverasr.com"
+  },
+  {
+    "slug": "somerset-pattaya",
+    "name": "Somerset Pattaya",
+    "city": "Pattaya",
+    "type": "apartment",
+    "stars": 5,
+    "totalRooms": 324,
+    "averagePrice": "฿3,800",
+    "transport": "Central Pattaya Road",
+    "nearbyAmenities": [
+      "CentralFestival",
+      "Pattaya Beach",
+      "Walking Street"
+    ],
+    "image": "https://images.unsplash.com/photo-1502672260266-1c1de2d9d00c?w=1200&q=80",
+    "mapLink": "https://maps.app.goo.gl/placeholder",
+    "website": "https://www.discoverasr.com"
+  },
+  {
+    "slug": "grand-center-point-space-pattaya",
+    "name": "Grande Centre Point Space Pattaya",
+    "city": "Pattaya",
+    "type": "apartment",
+    "stars": 5,
+    "totalRooms": 490,
+    "averagePrice": "฿6,500",
+    "transport": "North Pattaya",
+    "nearbyAmenities": [
+      "Terminal 21 Pattaya",
+      "Wong Amat Beach",
+      "Space Water Park"
+    ],
+    "image": "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1200&q=80",
+    "mapLink": "https://maps.app.goo.gl/placeholder",
+    "website": "https://grandecentrepointspacepattaya.com"
+  },
+  {
+    "slug": "centre-point-pattaya",
+    "name": "Centre Point Hotel Pattaya",
+    "city": "Pattaya",
+    "type": "apartment",
+    "stars": 4,
+    "totalRooms": 555,
+    "averagePrice": "฿3,000",
+    "transport": "North Pattaya Road",
+    "nearbyAmenities": [
+      "Terminal 21 Pattaya",
+      "Mini Siam",
+      "Art in Paradise"
+    ],
+    "image": "https://images.unsplash.com/photo-1493809842364-78817add7ff6?w=1200&q=80",
+    "mapLink": "https://maps.app.goo.gl/placeholder",
+    "website": "https://www.centrepoint.com"
+  },
+  {
+    "slug": "ashton-asoke",
+    "name": "Ashton Asoke",
+    "city": "Bangkok",
+    "type": "condo",
+    "stars": 5,
+    "totalRooms": 783,
+    "averagePrice": "N/A (Residential)",
+    "transport": "20m to Asok BTS / Sukhumvit MRT",
+    "nearbyAmenities": [
+      "Terminal 21",
+      "Benjakitti Park",
+      "Interchange 21"
+    ],
+    "image": "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=1200&q=80",
+    "mapLink": "https://maps.app.goo.gl/placeholder",
+    "website": "https://www.ananda.co.th"
+  },
+  {
+    "slug": "the-river-bangkok",
+    "name": "The River Condominium",
+    "city": "Bangkok",
+    "type": "condo",
+    "stars": 5,
+    "totalRooms": 826,
+    "averagePrice": "N/A (Residential)",
+    "transport": "Private boat to Saphan Taksin BTS",
+    "nearbyAmenities": [
+      "Iconsiam",
+      "Chao Phraya River",
+      "Sena Fest"
+    ],
+    "image": "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1200&q=80",
+    "mapLink": "https://maps.app.goo.gl/placeholder",
+    "website": "https://www.raimonland.com"
+  },
+  {
+    "slug": "the-line-jatujak",
+    "name": "The Line Jatujak-Mochit",
+    "city": "Bangkok",
+    "type": "condo",
+    "stars": 5,
+    "totalRooms": 841,
+    "averagePrice": "N/A (Residential)",
+    "transport": "300m to Mo Chit BTS / Chatuchak MRT",
+    "nearbyAmenities": [
+      "Chatuchak Weekend Market",
+      "Wachirabenchathat Park",
+      "Central Ladprao"
+    ],
+    "image": "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=1200&q=80",
+    "mapLink": "https://maps.app.goo.gl/placeholder",
+    "website": "https://www.sansiri.com"
+  },
+  {
+    "slug": "rhythm-sukhumvit-42",
+    "name": "Rhythm Sukhumvit 42",
+    "city": "Bangkok",
+    "type": "condo",
+    "stars": 4,
+    "totalRooms": 407,
+    "averagePrice": "N/A (Residential)",
+    "transport": "Direct access to Ekkamai BTS",
+    "nearbyAmenities": [
+      "Gateway Ekamai",
+      "Major Cineplex Sukhumvit",
+      "Sukhumvit Hospital"
+    ],
+    "image": "https://images.unsplash.com/photo-1493809842364-78817add7ff6?w=1200&q=80",
+    "mapLink": "https://maps.app.goo.gl/placeholder",
+    "website": "https://www.apthai.com"
+  },
+  {
+    "slug": "ideo-q-chula",
+    "name": "Ideo Q Chula-Samyan",
+    "city": "Bangkok",
+    "type": "condo",
+    "stars": 4,
+    "totalRooms": 1598,
+    "averagePrice": "N/A (Residential)",
+    "transport": "270m to Samyan MRT",
+    "nearbyAmenities": [
+      "Chulalongkorn University",
+      "Samyan Mitrtown",
+      "Lumphini Park"
+    ],
+    "image": "https://images.unsplash.com/photo-1502672260266-1c1de2d9d00c?w=1200&q=80",
+    "mapLink": "https://maps.app.goo.gl/placeholder",
+    "website": "https://www.ananda.co.th"
+  },
+  {
+    "slug": "the-base-central-pattaya",
+    "name": "The Base Central Pattaya",
+    "city": "Pattaya",
+    "type": "condo",
+    "stars": 4,
+    "totalRooms": 1112,
+    "averagePrice": "N/A (Residential)",
+    "transport": "Central Pattaya",
+    "nearbyAmenities": [
+      "CentralFestival Pattaya Beach",
+      "Pattaya Beach",
+      "Walking Street"
+    ],
+    "image": "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=1200&q=80",
+    "mapLink": "https://maps.app.goo.gl/placeholder",
+    "website": "https://www.sansiri.com"
+  },
+  {
+    "slug": "edge-central-pattaya",
+    "name": "Edge Central Pattaya",
+    "city": "Pattaya",
+    "type": "condo",
+    "stars": 5,
+    "totalRooms": 603,
+    "averagePrice": "N/A (Residential)",
+    "transport": "Central Pattaya",
+    "nearbyAmenities": [
+      "CentralFestival Pattaya Beach",
+      "Pattaya Night Bazaar",
+      "Pattaya Beach"
+    ],
+    "image": "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1200&q=80",
+    "mapLink": "https://maps.app.goo.gl/placeholder",
+    "website": "https://www.sansiri.com"
+  },
+  {
+    "slug": "riviera-wongamat",
+    "name": "The Riviera Wongamat Beach",
+    "city": "Pattaya",
+    "type": "condo",
+    "stars": 5,
+    "totalRooms": 979,
+    "averagePrice": "N/A (Residential)",
+    "transport": "Wong Amat Beach",
+    "nearbyAmenities": [
+      "Sanctuary of Truth",
+      "Wong Amat Beach",
+      "Terminal 21 Pattaya"
+    ],
+    "image": "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=1200&q=80",
+    "mapLink": "https://maps.app.goo.gl/placeholder",
+    "website": "https://www.therivierapattaya.com"
+  },
+  {
+    "slug": "unixx-south-pattaya",
+    "name": "Unixx South Pattaya",
+    "city": "Pattaya",
+    "type": "condo",
+    "stars": 4,
+    "totalRooms": 1207,
+    "averagePrice": "N/A (Residential)",
+    "transport": "Pratumnak Hill",
+    "nearbyAmenities": [
+      "Pattaya Viewpoint",
+      "Walking Street",
+      "Bali Hai Pier"
+    ],
+    "image": "https://images.unsplash.com/photo-1493809842364-78817add7ff6?w=1200&q=80",
+    "mapLink": "https://maps.app.goo.gl/placeholder",
+    "website": "https://www.raimonland.com"
+  },
+  {
+    "slug": "copacabana-jomtien",
+    "name": "Copacabana Beach Jomtien",
+    "city": "Pattaya",
+    "type": "condo",
+    "stars": 5,
+    "totalRooms": 1644,
+    "averagePrice": "N/A (Residential)",
+    "transport": "Jomtien Beach Road",
+    "nearbyAmenities": [
+      "Jomtien Beach",
+      "Dongtan Beach",
+      "Pattaya Floating Market"
+    ],
+    "image": "https://images.unsplash.com/photo-1502672260266-1c1de2d9d00c?w=1200&q=80",
+    "mapLink": "https://maps.app.goo.gl/placeholder",
+    "website": "https://www.copacabanajomtien.com"
+  }
+]

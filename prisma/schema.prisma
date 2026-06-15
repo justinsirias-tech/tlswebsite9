@@ -1,0 +1,101 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Location {
+  id           String   @id @default(uuid())
+  slug         String   @unique
+  name         String
+  name_th      String?
+  city         String
+  city_th      String?
+  type         String
+  stars        Int
+  totalRooms   Int
+  averagePrice String
+  transport    String
+  transport_th String?
+  image        String?
+  mapLink      String?
+  address      String?
+  address_th   String?
+  website      String?
+  article      String?
+  article_th   String?
+  nearbyAmenities String[]
+  nearbyAmenities_th String[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Pricing {
+  id           String   @id @default(uuid())
+  category     String
+  name         String
+  name_th      String?
+  nonMember    Float
+  member       Float?
+  unit         String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Booking {
+  id           String   @id @default(uuid())
+  customerName String
+  email        String
+  phone        String
+  pickupDate   DateTime
+  service      String
+  status       String   @default("PENDING")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Article {
+  id        String   @id @default(uuid())
+  title      String
+  title_th   String?
+  content    String
+  content_th String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model KeywordQueue {
+  id        String   @id @default(uuid())
+  keyword   String   @unique
+  status    String   @default("PENDING")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ContactRequest {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  message   String
+  status    String   @default("PENDING")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AdminUser {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         String   @default("EDITOR")
+  permissions  String[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}

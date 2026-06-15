@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact & Booking | That Laundry Shop</title>
+    <meta name="description" content="Contact That Laundry Shop in Bangkok to book a service or ask a question. We offer fast turnaround times for all your laundry needs.">
+    <link rel="canonical" href="https://www.thatlaundryshop.com/contact.html" />
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .page-header {
+            padding-top: 150px;
+            padding-bottom: 60px;
+            background: var(--primary);
+            color: white;
+            text-align: center;
+        }
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 4rem;
+        }
+        .contact-info-card {
+            background: var(--surface);
+            padding: 2rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-md);
+            margin-bottom: 2rem;
+        }
+        .contact-info-item {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            align-items: flex-start;
+        }
+        .contact-info-item i {
+            color: var(--secondary);
+            font-size: 1.5rem;
+            margin-top: 4px;
+        }
+        @media (max-width: 768px) {
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container navbar">
+            <a href="index.html" class="logo">
+                <i class="fa-solid fa-shirt"></i>
+                That Laundry <span>Shop</span>
+            </a>
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="services.html">Services</a>
+                <a href="#">Prices</a>
+                <a href="contact.html" class="active">Booking</a>
+                <a href="contact.html" class="active">Contact</a>
+            </nav>
+            <button class="mobile-menu-btn" aria-label="Toggle Navigation">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <main>
+        <div class="page-header">
+            <div class="container">
+                <h1 style="font-size: 3rem; margin-bottom: 1rem;">Contact Us</h1>
+                <p style="font-size: 1.2rem; opacity: 0.9;">Book a service, ask a question, or find our location.</p>
+            </div>
+        </div>
+
+        <section class="py-5" aria-label="Contact Information and Form">
+            <div class="container">
+                <div class="contact-grid">
+                    
+                    <!-- Info Sidebar -->
+                    <div>
+                        <div class="contact-info-card">
+                            <h3 style="color: var(--primary); margin-bottom: 1.5rem;">Get in Touch</h3>
+                            
+                            <div class="contact-info-item">
+                                <i class="fa-solid fa-location-dot"></i>
+                                <div>
+                                    <h4 style="margin-bottom: 0.25rem;">Address</h4>
+                                    <p style="color: var(--text-light);">12/500, 15 Sukhumvit Residences, G/F, Sukhumvit 15, North Klongtoey Wattana, Bangkok 10110.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="contact-info-item">
+                                <i class="fa-solid fa-phone"></i>
+                                <div>
+                                    <h4 style="margin-bottom: 0.25rem;">Phone</h4>
+                                    <a href="tel:+66946916668" style="color: var(--text-light);">+66 94 691 6668</a>
+                                </div>
+                            </div>
+                            
+                            <div class="contact-info-item">
+                                <i class="fa-solid fa-envelope"></i>
+                                <div>
+                                    <h4 style="margin-bottom: 0.25rem;">Email</h4>
+                                    <a href="mailto:info@thatlaundryshop.com" style="color: var(--text-light);">info@thatlaundryshop.com</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contact Form -->
+                    <div>
+                        <div class="contact-form">
+                            <h2 style="color: var(--primary); margin-bottom: 2rem;">Send us a message</h2>
+                            <form action="#" method="POST" id="contactForm">
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                                    <div class="form-group">
+                                        <label for="name">Name *</label>
+                                        <input type="text" id="name" class="form-control" required placeholder="John Doe">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="phone">Phone no. *</label>
+                                        <input type="tel" id="phone" class="form-control" required placeholder="+66 ...">
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="email">Email address *</label>
+                                    <input type="email" id="email" class="form-control" required placeholder="john@example.com">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="service">Service Type</label>
+                                    <select id="service" class="form-control">
+                                        <option value="wash">Wash & Fold</option>
+                                        <option value="dryclean">Dry Cleaning</option>
+                                        <option value="ironing">Ironing Only</option>
+                                        <option value="hotel">Hotels Laundry</option>
+                                        <option value="other">Other Inquiry</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="message">Message *</label>
+                                    <textarea id="message" class="form-control" required placeholder="How can we help you?"></textarea>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary" style="width: 100%;">Send Message</button>
+                            </form>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; 2026 That Laundry Shop. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

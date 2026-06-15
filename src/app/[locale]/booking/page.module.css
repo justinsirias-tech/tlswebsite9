@@ -1,0 +1,359 @@
+.bookingSection {
+  padding: 6rem 0;
+  background: linear-gradient(135deg, var(--background) 0%, rgba(240, 244, 255, 0.5) 100%);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+}
+
+.bookingContainer {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 4rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  align-items: flex-start;
+}
+
+/* Left side Info panel */
+.infoPanel {
+  position: sticky;
+  top: 100px;
+}
+
+.infoTitle {
+  font-size: 3rem;
+  color: var(--primary);
+  margin-bottom: 1.5rem;
+  line-height: 1.1;
+  font-family: 'Outfit', sans-serif;
+}
+
+.infoSubtitle {
+  font-size: 1.2rem;
+  color: var(--text-light);
+  margin-bottom: 2.5rem;
+  line-height: 1.6;
+}
+
+.contactCards {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.contactCard {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.2rem;
+  padding: 1.5rem;
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid rgba(0,0,0,0.02);
+}
+
+.contactCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+.cardIcon {
+  width: 50px;
+  height: 50px;
+  background: rgba(var(--accent-rgb, 58, 123, 213), 0.1);
+  color: var(--accent);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.cardText h4 {
+  font-size: 1.1rem;
+  color: var(--primary);
+  margin-bottom: 0.3rem;
+}
+
+.cardText p {
+  color: var(--text-light);
+  margin: 0;
+}
+
+
+/* Right side Form Panel */
+.formWrapper {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.8);
+  border-radius: 20px;
+  padding: 3rem;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.fullWidth {
+  grid-column: 1 / -1;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.inputGroup label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.inputGroup input,
+.inputGroup select,
+.inputGroup textarea {
+  width: 100%;
+  padding: 1rem 1.2rem;
+  border: 2px solid rgba(0,0,0,0.08);
+  border-radius: var(--radius);
+  background: white;
+  font-family: inherit;
+  font-size: 1rem;
+  color: var(--text);
+  transition: all 0.3s ease;
+}
+
+.inputGroup input:focus,
+.inputGroup select:focus,
+.inputGroup textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(58, 123, 213, 0.1);
+}
+
+.inputGroup textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+
+/* Checkbox grid */
+.checkboxGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.checkboxItem {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  border: 2px solid rgba(0,0,0,0.08);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.checkboxItem:hover {
+  border-color: rgba(58, 123, 213, 0.5);
+}
+
+.checkboxItem input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.checkboxItem .checkmark {
+  width: 24px;
+  height: 24px;
+  border: 2px solid rgba(0,0,0,0.2);
+  border-radius: 6px;
+  margin-right: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.checkboxItem input:checked ~ .checkmark {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.checkboxItem input:checked ~ .checkmark::after {
+  content: '\f00c';
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 900;
+  color: white;
+  font-size: 12px;
+}
+
+.checkboxItem input:checked ~ .labelName {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+
+/* Submit Button */
+.submitBtn {
+  margin-top: 2rem;
+  width: 100%;
+  padding: 1.2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, var(--accent) 0%, #2980b9 100%);
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 20px rgba(58, 123, 213, 0.3);
+}
+
+.submitBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 30px rgba(58, 123, 213, 0.4);
+}
+
+.submitBtn:active {
+  transform: translateY(1px);
+}
+
+/* Success Message */
+.successMessage {
+  text-align: center;
+  padding: 4rem 2rem;
+}
+
+.successIcon {
+  width: 80px;
+  height: 80px;
+  background: #00d084;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  margin: 0 auto 2rem auto;
+  box-shadow: 0 10px 30px rgba(0, 208, 132, 0.3);
+  animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes popIn {
+  0% { transform: scale(0); }
+  100% { transform: scale(1); }
+}
+
+
+@media (max-width: 992px) {
+  .bookingContainer {
+    grid-template-columns: 1fr;
+  }
+  .infoPanel {
+    position: relative;
+    top: 0;
+    text-align: center;
+  }
+  .contactCard {
+    text-align: left;
+  }
+}
+
+.disclaimerGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  font-size: 0.9rem;
+  color: var(--text-light);
+}
+
+@media (max-width: 768px) {
+  .disclaimerGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Custom Select Dropdown */
+.customSelect {
+  position: relative;
+  width: 120px;
+  flex-shrink: 0;
+}
+
+.selectTrigger {
+  padding: 0.8rem 0.5rem;
+  background: white;
+  border: 2px solid rgba(0,0,0,0.08);
+  border-radius: var(--radius);
+  color: var(--text);
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  user-select: none;
+  font-size: 0.95rem;
+}
+
+.selectMenu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 250px;
+  background: white;
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  z-index: 100;
+  margin-top: 5px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.searchInput {
+  padding: 0.8rem;
+  border: none;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+  outline: none;
+  font-family: inherit;
+  font-size: 0.95rem;
+}
+
+.optionsList {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.optionItem {
+  padding: 0.6rem 0.8rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  font-size: 0.9rem;
+}
+
+.optionItem:hover {
+  background: rgba(0,0,0,0.05);
+}
+
+@media (max-width: 600px) {
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+  .formWrapper {
+    padding: 2rem 1.5rem;
+  }
+}

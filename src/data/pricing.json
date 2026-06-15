@@ -1,0 +1,45 @@
+{
+  "weight": [
+    { "name": "Wash / Fold", "nonMember": 110, "member": 90, "unit": "THB / KG" },
+    { "name": "Wash / Iron & Fold", "nonMember": 140, "member": 115, "unit": "THB / KG" },
+    { "name": "Wash / Iron & Hang", "nonMember": 160, "member": 135, "unit": "THB / KG" }
+  ],
+  "garments": [
+    { "name": "Shirt", "nonMember": 77, "member": 46 },
+    { "name": "Polo-Tee", "nonMember": 77, "member": 46 },
+    { "name": "Dress", "nonMember": 120, "member": 100 },
+    { "name": "Trousers", "nonMember": 77, "member": 46 },
+    { "name": "Jeans", "nonMember": 118, "member": 95 },
+    { "name": "Blouse", "nonMember": 77, "member": 46 },
+    { "name": "Short", "nonMember": 63, "member": 36 },
+    { "name": "Skirt", "nonMember": 77, "member": 46 },
+    { "name": "Jacket", "nonMember": 154, "member": 127 },
+    { "name": "Under Garments", "nonMember": 16, "member": 13 },
+    { "name": "Socks", "nonMember": 16, "member": 13 }
+  ],
+  "linen": [
+    { "name": "Duvet (3.5FT Single)", "nonMember": 185 },
+    { "name": "Duvet (5.0FT Queen)", "nonMember": 285 },
+    { "name": "Duvet (6.0FT King)", "nonMember": 400 },
+    { "name": "Duvet Cover (3.5FT Single)", "nonMember": 120 },
+    { "name": "Duvet Cover (5.0FT Queen)", "nonMember": 180 },
+    { "name": "Duvet Cover (6.0FT King)", "nonMember": 290 },
+    { "name": "Bed Sheets (3.5FT Single)", "nonMember": 135 },
+    { "name": "Bed Sheets (5.0FT Queen)", "nonMember": 159 },
+    { "name": "Bed Sheets (6.0FT King)", "nonMember": 195 },
+    { "name": "Comforter/Protector (3.5FT Single)", "nonMember": 135 },
+    { "name": "Comforter/Protector (5.0FT Queen)", "nonMember": 246 },
+    { "name": "Comforter/Protector (6.0FT King)", "nonMember": 354 },
+    { "name": "Pillow Case", "nonMember": 62 },
+    { "name": "Bolster Case", "nonMember": 62 },
+    { "name": "Pillow", "nonMember": 183 },
+    { "name": "Bolster", "nonMember": 183 },
+    { "name": "Topper (3.5FT Single)", "nonMember": 620 }
+  ],
+  "ironing": [
+    { "name": "Ironing Only (All Items)", "nonMember": 40, "member": 35, "unit": "THB / piece" }
+  ],
+  "dryclean": [
+    { "name": "Dry Cleaning (Suit 2-piece)", "nonMember": 450, "member": 390, "unit": "THB / suit" }
+  ]
+}
