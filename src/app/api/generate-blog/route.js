@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { GoogleGenAI } from "@google/genai";
+import { getUniqueLaundryImages } from "@/lib/imagePicker";
 
 const isAuthenticated = async () => {
   const cookieStore = await cookies();
@@ -20,6 +21,7 @@ export async function POST(request) {
       return NextResponse.json({ error: "Missing topic" }, { status: 400 });
     }
 
+    const images = await getUniqueLaundryImages(3);
     const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
     const prompt = `You are an expert SEO content writer for a luxury laundry service in Thailand called "That Laundry Shop".
     I want you to write a massive, highly-detailed, SEO-optimized article based on the following topic: "${topic}".
@@ -27,7 +29,11 @@ export async function POST(request) {
     CRITICAL INSTRUCTIONS:
     1. The article MUST be at least 2,000 words long. This is a strict requirement. Expand deeply on fabric science, environmental impact, convenience, luxury lifestyle, the climate in Thailand, and the importance of professional care.
     2. Format the output ENTIRELY in valid HTML (using <h2>, <h3>, <p>, <ul>, <li>, <strong>). Do not include <html>, <head>, or <body> tags. Just the raw HTML content.
-    3. **Images**: You MUST embed exactly 3 images throughout the article. Use this exact format: <img src="https://loremflickr.com/800/400/laundry,garment,clothing?random=1" alt="Laundry and garment care" style="width:100%; border-radius:12px; margin: 2rem 0;" />. (Increment the random=1, 2, 3 for each image). This ensures the images are strictly laundry related.
+    3. **Images**: You MUST embed exactly 3 images throughout the article. Use these EXACT 3 image URLs in order:
+       - Image 1: <img src="${images[0]}" alt="Laundry and garment care" style="width:100%; border-radius:12px; margin: 2rem 0;" />
+       - Image 2: <img src="${images[1]}" alt="Luxury clothing care" style="width:100%; border-radius:12px; margin: 2rem 0;" />
+       - Image 3: <img src="${images[2]}" alt="Premium laundry service" style="width:100%; border-radius:12px; margin: 2rem 0;" />
+       Ensure all 3 are embedded inside the article where contextually appropriate. Do not repeat any image URL.
     4. **Internal Sitelinks**: You MUST strategically embed at least 3 internal links inside paragraph text using <a> tags pointing to: "/services", "/pricing", and "/about". Example: <a href="/services">our premium dry cleaning services</a>.
     5. **External Backlinks**: You MUST include at least 2 external links to authoritative sources inside paragraph text (e.g., <a href="https://en.wikipedia.org/wiki/Dry_cleaning">the history of dry cleaning</a>).
     6. **Keywords**: You must naturally include these exact keywords multiple times: "that laundry shop", "premium dry cleaning", "luxury garment care".
