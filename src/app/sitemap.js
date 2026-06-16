@@ -3,9 +3,15 @@ import prisma from '../lib/prisma';
 export default async function sitemap() {
   const baseUrl = 'https://www.thatlaundryshop.com';
 
-  // Fetch dynamic content
-  const articles = await prisma.article.findMany();
-  const locations = await prisma.location.findMany();
+  // Fetch dynamic content with try/catch to prevent build-time DB timeouts on Vercel
+  let articles = [];
+  let locations = [];
+  try {
+    articles = await prisma.article.findMany();
+    locations = await prisma.location.findMany();
+  } catch (err) {
+    console.error("Warning: Database was unreachable during sitemap generation at build time. Falling back to static pages.", err.message);
+  }
 
   const articleUrls = articles.map((article) => ({
     url: `${baseUrl}/articles/${article.id}`,
