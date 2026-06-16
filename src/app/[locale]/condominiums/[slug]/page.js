@@ -7,18 +7,23 @@ import { getTranslations } from "next-intl/server";
 
 // Generate static params so Next.js can pre-render these pages
 export async function generateStaticParams() {
-  const condos = await prisma.location.findMany({ where: { type: "condo" } });
-  const locales = ['en', 'th', 'cn'];
-  const params = [];
-  for (const locale of locales) {
-    for (const condo of condos) {
-      params.push({
-        locale,
-        slug: condo.slug
-      });
+  try {
+    const condos = await prisma.location.findMany({ where: { type: "condo" } });
+    const locales = ['en', 'th', 'cn'];
+    const params = [];
+    for (const locale of locales) {
+      for (const condo of condos) {
+        params.push({
+          locale,
+          slug: condo.slug
+        });
+      }
     }
+    return params;
+  } catch (error) {
+    console.error("Failed to generate static params at build time:", error);
+    return [];
   }
-  return params;
 }
 
 // Dynamic metadata for SEO
