@@ -1,6 +1,8 @@
 import SEOArticles from "../../../components/SEOArticles";
 import prisma from "../../../lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "News & Garment Care Articles | That Laundry Shop",
   description: "Read our latest news, updates, and comprehensive articles on premium garment care and dry cleaning services.",

@@ -30,10 +30,15 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }) {
   const resolvedParams = await params;
   const locale = resolvedParams.locale;
-  const condo = await prisma.location.findUnique({ where: { slug: resolvedParams.slug } });
+  let condo = null;
+  try {
+    condo = await prisma.location.findUnique({ where: { slug: resolvedParams.slug } });
+  } catch (error) {
+    console.error("Failed to fetch condominium metadata at build time:", error);
+  }
   
   if (!condo) {
-    return { title: "Condominium Not Found | That Laundry Shop" };
+    return { title: "Condominium | That Laundry Shop" };
   }
 
   const name = locale === "th" && condo.name_th ? condo.name_th : condo.name;

@@ -26,14 +26,18 @@ export async function generateStaticParams() {
   }
 }
 
-// Dynamic metadata for SEO
 export async function generateMetadata({ params }) {
   const resolvedParams = await params;
   const locale = resolvedParams.locale;
-  const hotel = await prisma.location.findUnique({ where: { slug: resolvedParams.slug } });
+  let hotel = null;
+  try {
+    hotel = await prisma.location.findUnique({ where: { slug: resolvedParams.slug } });
+  } catch (error) {
+    console.error("Failed to fetch hotel metadata at build time:", error);
+  }
   
   if (!hotel) {
-    return { title: "Hotel Not Found | That Laundry Shop" };
+    return { title: "Hotel | That Laundry Shop" };
   }
 
   const name = locale === "th" && hotel.name_th ? hotel.name_th : hotel.name;

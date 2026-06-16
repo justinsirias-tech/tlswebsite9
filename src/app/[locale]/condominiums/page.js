@@ -4,6 +4,8 @@ import Link from "next/link";
 import prisma from "../../../lib/prisma";
 import DirectorySearch from "../../../components/DirectorySearch";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "Serviced Condominiums | That Laundry Shop",
   description: "View the list of premium residential condominiums in Bangkok and Pattaya that partner with That Laundry Shop for professional garment care.",

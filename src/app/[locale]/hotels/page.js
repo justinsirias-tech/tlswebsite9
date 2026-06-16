@@ -4,6 +4,8 @@ import Link from "next/link";
 import prisma from "../../../lib/prisma";
 import DirectorySearch from "../../../components/DirectorySearch";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "Hotels & Serviced Apartments | That Laundry Shop",
   description: "View our comprehensive directory of premium hotels, serviced apartments, and condominiums in Bangkok and Pattaya that partner with That Laundry Shop.",
