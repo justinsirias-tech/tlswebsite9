@@ -6,7 +6,8 @@ const connectionString = `${process.env.DATABASE_URL}`;
 
 const pool = new Pool({ 
   connectionString,
-  ssl: { rejectUnauthorized: false }
+  ssl: { rejectUnauthorized: false },
+  max: 2 // Limit connection pool size per worker
 });
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });

@@ -8,9 +8,17 @@ import { getTranslations } from "next-intl/server";
 // Generate static params so Next.js can pre-render these pages
 export async function generateStaticParams() {
   const condos = await prisma.location.findMany({ where: { type: "condo" } });
-  return condos.map((condo) => ({
-    slug: condo.slug,
-  }));
+  const locales = ['en', 'th', 'cn'];
+  const params = [];
+  for (const locale of locales) {
+    for (const condo of condos) {
+      params.push({
+        locale,
+        slug: condo.slug
+      });
+    }
+  }
+  return params;
 }
 
 // Dynamic metadata for SEO

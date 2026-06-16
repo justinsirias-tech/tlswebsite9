@@ -66,7 +66,7 @@ export async function POST(request) {
     IMPORTANT: Output ONLY valid JSON. No markdown formatting outside the JSON, no backticks enclosing the JSON response, no comments. Ensure the "article" value is a single valid JSON string containing the HTML.`;
 
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-pro",
+      model: "gemini-2.5-flash",
       contents: prompt,
       config: {
         responseMimeType: "application/json",

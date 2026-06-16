@@ -7,10 +7,18 @@ import prisma from "../../../../lib/prisma";
 
 // Generate static params so Next.js can pre-render these pages
 export async function generateStaticParams() {
-  const hotels = await prisma.location.findMany();
-  return hotels.map((hotel) => ({
-    slug: hotel.slug,
-  }));
+  const hotels = await prisma.location.findMany({ where: { type: "hotel" } });
+  const locales = ['en', 'th', 'cn'];
+  const params = [];
+  for (const locale of locales) {
+    for (const hotel of hotels) {
+      params.push({
+        locale,
+        slug: hotel.slug
+      });
+    }
+  }
+  return params;
 }
 
 // Dynamic metadata for SEO

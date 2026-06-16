@@ -44,7 +44,7 @@ export async function GET(request) {
     IMPORTANT: Output ONLY valid JSON. No markdown formatting outside the JSON, no backticks enclosing the JSON response.`;
 
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-pro",
+      model: "gemini-2.5-flash",
       contents: prompt,
       config: { responseMimeType: "application/json" }
     });

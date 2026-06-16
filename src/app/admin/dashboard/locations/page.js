@@ -193,7 +193,7 @@ export default function LocationsAdminPage() {
           article_th: data.article_th || prev.article_th
         }));
       } else {
-        alert("Failed to translate content: " + (data.error || "Unknown error"));
+        alert("Failed to translate content: " + (data.details || data.error || "Unknown error"));
       }
     } catch (err) {
       console.error(err);
@@ -575,7 +575,7 @@ export default function LocationsAdminPage() {
               </div>
 
               <div className={styles.modalActions}>
-                <button type="button" className="btn btn-outline" onClick={closeModal} style={{ color: "white", borderColor: "rgba(255,255,255,0.2)" }}>Cancel</button>
+                <button type="button" className="btn btn-outline" onClick={closeModal}>Cancel</button>
                 <button type="submit" className="btn btn-primary">Save Location</button>
               </div>
             </form>

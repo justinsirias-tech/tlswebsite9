@@ -20,7 +20,7 @@ export default function UsersAdminPage() {
   const availablePermissions = [
     { id: "bookings", label: "Bookings" },
     { id: "contacts", label: "Contact Requests" },
-    { id: "locations", label: "Hotel Directory" },
+    { id: "locations", label: "Building Directory" },
     { id: "pricing", label: "Pricing Menu" },
     { id: "articles", label: "Articles" },
   ];

@@ -43,7 +43,7 @@ export default async function AdminLayout({ children }) {
           )}
           {hasPerm('locations') && (
             <Link href="/admin/dashboard/locations" className={styles.navLink}>
-              <i className="fa-solid fa-building"></i> Hotel Directory
+              <i className="fa-solid fa-building"></i> Building Directory
             </Link>
           )}
           {hasPerm('pricing') && (
