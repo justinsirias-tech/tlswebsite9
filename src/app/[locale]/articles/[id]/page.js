@@ -1,8 +1,6 @@
 import prisma from "../../../../lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import Header from "../../../../components/Header";
-import Footer from "../../../../components/Footer";
 
 export const dynamic = "force-dynamic";
 
@@ -30,7 +28,6 @@ export default async function ArticleDetails({ params }) {
 
   return (
     <>
-      <Header />
       <div style={{ background: "var(--background)", paddingTop: "8rem", paddingBottom: "2rem" }}>
         <div className="container" style={{ maxWidth: "800px" }}>
           <Link href="/articles" style={{ color: "var(--accent)", textDecoration: "none", fontWeight: "600", display: "inline-block", marginBottom: "1.5rem" }}>
@@ -49,7 +46,6 @@ export default async function ArticleDetails({ params }) {
           />
         </div>
       </section>
-      <Footer />
     </>
   );
 }
