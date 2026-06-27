@@ -40,7 +40,7 @@ async function sendAdminNotification(request) {
     const emailHtml = `
       <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #edf2f7; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
         <div style="background-color: #ffffff; padding: 25px; text-align: center; border-bottom: 1px solid #edf2f7;">
-          <img src="https://tlswebsite9.vercel.app/images/logo.webp" alt="That Laundry Shop" style="height: 60px; width: auto; display: inline-block; margin-bottom: 5px;" />
+          <img src="https://www.thatlaundryshop.com/images/logo.webp" alt="That Laundry Shop" style="height: 60px; width: auto; display: inline-block; margin-bottom: 5px;" />
           <h2 style="margin: 5px 0 0 0; font-size: 18px; font-weight: 700; color: #222945; letter-spacing: 0.05em; text-transform: uppercase;">
             New Membership Application
           </h2>

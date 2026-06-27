@@ -41,7 +41,7 @@ export default function Header() {
         alignItems: "center"
       }}>
         <Link href="/" className="logo">
-          <Image src="/images/logo.webp" alt="That Laundry Shop" width={96} height={70} style={{ height: scrolled ? '55px' : '70px', width: 'auto', objectFit: 'contain', transition: 'height 0.3s ease' }} priority unoptimized />
+          <Image src="/images/logo.webp" alt="That Laundry Shop" width={180} height={70} style={{ height: scrolled ? '55px' : '70px', width: 'auto', transition: 'height 0.3s ease' }} priority unoptimized />
         </Link>
         
         <nav className={`nav-links ${isMenuOpen ? "active glass" : ""}`}>
