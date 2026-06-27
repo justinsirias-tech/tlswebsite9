@@ -421,10 +421,12 @@ export async function POST(req) {
       }
     });
 
-    // Send the confirmation email in the background so it doesn't block the response
-    sendConfirmationEmail(booking).catch(err => {
-      console.error("Failed to send background email:", err);
-    });
+    // Send confirmation email (awaited to ensure delivery in serverless environment)
+    try {
+      await sendConfirmationEmail(booking);
+    } catch (err) {
+      console.error("Failed to send booking email:", err);
+    }
 
     return NextResponse.json({ 
       success: true, 

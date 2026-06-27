@@ -145,10 +145,12 @@ export async function POST(req) {
       }
     });
 
-    // Send email notification in background
-    sendAdminNotification(membershipRequest).catch(err => {
-      console.error("Failed to send background membership email:", err);
-    });
+    // Send email notification (awaited to ensure delivery in serverless environment)
+    try {
+      await sendAdminNotification(membershipRequest);
+    } catch (err) {
+      console.error("Failed to send membership email:", err);
+    }
 
     return NextResponse.json({
       success: true,
