@@ -13,7 +13,7 @@ export default function Footer() {
         
         <div>
           <h3 style={{ marginBottom: "1rem" }}>
-            <Image src="/images/logo.webp" alt="That Laundry Shop" width={280} height={120} unoptimized style={{ height: '120px', width: 'auto', filter: 'brightness(0) invert(1)' }} />
+            <Image src="/images/logo_light.webp" alt="That Laundry Shop" width={280} height={120} unoptimized style={{ height: '120px', width: 'auto' }} />
           </h3>
           <p style={{ color: "var(--text-muted)", marginBottom: "1.5rem" }}>
             {t("aboutText")}
