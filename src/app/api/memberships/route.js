@@ -39,12 +39,11 @@ async function sendAdminNotification(request) {
 
     const emailHtml = `
       <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #edf2f7; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
-        <div style="background-color: #ffffff; padding: 25px; text-align: center; border-bottom: 1px solid #edf2f7;">
-          <img src="https://www.thatlaundryshop.com/images/logo.webp" alt="That Laundry Shop" style="height: 60px; width: auto; display: inline-block; margin-bottom: 5px;" />
-          <h2 style="margin: 5px 0 0 0; font-size: 18px; font-weight: 700; color: #222945; letter-spacing: 0.05em; text-transform: uppercase;">
+        <div style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); padding: 25px; text-align: center; color: white;">
+          <h2 style="margin: 0; font-size: 20px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;">
             New Membership Application
           </h2>
-          <p style="margin: 3px 0 0 0; font-size: 12px; color: #64748b; font-weight: 500;">
+          <p style="margin: 5px 0 0 0; font-size: 13px; opacity: 0.8;">
             That Laundry Shop Premium Club
           </p>
         </div>
@@ -145,12 +144,10 @@ export async function POST(req) {
       }
     });
 
-    // Send email notification (awaited to ensure delivery in serverless environment)
-    try {
-      await sendAdminNotification(membershipRequest);
-    } catch (err) {
-      console.error("Failed to send membership email:", err);
-    }
+    // Send email notification in background
+    sendAdminNotification(membershipRequest).catch(err => {
+      console.error("Failed to send background membership email:", err);
+    });
 
     return NextResponse.json({
       success: true,
