@@ -154,7 +154,15 @@ Notes: ${specialInst}`.trim();
 
       const [d, m, y] = pickupDate.split('/');
       const timeStart = (pickupTime || '12:00').split(' ')[0];
-      const formattedDate = new Date(`${y}-${m}-${d}T${timeStart}:00`);
+      const [hour, minute] = timeStart.split(':');
+      
+      const year = parseInt(y, 10);
+      const monthIndex = parseInt(m, 10) - 1;
+      const day = parseInt(d, 10);
+      const hrs = parseInt(hour || '12', 10);
+      const mins = parseInt(minute || '00', 10);
+      
+      const formattedDate = new Date(year, monthIndex, day, hrs, mins);
 
       const bookingData = {
         customerName: e.target.elements.customerName.value,
