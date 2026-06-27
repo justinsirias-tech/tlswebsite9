@@ -6,7 +6,12 @@ export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }) {
   const { id } = await params;
-  const article = await prisma.article.findUnique({ where: { id } });
+  let article = null;
+  try {
+    article = await prisma.article.findUnique({ where: { id } });
+  } catch (error) {
+    console.error("Failed to fetch article metadata:", error);
+  }
   if (!article) return { title: 'Article Not Found' };
   
   return {

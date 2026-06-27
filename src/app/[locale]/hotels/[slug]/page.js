@@ -62,7 +62,12 @@ export default async function HotelArticlePage({ params }) {
   const locale = resolvedParams.locale;
   const t = await getTranslations({ locale, namespace: "Directory" });
 
-  const hotel = await prisma.location.findUnique({ where: { slug: resolvedParams.slug } });
+  let hotel = null;
+  try {
+    hotel = await prisma.location.findUnique({ where: { slug: resolvedParams.slug } });
+  } catch (error) {
+    console.error("Failed to fetch hotel details at build time:", error);
+  }
 
   if (!hotel) {
     notFound();

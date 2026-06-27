@@ -63,7 +63,12 @@ export default async function CondoArticlePage({ params }) {
   const locale = resolvedParams.locale;
   const t = await getTranslations({ locale, namespace: "Directory" });
 
-  const condo = await prisma.location.findUnique({ where: { slug: resolvedParams.slug } });
+  let condo = null;
+  try {
+    condo = await prisma.location.findUnique({ where: { slug: resolvedParams.slug } });
+  } catch (error) {
+    console.error("Failed to fetch condo details at build time:", error);
+  }
 
   if (!condo || condo.type !== "condo") {
     notFound();
