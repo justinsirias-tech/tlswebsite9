@@ -80,3 +80,22 @@
   padding: 0.5rem;
   border-radius: 50%;
 }
+
+@media (max-width: 768px) {
+  .header {
+    padding: 6rem 0 3rem 0;
+  }
+  .serviceGrid {
+    gap: 2.5rem;
+    margin-top: -1.5rem;
+  }
+  .serviceImage {
+    min-height: 220px;
+  }
+  .serviceContent {
+    padding: 2.5rem 1.5rem;
+  }
+  .serviceTitle {
+    font-size: clamp(1.8rem, 5vw, 2.2rem);
+  }
+}

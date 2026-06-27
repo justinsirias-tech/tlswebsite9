@@ -19,8 +19,20 @@ const verifySuperAdmin = async () => {
   }
 };
 
+const verifyAdmin = async () => {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("adminToken")?.value;
+  if (!token) return null;
+  try {
+    const { payload } = await jwtVerify(token, JWT_SECRET);
+    return payload;
+  } catch (err) {
+    return null;
+  }
+};
+
 export async function GET() {
-  if (!(await verifySuperAdmin())) {
+  if (!(await verifyAdmin())) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

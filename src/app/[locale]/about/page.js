@@ -1,4 +1,5 @@
 import styles from "./page.module.css";
+import Image from "next/image";
 import Script from "next/script";
 import StoryContent from "../../../components/StoryContent";
 import StoryContentTh from "../../../components/StoryContentTh";
@@ -57,7 +58,16 @@ export default async function AboutPage({ params }) {
       />
 
       <div className={styles.header}>
-        <div className="container">
+        <Image
+          src="/assets/hero_bg_v2.webp"
+          alt="Premium laundry shop story backdrop"
+          fill
+          priority
+          unoptimized
+          style={{ objectFit: "cover", objectPosition: "center" }}
+        />
+        <div className={styles.headerOverlay}></div>
+        <div className="container" style={{ position: "relative", zIndex: 2 }}>
           <h1 style={{ fontSize: "4rem", marginBottom: "1rem", fontWeight: "800", color: "white" }}>
             {locale === "th" ? "เรื่องราวของเรา" : locale === "cn" ? "我们的故事" : "Our Story"}
           </h1>
@@ -114,7 +124,7 @@ export default async function AboutPage({ params }) {
             </div>
             
             <div className={styles.imageWrapper}>
-              <img src="/assets/about_artisans.png" alt="Master Tailor inspecting garment" />
+              <Image src="/assets/about_artisans.webp" alt="Master Tailor inspecting garment" width={600} height={400} unoptimized style={{ width: "100%", height: "auto", display: "block" }} />
             </div>
           </div>
         </div>

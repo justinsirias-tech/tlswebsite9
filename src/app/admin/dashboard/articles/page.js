@@ -102,7 +102,7 @@ export default function ManageArticles() {
       const res = await fetch("/api/cron/auto-generate?secret=TLS2026");
       const data = await res.json();
       if (data.success) {
-        alert("Cron job triggered successfully! Generated: " + data.articleTitle);
+        alert(data.message || "Cron job triggered successfully in the background!");
         fetchArticles();
         fetchQueue();
       } else {

@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from 'react';
+import Image from 'next/image';
 
 export default function StoryContentCn() {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -62,7 +63,7 @@ export default function StoryContentCn() {
 
       <h2 style={{ fontSize: "2rem", color: "var(--primary)", marginTop: "3rem", marginBottom: "1.5rem" }}>第四章：对可持续发展和环保实践的坚定承诺</h2>
       <div style={{ margin: "2.5rem 0", borderRadius: "16px", overflow: "hidden", boxShadow: "0 15px 35px rgba(0,0,0,0.1)" }}>
-        <img src="/assets/story_eco.png" alt="纯净环保溶剂" style={{ width: "100%", display: "block" }} />
+        <Image src="/assets/story_eco.webp" alt="纯净环保溶剂" width={800} height={500} style={{ width: "100%", height: "auto", display: "block" }} />
       </div>
       <p style={{ marginBottom: "1.5rem" }}>
         在当今世界，奢华与卓越品质必须与环境责任密不可分。That Laundry Shop 早在初期便认识到，传统的洗衣和干洗行业是环境负担最重的行业之一，以其过度的水消耗、高能耗以及有毒挥发性有机化合物 (VOCs) 的排放而闻名。我们做出了一项根本性、不妥协的决定：对完美清洁的追求绝不会以牺牲地球为代价。这种对可持续发展的承诺已融入我们运营模式的方方面面。我们已完全淘汰了全氯乙烯（Perc）的使用，这是一种有毒、致癌的溶剂，在普通干洗店中仍普遍使用，令人震惊。相反，我们利用高级、可生物降解且无毒的液态硅酮和碳氢化合物替代品。这些环保溶剂自然降解为沙子、水和微量二氧化碳，对土壤、地下水或臭氧层不构成任何威胁。
@@ -73,7 +74,7 @@ export default function StoryContentCn() {
 
       <h2 style={{ fontSize: "2rem", color: "var(--primary)", marginTop: "3rem", marginBottom: "1.5rem" }}>第五章：白手套体验：重新定义便捷与客户关怀</h2>
       <div style={{ margin: "2.5rem 0", borderRadius: "16px", overflow: "hidden", boxShadow: "0 15px 35px rgba(0,0,0,0.1)" }}>
-        <img src="/assets/story_delivery.png" alt="白手套礼宾送达服务" style={{ width: "100%", display: "block" }} />
+        <Image src="/assets/story_delivery.webp" alt="白手套礼宾送达服务" width={800} height={500} style={{ width: "100%", height: "auto", display: "block" }} />
       </div>
       <p style={{ marginBottom: "1.5rem" }}>
         我们深知，我们的客户群体包括泰国最繁忙、要求最高的专业人士和外籍人士。对他们而言，时间是极致的奢华。因此，我们将 That Laundry Shop 不仅设计为一个清洁设施，更是一个全面、白手套式的物流和礼宾服务。您的体验从通过我们流畅的数字平台预约取件的那一刻开始。我们的专业车队，配备定制配送车辆，由我们礼貌且穿着制服的物流专家驾驶，准时抵达您预定的时间。我们不只是收集您的衣物；我们的司机都经过培训，从第一次互动开始就以最崇高的敬意对待您的衣物，将它们小心翼翼地放入专用运输袋中，以防止在运输过程中产生任何褶皱或损坏。
@@ -84,7 +85,7 @@ export default function StoryContentCn() {
 
       <h2 style={{ fontSize: "2rem", color: "var(--primary)", marginTop: "3rem", marginBottom: "1.5rem" }}>第六章：酒店业的信赖伙伴</h2>
       <div style={{ margin: "2.5rem 0", borderRadius: "16px", overflow: "hidden", boxShadow: "0 15px 35px rgba(0,0,0,0.1)" }}>
-        <img src="/assets/story_hospitality.png" alt="豪华酒店毛巾" style={{ width: "100%", display: "block" }} />
+        <Image src="/assets/story_hospitality.webp" alt="豪华酒店毛巾" width={800} height={500} style={{ width: "100%", height: "auto", display: "block" }} />
       </div>
       <p style={{ marginBottom: "1.5rem" }}>
         尽管我们面向消费者的服务是 That Laundry Shop 的公众形象，但我们的专业知识和可靠性使我们成为泰国一些最负盛名的豪华酒店、精品度假村和高端服务式公寓值得信赖的幕后合作伙伴。酒店业以绝对完美的标准运营；一条有污渍的毛巾或一件熨烫不佳的制服都可能无可挽回地损害五星级声誉。这些精英机构将他们的客用洗衣、员工制服和精致布草委托给我们，因为他们深知我们以军事般的精确和匠心独运的护理标准运作。

@@ -11,7 +11,7 @@ export default function ManageServices() {
   // Form state
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [iconPath, setIconPath] = useState("/assets/wash_and_fold.png");
+  const [iconPath, setIconPath] = useState("/assets/wash_and_fold.webp");
   const [feature, setFeature] = useState("");
   const [features, setFeatures] = useState([]);
 
@@ -56,7 +56,7 @@ export default function ManageServices() {
       // Reset form
       setTitle("");
       setDescription("");
-      setIconPath("/assets/wash_and_fold.png");
+      setIconPath("/assets/wash_and_fold.webp");
       setFeatures([]);
       fetchServices();
     } catch (err) {
@@ -100,8 +100,8 @@ export default function ManageServices() {
             <div style={{ marginBottom: "1rem" }}>
               <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: 500 }}>Image Path</label>
               <select value={iconPath} onChange={e => setIconPath(e.target.value)} style={{ width: "100%", padding: "0.75rem", border: "1px solid #ccc", borderRadius: "8px" }}>
-                <option value="/assets/wash_and_fold.png">Wash & Fold</option>
-                <option value="/assets/dry_clean.png">Dry Clean</option>
+                <option value="/assets/wash_and_fold.webp">Wash & Fold</option>
+                <option value="/assets/dry_clean.webp">Dry Clean</option>
                 <option value="none">None (Ironing Icon)</option>
               </select>
             </div>

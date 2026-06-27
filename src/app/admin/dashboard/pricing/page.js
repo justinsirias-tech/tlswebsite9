@@ -8,6 +8,45 @@ export default function PricingAdminPage() {
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState("weight");
   const [newItem, setNewItem] = useState({ name: "", name_th: "", nonMember: "", member: "", unit: "piece" });
+  const [translatingId, setTranslatingId] = useState(null);
+
+  const translateName = async (englishName, id) => {
+    if (!englishName) return;
+    setTranslatingId(id);
+    try {
+      const res = await fetch("/api/translate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: englishName })
+      });
+      const data = await res.json();
+      if (res.ok && data.name_th) {
+        if (id === "new") {
+          setNewItem(prev => ({ ...prev, name_th: data.name_th }));
+        } else {
+          setPricing(prev => prev.map(p => p.id === id ? { ...p, name_th: data.name_th } : p));
+          const item = pricing.find(p => p.id === id);
+          if (item) {
+            const payload = {
+              ...item,
+              name_th: data.name_th,
+              nonMember: parseFloat(item.nonMember) || 0,
+              member: item.member ? parseFloat(item.member) : null,
+            };
+            await fetch(`/api/pricing/${id}`, {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload)
+            });
+          }
+        }
+      }
+    } catch (err) {
+      console.error("Translation error:", err);
+    } finally {
+      setTranslatingId(null);
+    }
+  };
 
   const categories = [
     { id: "weight", label: "By Weight" },
@@ -107,7 +146,22 @@ export default function PricingAdminPage() {
     }
   };
 
-  const filteredPricing = pricing.filter(p => p.category === activeCategory);
+  const getSortedPricing = (items) => {
+    const toppers = [];
+    const others = [];
+    items.forEach(item => {
+      if (item.name && item.name.toLowerCase().includes("topper")) {
+        toppers.push(item);
+      } else {
+        others.push(item);
+      }
+    });
+    // Sort toppers alphabetically so 3.5FT < 5.0FT < 6.0FT
+    toppers.sort((a, b) => a.name.localeCompare(b.name));
+    return [...others, ...toppers];
+  };
+
+  const filteredPricing = getSortedPricing(pricing.filter(p => p.category === activeCategory));
 
   return (
     <div className={styles.adminPage}>
@@ -146,30 +200,51 @@ export default function PricingAdminPage() {
             <tbody>
               {filteredPricing.length === 0 ? (
                 <tr>
-                  <td colSpan="5" style={{ textAlign: "center", padding: "2rem" }}>No items in this category.</td>
+                  <td colSpan="6" style={{ textAlign: "center", padding: "2rem" }}>No items in this category.</td>
                 </tr>
               ) : (
-                <>
-                  {filteredPricing.map((item) => (
+                filteredPricing.map((item) => (
                   <tr key={item.id}>
                     <td>
                       <input 
                         type="text" 
                         value={item.name} 
                         onChange={(e) => handleInlineChange(item.id, 'name', e.target.value)} 
-                        onBlur={() => handleInlineSave(item.id)}
+                        onBlur={() => {
+                          handleInlineSave(item.id);
+                          if (!item.name_th && item.name) {
+                            translateName(item.name, item.id);
+                          }
+                        }}
                         className={styles.inlineInput}
                       />
                     </td>
                     <td>
-                      <input 
-                        type="text" 
-                        value={item.name_th || ""} 
-                        onChange={(e) => handleInlineChange(item.id, 'name_th', e.target.value)} 
-                        onBlur={() => handleInlineSave(item.id)}
-                        className={styles.inlineInput}
-                        placeholder="Thai name"
-                      />
+                      <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                        <input 
+                          type="text" 
+                          value={item.name_th || ""} 
+                          onChange={(e) => handleInlineChange(item.id, 'name_th', e.target.value)} 
+                          onBlur={() => handleInlineSave(item.id)}
+                          className={styles.inlineInput}
+                          placeholder="Thai name"
+                          style={{ flex: 1 }}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => translateName(item.name, item.id)}
+                          disabled={translatingId === item.id || !item.name}
+                          className="btn"
+                          style={{ padding: "0.2rem 0.4rem", fontSize: "0.8rem", background: "none", border: "none", cursor: "pointer" }}
+                          title="Auto-translate English name to Thai"
+                        >
+                          {translatingId === item.id ? (
+                            <i className="fa-solid fa-spinner fa-spin" style={{ color: "var(--primary)" }}></i>
+                          ) : (
+                            "🇹🇭"
+                          )}
+                        </button>
+                      </div>
                     </td>
                     <td>
                       <div style={{ display: "flex", alignItems: "center" }}>
@@ -216,21 +291,28 @@ export default function PricingAdminPage() {
                       </div>
                     </td>
                   </tr>
-                  ))}
-                {/* INLINE ADD NEW ROW */}
-                <tr style={{ background: "rgba(58, 123, 213, 0.05)" }}>
-                  <td>
-                    <input 
-                      type="text" 
-                      placeholder="New item name (EN)..."
-                      value={newItem.name} 
-                      onChange={(e) => setNewItem({ ...newItem, name: e.target.value })} 
-                      onKeyDown={handleKeyDown}
-                      className={styles.inlineInput}
-                      style={{ background: "white" }}
-                    />
-                  </td>
-                  <td>
+                ))
+              )}
+              {/* INLINE ADD NEW ROW */}
+              <tr style={{ background: "rgba(58, 123, 213, 0.05)" }}>
+                <td>
+                  <input 
+                    type="text" 
+                    placeholder="New item name (EN)..."
+                    value={newItem.name} 
+                    onChange={(e) => setNewItem({ ...newItem, name: e.target.value })} 
+                    onKeyDown={handleKeyDown}
+                    onBlur={() => {
+                      if (!newItem.name_th && newItem.name) {
+                        translateName(newItem.name, "new");
+                      }
+                    }}
+                    className={styles.inlineInput}
+                    style={{ background: "white" }}
+                  />
+                </td>
+                <td>
+                  <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
                     <input 
                       type="text" 
                       placeholder="New item name (TH)..."
@@ -238,56 +320,69 @@ export default function PricingAdminPage() {
                       onChange={(e) => setNewItem({ ...newItem, name_th: e.target.value })} 
                       onKeyDown={handleKeyDown}
                       className={styles.inlineInput}
-                      style={{ background: "white" }}
+                      style={{ flex: 1, background: "white" }}
                     />
-                  </td>
-                  <td>
-                    <div style={{ display: "flex", alignItems: "center" }}>
-                      <span style={{ marginRight: "4px" }}>฿</span>
-                      <input 
-                        type="number" 
-                        placeholder="0"
-                        value={newItem.nonMember} 
-                        onChange={(e) => setNewItem({ ...newItem, nonMember: e.target.value })} 
-                        onKeyDown={handleKeyDown}
-                        className={styles.inlineInput}
-                        style={{ width: "80px", background: "white" }}
-                      />
-                    </div>
-                  </td>
-                  <td>
-                    <div style={{ display: "flex", alignItems: "center" }}>
-                      <span style={{ marginRight: "4px" }}>฿</span>
-                      <input 
-                        type="number" 
-                        placeholder="-"
-                        value={newItem.member} 
-                        onChange={(e) => setNewItem({ ...newItem, member: e.target.value })} 
-                        onKeyDown={handleKeyDown}
-                        className={styles.inlineInput}
-                        style={{ width: "80px", background: "white" }}
-                      />
-                    </div>
-                  </td>
-                  <td>
+                    <button
+                      type="button"
+                      onClick={() => translateName(newItem.name, "new")}
+                      disabled={translatingId === "new" || !newItem.name}
+                      className="btn"
+                      style={{ padding: "0.2rem 0.4rem", fontSize: "0.8rem", background: "none", border: "none", cursor: "pointer" }}
+                      title="Auto-translate English name to Thai"
+                    >
+                      {translatingId === "new" ? (
+                        <i className="fa-solid fa-spinner fa-spin" style={{ color: "var(--primary)" }}></i>
+                      ) : (
+                        "🇹🇭"
+                      )}
+                    </button>
+                  </div>
+                </td>
+                <td>
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <span style={{ marginRight: "4px" }}>฿</span>
                     <input 
-                      type="text" 
-                      placeholder="piece"
-                      value={newItem.unit} 
-                      onChange={(e) => setNewItem({ ...newItem, unit: e.target.value })} 
+                      type="number" 
+                      placeholder="0"
+                      value={newItem.nonMember} 
+                      onChange={(e) => setNewItem({ ...newItem, nonMember: e.target.value })} 
                       onKeyDown={handleKeyDown}
                       className={styles.inlineInput}
                       style={{ width: "80px", background: "white" }}
                     />
-                  </td>
-                  <td>
-                    <button className="btn btn-primary" onClick={handleInlineAdd} disabled={!newItem.name || !newItem.nonMember} style={{ padding: "0.4rem 1rem", fontSize: "0.85rem" }}>
-                      <i className="fa-solid fa-plus"></i> Add
-                    </button>
-                  </td>
-                </tr>
-                </>
-              )}
+                  </div>
+                </td>
+                <td>
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <span style={{ marginRight: "4px" }}>฿</span>
+                    <input 
+                      type="number" 
+                      placeholder="-"
+                      value={newItem.member} 
+                      onChange={(e) => setNewItem({ ...newItem, member: e.target.value })} 
+                      onKeyDown={handleKeyDown}
+                      className={styles.inlineInput}
+                      style={{ width: "80px", background: "white" }}
+                    />
+                  </div>
+                </td>
+                <td>
+                  <input 
+                    type="text" 
+                    placeholder="piece"
+                    value={newItem.unit} 
+                    onChange={(e) => setNewItem({ ...newItem, unit: e.target.value })} 
+                    onKeyDown={handleKeyDown}
+                    className={styles.inlineInput}
+                    style={{ width: "80px", background: "white" }}
+                  />
+                </td>
+                <td>
+                  <button className="btn btn-primary" onClick={handleInlineAdd} disabled={!newItem.name || !newItem.nonMember} style={{ padding: "0.4rem 1rem", fontSize: "0.85rem" }}>
+                    <i className="fa-solid fa-plus"></i> Add
+                  </button>
+                </td>
+              </tr>
             </tbody>
           </table>
         )}

@@ -1,7 +1,23 @@
 import styles from "./page.module.css";
+import Image from "next/image";
 import { Link } from "../../i18n/routing";
 import Script from "next/script";
 import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
+
+export async function generateMetadata({ params }) {
+  const resolvedParams = await params;
+  const locale = resolvedParams.locale;
+  const t = await getTranslations({ locale, namespace: "Home" });
+
+  return {
+    title: t("metaTitle"),
+    description: t("metaDesc"),
+    alternates: {
+      canonical: `https://www.thatlaundryshop.com/${locale}`,
+    }
+  };
+}
 
 export default function Home() {
   const t = useTranslations("Home");
@@ -9,7 +25,7 @@ export default function Home() {
     "@context": "https://schema.org",
     "@type": "DryCleaningOrLaundry",
     "name": "That Laundry Shop",
-    "image": "https://www.thatlaundryshop.com/assets/hero_laundry.png",
+    "image": "https://www.thatlaundryshop.com/assets/hero_laundry.webp",
     "@id": "https://www.thatlaundryshop.com",
     "url": "https://www.thatlaundryshop.com",
     "telephone": "+6621234567",
@@ -52,7 +68,17 @@ export default function Home() {
       />
       
       <section className={styles.hero}>
-        <div className={styles.heroBackground}></div>
+        <div className={styles.heroBackground}>
+          <Image
+            src="/assets/hero_bg_v2.webp"
+            alt="Premium laundry shop backdrop"
+            fill
+            priority
+            unoptimized
+            style={{ objectFit: "cover", objectPosition: "center" }}
+          />
+          <div className={styles.heroOverlay}></div>
+        </div>
         <div className="container">
           <div className={styles.heroContent}>
             <h1 className={styles.heroTitle}>{t('heroTitle')}</h1>
@@ -74,7 +100,7 @@ export default function Home() {
       <section className="section" style={{ background: "white" }}>
         <div className="container">
           <div style={{ textAlign: "center", maxWidth: "700px", margin: "0 auto" }}>
-            <h2 style={{ fontSize: "2.5rem", marginBottom: "1rem" }}>{t('goldStandardTitle')}</h2>
+            <h2 className={styles.sectionTitle}>{t('goldStandardTitle')}</h2>
             <p style={{ color: "var(--text-light)", fontSize: "1.1rem" }}>
               {t('goldStandardDesc')}
             </p>
@@ -111,7 +137,7 @@ export default function Home() {
       <section className={styles.ctaSection}>
         <div className="container">
           <div className={styles.ctaContent}>
-            <h2 style={{ fontSize: "3rem", marginBottom: "1.5rem", color: "white" }}>{t('ctaTitle')}</h2>
+            <h2 className={styles.ctaTitle}>{t('ctaTitle')}</h2>
             <p style={{ fontSize: "1.2rem", marginBottom: "2.5rem", opacity: 0.9 }}>
               {t('ctaDesc')}
             </p>

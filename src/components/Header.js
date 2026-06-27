@@ -3,6 +3,7 @@
 import { Link, usePathname, useRouter } from "../i18n/routing";
 import { useState, useEffect } from "react";
 import { useTranslations, useLocale } from "next-intl";
+import Image from "next/image";
 
 export default function Header() {
   const pathname = usePathname();
@@ -25,6 +26,8 @@ export default function Header() {
 
   return (
     <header style={{ 
+      position: "relative",
+      zIndex: 1000,
       padding: scrolled ? "0.5rem 0" : "1rem 0",
       backgroundColor: "rgba(255, 255, 255, 0.98)",
       backdropFilter: "blur(10px)",
@@ -38,16 +41,16 @@ export default function Header() {
         alignItems: "center"
       }}>
         <Link href="/" className="logo">
-          <img src="/images/logo.png" alt="That Laundry Shop" style={{ height: scrolled ? '55px' : '70px', width: 'auto', transition: 'height 0.3s ease' }} />
+          <Image src="/images/logo.webp" alt="That Laundry Shop" width={180} height={70} style={{ height: scrolled ? '55px' : '70px', width: 'auto', transition: 'height 0.3s ease' }} priority unoptimized />
         </Link>
         
         <nav className={`nav-links ${isMenuOpen ? "active glass" : ""}`}>
-          <Link href="/" className={pathname === "/" ? "active" : ""}>{t('home')}</Link>
-          <Link href="/about" className={pathname === "/about" ? "active" : ""}>{t('about')}</Link>
-          <Link href="/services" className={pathname === "/services" ? "active" : ""}>{t('services')}</Link>
-          <Link href="/pricing" className={pathname === "/pricing" ? "active" : ""}>{t('pricing')}</Link>
-          <Link href="/promotions" className={pathname === "/promotions" ? "active" : ""}>{t('promotions')}</Link>
-          <Link href="/contact" className={pathname === "/contact" ? "active" : ""}>{t('contact')}</Link>
+          <Link href="/" onClick={() => setIsMenuOpen(false)} className={pathname === "/" ? "active" : ""}>{t('home')}</Link>
+          <Link href="/about" onClick={() => setIsMenuOpen(false)} className={pathname === "/about" ? "active" : ""}>{t('about')}</Link>
+          <Link href="/services" onClick={() => setIsMenuOpen(false)} className={pathname === "/services" ? "active" : ""}>{t('services')}</Link>
+          <Link href="/pricing" onClick={() => setIsMenuOpen(false)} className={pathname === "/pricing" ? "active" : ""}>{t('pricing')}</Link>
+          <Link href="/promotions" onClick={() => setIsMenuOpen(false)} className={pathname === "/promotions" ? "active" : ""}>{t('promotions')}</Link>
+          <Link href="/contact" onClick={() => setIsMenuOpen(false)} className={pathname === "/contact" ? "active" : ""}>{t('contact')}</Link>
           {/* Language Switcher Dropdown */}
           <div 
             style={{ position: 'relative', marginLeft: '1rem' }} 
@@ -72,9 +75,11 @@ export default function Header() {
               }}
               className="lang-trigger-btn"
             >
-              <img 
+              <Image 
                 src={`https://flagcdn.com/w40/${locale === 'en' ? 'gb' : locale === 'th' ? 'th' : 'cn'}.png`} 
                 alt={locale.toUpperCase()} 
+                width={16}
+                height={16}
                 style={{ width: '16px', height: '16px', borderRadius: '50%', objectFit: 'cover' }} 
               />
               <span style={{ fontSize: '0.85rem' }}>{locale.toUpperCase()}</span>
@@ -104,6 +109,7 @@ export default function Header() {
                     onClick={() => {
                       router.replace(pathname, {locale: 'en'});
                       setIsLangOpen(false);
+                      setIsMenuOpen(false);
                     }}
                     style={{
                       display: 'flex',
@@ -121,7 +127,7 @@ export default function Header() {
                     }}
                     className="lang-item-btn"
                   >
-                    <img src="https://flagcdn.com/w40/gb.png" alt="English" style={{ width: '14px', height: '14px', borderRadius: '50%', objectFit: 'cover' }} />
+                    <Image src="https://flagcdn.com/w40/gb.png" alt="English" width={14} height={14} style={{ width: '14px', height: '14px', borderRadius: '50%', objectFit: 'cover' }} />
                     <span style={{ fontSize: '0.85rem' }}>English</span>
                   </button>
 
@@ -129,6 +135,7 @@ export default function Header() {
                     onClick={() => {
                       router.replace(pathname, {locale: 'th'});
                       setIsLangOpen(false);
+                      setIsMenuOpen(false);
                     }}
                     style={{
                       display: 'flex',
@@ -146,7 +153,7 @@ export default function Header() {
                     }}
                     className="lang-item-btn"
                   >
-                    <img src="https://flagcdn.com/w40/th.png" alt="Thai" style={{ width: '14px', height: '14px', borderRadius: '50%', objectFit: 'cover' }} />
+                    <Image src="https://flagcdn.com/w40/th.png" alt="Thai" width={14} height={14} style={{ width: '14px', height: '14px', borderRadius: '50%', objectFit: 'cover' }} />
                     <span style={{ fontSize: '0.85rem' }}>ไทย</span>
                   </button>
 
@@ -154,6 +161,7 @@ export default function Header() {
                     onClick={() => {
                       router.replace(pathname, {locale: 'cn'});
                       setIsLangOpen(false);
+                      setIsMenuOpen(false);
                     }}
                     style={{
                       display: 'flex',
@@ -171,14 +179,14 @@ export default function Header() {
                     }}
                     className="lang-item-btn"
                   >
-                    <img src="https://flagcdn.com/w40/cn.png" alt="Chinese" style={{ width: '14px', height: '14px', borderRadius: '50%', objectFit: 'cover' }} />
+                    <Image src="https://flagcdn.com/w40/cn.png" alt="Chinese" width={14} height={14} style={{ width: '14px', height: '14px', borderRadius: '50%', objectFit: 'cover' }} />
                     <span style={{ fontSize: '0.85rem' }}>中文</span>
                   </button>
                 </div>
               </div>
             )}
           </div>
-          <Link href="/booking" className="btn btn-primary" style={{ padding: "0.5rem 1.5rem", marginLeft: "1rem" }}>{t('bookNow')}</Link>
+          <Link href="/booking" onClick={() => setIsMenuOpen(false)} className="btn btn-primary nav-book-btn" style={{ padding: "0.5rem 1.5rem", marginLeft: "1rem" }}>{t('bookNow')}</Link>
         </nav>
 
         <button 

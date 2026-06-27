@@ -3,6 +3,7 @@
 import { useState } from "react";
 import styles from "./page.module.css";
 import Link from "next/link";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 
 export default function PricingTabs({ priceData, locale }) {
@@ -179,13 +180,24 @@ export default function PricingTabs({ priceData, locale }) {
 
       <div className={styles.tabContent}>
         <div className={styles.categorySection}>
-          <div 
-            className={styles.categoryBanner} 
-            style={{ backgroundImage: `url(${currentCategory.image})` }}
-          >
+          <div className={styles.categoryBanner}>
+            <Image
+              src={currentCategory.image}
+              alt={currentCategory.title}
+              fill
+              unoptimized
+              style={{ objectFit: 'cover', objectPosition: 'center' }}
+            />
             <div className={styles.categoryBannerContent}>
               <h2 className={styles.categoryBannerTitle}>{currentCategory.title}</h2>
-              <p className={styles.categoryBannerDesc}>{currentCategory.desc}</p>
+              <p className={styles.categoryBannerDesc}>
+                {currentCategory.desc}
+                {activeTab === "weight" && (
+                  <strong style={{ fontSize: "1.45rem", fontWeight: "800", color: "#fff", display: "inline-block", marginLeft: "8px" }}>
+                    ({t("minChargeWeight")})
+                  </strong>
+                )}
+              </p>
             </div>
           </div>
           <div className={styles.cardGrid} style={{ padding: "0 2rem" }}>

@@ -2,6 +2,7 @@ import prisma from '../lib/prisma';
 
 export default async function sitemap() {
   const baseUrl = 'https://www.thatlaundryshop.com';
+  const locales = ['en', 'th', 'cn'];
 
   // Fetch dynamic content with try/catch to prevent build-time DB timeouts on Vercel
   let articles = [];
@@ -13,70 +14,56 @@ export default async function sitemap() {
     console.error("Warning: Database was unreachable during sitemap generation at build time. Falling back to static pages.", err.message);
   }
 
-  const articleUrls = articles.map((article) => ({
-    url: `${baseUrl}/articles/${article.id}`,
-    lastModified: article.updatedAt,
-    changeFrequency: 'weekly',
-    priority: 0.8,
-  }));
+  const sitemapEntries = [];
 
-  const locationUrls = locations.map((location) => ({
-    url: `${baseUrl}/hotels/${location.slug}`,
-    lastModified: location.updatedAt,
-    changeFrequency: 'weekly',
-    priority: 0.8,
-  }));
-
-  return [
-    {
-      url: baseUrl,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 1.0,
-    },
-    {
-      url: `${baseUrl}/services`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/pricing`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/booking`,
-      lastModified: new Date(),
-      changeFrequency: 'yearly',
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/contact`,
-      lastModified: new Date(),
-      changeFrequency: 'yearly',
-      priority: 0.5,
-    },
-    {
-      url: `${baseUrl}/about`,
-      lastModified: new Date(),
-      changeFrequency: 'yearly',
-      priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/articles`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/hotels`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.8,
-    },
-    ...articleUrls,
-    ...locationUrls,
+  // 1. Static Pages for each locale
+  const staticPages = [
+    { path: '', changeFrequency: 'daily', priority: 1.0 },
+    { path: '/services', changeFrequency: 'monthly', priority: 0.9 },
+    { path: '/pricing', changeFrequency: 'weekly', priority: 0.9 },
+    { path: '/booking', changeFrequency: 'yearly', priority: 0.9 },
+    { path: '/contact', changeFrequency: 'yearly', priority: 0.5 },
+    { path: '/about', changeFrequency: 'yearly', priority: 0.7 },
+    { path: '/articles', changeFrequency: 'weekly', priority: 0.8 },
+    { path: '/hotels', changeFrequency: 'weekly', priority: 0.8 },
+    { path: '/condominiums', changeFrequency: 'weekly', priority: 0.8 },
   ];
+
+  for (const locale of locales) {
+    for (const page of staticPages) {
+      sitemapEntries.push({
+        url: `${baseUrl}/${locale}${page.path}`,
+        lastModified: new Date(),
+        changeFrequency: page.changeFrequency,
+        priority: page.priority,
+      });
+    }
+  }
+
+  // 2. Dynamic Articles for each locale
+  for (const article of articles) {
+    for (const locale of locales) {
+      sitemapEntries.push({
+        url: `${baseUrl}/${locale}/articles/${article.id}`,
+        lastModified: article.updatedAt,
+        changeFrequency: 'weekly',
+        priority: 0.8,
+      });
+    }
+  }
+
+  // 3. Dynamic Locations (Hotels / Condos) for each locale
+  for (const location of locations) {
+    const section = location.type === 'condo' ? 'condominiums' : 'hotels';
+    for (const locale of locales) {
+      sitemapEntries.push({
+        url: `${baseUrl}/${locale}/${section}/${location.slug}`,
+        lastModified: location.updatedAt,
+        changeFrequency: 'weekly',
+        priority: 0.8,
+      });
+    }
+  }
+
+  return sitemapEntries;
 }

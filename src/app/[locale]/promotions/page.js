@@ -2,6 +2,7 @@ import styles from "./page.module.css";
 import Link from "next/link";
 import Script from "next/script";
 import { getTranslations } from "next-intl/server";
+import MembershipSection from "./MembershipSection";
 
 const benefits = [
   { key: "benefitRates", tiers: { silver: true, gold: true, platinum: true } },
@@ -71,168 +72,51 @@ export default async function PromotionsPage({ params }) {
               {t("advancePaymentNote")}
             </p>
             
-            <div className={styles.membershipGrid}>
-              
-              {/* Silver Package */}
-              <div className={styles.packageCard}>
-                <div className={`${styles.creditCardGraphic} ${styles.silverCard}`}>
-                  <div className={styles.cardHeader}>
-                    <span className={styles.cardBrand}>That Laundry Shop</span>
-                    <span className={styles.cardType}>{t("silverTier").toUpperCase()}</span>
-                  </div>
-                  <div className={styles.cardChip}>
-                    <div className={styles.chipLine}></div>
-                  </div>
-                  <div className={styles.cardNumber}>1990 0000 0000 0199</div>
-                  <div className={styles.cardFooter}>
-                    <div className={styles.cardFooterCol}>
-                      <span className={styles.cardLabel}>PRICE</span>
-                      <span className={styles.cardValue}>{t("silverPrice")} THB</span>
-                    </div>
-                    <div className={styles.cardFooterCol}>
-                      <span className={styles.cardLabel}>PERIOD</span>
-                      <span className={styles.cardValue}>Monthly</span>
-                    </div>
-                  </div>
-                </div>
-                <div className={styles.packageContent}>
-                  <h3 className={styles.tierName}>{t("silverTier")}</h3>
-                  <p className={styles.tierDesc}>{t("memberDesc")}</p>
-                  
-                  <div className={styles.advancePaymentOptions}>
-                    <div className={styles.advanceOption}>
-                      <span className={styles.advanceLabel}>{t("advancePayment6")}</span>
-                      <span className={styles.advanceValue}>{(6 * silverPriceVal).toLocaleString()} THB</span>
-                    </div>
-                    <div className={styles.advanceOption}>
-                      <span className={styles.advanceLabel}>{t("advancePayment12")}</span>
-                      <span className={styles.advanceValue}>{(12 * silverPriceVal).toLocaleString()} THB</span>
-                    </div>
-                  </div>
-
-                  <ul className={styles.tierFeatures}>
-                    {benefits.filter(b => b.tiers.silver).map(b => (
-                      <li key={b.key}>
-                        <i className="fa-solid fa-circle-check"></i>
-                        {t(b.key)}
-                      </li>
-                    ))}
-                  </ul>
-                  <Link href="/booking" className="btn btn-outline" style={{ width: "100%", marginTop: "auto" }}>
-                    {t("joinSilver")}
-                  </Link>
-                </div>
-              </div>
-
-              {/* Gold Package */}
-              <div className={styles.packageCard}>
-                <div className={`${styles.creditCardGraphic} ${styles.goldCard}`}>
-                  <div className={styles.cardHeader}>
-                    <span className={styles.cardBrand}>That Laundry Shop</span>
-                    <span className={styles.cardType}>{t("goldTier").toUpperCase()}</span>
-                  </div>
-                  <div className={styles.cardChip}>
-                    <div className={styles.chipLine}></div>
-                  </div>
-                  <div className={styles.cardNumber}>2990 0000 0000 0299</div>
-                  <div className={styles.cardFooter}>
-                    <div className={styles.cardFooterCol}>
-                      <span className={styles.cardLabel}>PRICE</span>
-                      <span className={styles.cardValue}>{t("goldPrice")} THB</span>
-                    </div>
-                    <div className={styles.cardFooterCol}>
-                      <span className={styles.cardLabel}>PERIOD</span>
-                      <span className={styles.cardValue}>Monthly</span>
-                    </div>
-                  </div>
-                </div>
-                <div className={styles.packageContent}>
-                  <h3 className={styles.tierName}>{t("goldTier")}</h3>
-                  <p className={styles.tierDesc}>{t("memberDesc")}</p>
-                  
-                  <div className={styles.advancePaymentOptions}>
-                    <div className={styles.advanceOption}>
-                      <span className={styles.advanceLabel}>{t("advancePayment6")}</span>
-                      <span className={styles.advanceValue}>{(6 * goldPriceVal).toLocaleString()} THB</span>
-                    </div>
-                    <div className={styles.advanceOption}>
-                      <span className={styles.advanceLabel}>
-                        {t("advancePayment12")}
-                        <span className={styles.freeBadge}>{t("oneMonthFree")}</span>
-                      </span>
-                      <span className={styles.advanceValue}>{(11 * goldPriceVal).toLocaleString()} THB</span>
-                    </div>
-                  </div>
-
-                  <ul className={styles.tierFeatures}>
-                    {benefits.filter(b => b.tiers.gold).map(b => (
-                      <li key={b.key}>
-                        <i className="fa-solid fa-circle-check"></i>
-                        {t(b.key)}
-                      </li>
-                    ))}
-                  </ul>
-                  <Link href="/booking" className="btn btn-primary" style={{ width: "100%", marginTop: "auto" }}>
-                    {t("joinGold")}
-                  </Link>
-                </div>
-              </div>
-
-              {/* Platinum Package */}
-              <div className={styles.packageCard}>
-                <div className={`${styles.creditCardGraphic} ${styles.vipCard}`}>
-                  <div className={styles.cardHeader}>
-                    <span className={styles.cardBrand}>That Laundry Shop</span>
-                    <span className={styles.cardType}>{t("vipTier").toUpperCase()}</span>
-                  </div>
-                  <div className={styles.cardChip}>
-                    <div className={styles.chipLine}></div>
-                  </div>
-                  <div className={styles.cardNumber}>3990 0000 0000 0399</div>
-                  <div className={styles.cardFooter}>
-                    <div className={styles.cardFooterCol}>
-                      <span className={styles.cardLabel}>PRICE</span>
-                      <span className={styles.cardValue}>{t("vipPrice")} THB</span>
-                    </div>
-                    <div className={styles.cardFooterCol}>
-                      <span className={styles.cardLabel}>PERIOD</span>
-                      <span className={styles.cardValue}>Monthly</span>
-                    </div>
-                  </div>
-                </div>
-                <div className={styles.packageContent}>
-                  <h3 className={styles.tierName}>{t("vipTier")}</h3>
-                  <p className={styles.tierDesc}>{t("memberDesc")}</p>
-                  
-                  <div className={styles.advancePaymentOptions}>
-                    <div className={styles.advanceOption}>
-                      <span className={styles.advanceLabel}>{t("advancePayment6")}</span>
-                      <span className={styles.advanceValue}>{(6 * vipPriceVal).toLocaleString()} THB</span>
-                    </div>
-                    <div className={styles.advanceOption}>
-                      <span className={styles.advanceLabel}>
-                        {t("advancePayment12")}
-                        <span className={styles.freeBadge}>{t("twoMonthsFree")}</span>
-                      </span>
-                      <span className={styles.advanceValue}>{(10 * vipPriceVal).toLocaleString()} THB</span>
-                    </div>
-                  </div>
-
-                  <ul className={styles.tierFeatures}>
-                    {benefits.filter(b => b.tiers.platinum).map(b => (
-                      <li key={b.key}>
-                        <i className="fa-solid fa-circle-check"></i>
-                        {t(b.key)}
-                      </li>
-                    ))}
-                  </ul>
-                  <Link href="/booking" className="btn btn-primary" style={{ width: "100%", marginTop: "auto", background: "linear-gradient(135deg, #1e293b 0%, #0f172a 100%)", borderColor: "#1e293b" }}>
-                    {t("joinVip")}
-                  </Link>
-                </div>
-              </div>
-
-            </div>
+            <MembershipSection 
+              locale={locale}
+              translations={{
+                silverTier: t("silverTier"),
+                silverPrice: t("silverPrice"),
+                goldTier: t("goldTier"),
+                goldPrice: t("goldPrice"),
+                vipTier: t("vipTier"),
+                vipPrice: t("vipPrice"),
+                memberDesc: t("memberDesc"),
+                advancePayment6: t("advancePayment6"),
+                advancePayment12: t("advancePayment12"),
+                oneMonthFree: t("oneMonthFree"),
+                twoMonthsFree: t("twoMonthsFree"),
+                joinSilver: t("joinSilver"),
+                joinGold: t("joinGold"),
+                joinVip: t("joinVip"),
+                benefitRates: t("benefitRates"),
+                benefitDryClean5: t("benefitDryClean5"),
+                benefitPriority: t("benefitPriority"),
+                benefitTransport: t("benefitTransport"),
+                benefitDuvet: t("benefitDuvet"),
+                formTitle: t("formTitle"),
+                formDesc: t("formDesc"),
+                formName: t("formName"),
+                formEmail: t("formEmail"),
+                formPhone: t("formPhone"),
+                formPackage: t("formPackage"),
+                formTerm: t("formTerm"),
+                formDob: t("formDob"),
+                formAddress: t("formAddress"),
+                formRoomNo: t("formRoomNo"),
+                formNotes: t("formNotes"),
+                formConfidentiality: t("formConfidentiality"),
+                formAddressPlaceholder: t("formAddressPlaceholder"),
+                formSubmit: t("formSubmit"),
+                formSubmitting: t("formSubmitting"),
+                formSuccessTitle: t("formSuccessTitle"),
+                formSuccessDesc: t("formSuccessDesc"),
+                formClose: t("formClose")
+              }}
+              silverPriceVal={silverPriceVal}
+              goldPriceVal={goldPriceVal}
+              vipPriceVal={vipPriceVal}
+            />
           </div>
 
           {/* PROMOTIONS SECTION */}

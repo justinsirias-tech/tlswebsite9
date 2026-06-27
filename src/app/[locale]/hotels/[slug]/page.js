@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import styles from "./page.module.css";
 import Link from "next/link";
+import Image from "next/image";
 import Script from "next/script";
 import { getTranslations } from "next-intl/server";
 import prisma from "../../../../lib/prisma";
@@ -101,10 +102,15 @@ export default async function HotelArticlePage({ params }) {
       />
 
       {/* Hero Section with Hotel Image */}
-      <div 
-        className={styles.heroSection} 
-        style={{ backgroundImage: `url('${hotel.image || "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1200&q=80"}')` }}
-      >
+      <div className={styles.heroSection}>
+        <Image
+          src={hotel.image || "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1200&q=80"}
+          alt={name}
+          fill
+          priority
+          unoptimized
+          style={{ objectFit: 'cover', objectPosition: 'center' }}
+        />
         <div className={styles.heroOverlay}></div>
         <div className={styles.heroContent}>
           <h1 className={styles.hotelTitle}>{name}</h1>

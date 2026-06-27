@@ -94,3 +94,16 @@
   transform: scale(1.05);
 }
 
+@media (max-width: 480px) {
+  .articleCard {
+    padding: 1.5rem;
+  }
+  .cardImageContainer {
+    width: calc(100% + 3rem);
+    margin-left: -1.5rem;
+    margin-right: -1.5rem;
+    margin-top: -1.5rem;
+    height: 160px;
+  }
+}
+

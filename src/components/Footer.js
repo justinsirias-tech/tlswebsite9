@@ -1,5 +1,6 @@
 import { Link } from "../i18n/routing";
 import { useTranslations, useLocale } from "next-intl";
+import Image from "next/image";
 
 export default function Footer() {
   const t = useTranslations("Footer");
@@ -12,7 +13,7 @@ export default function Footer() {
         
         <div>
           <h3 style={{ marginBottom: "1rem" }}>
-            <img src="/images/logo.png" alt="That Laundry Shop" style={{ height: '120px', width: 'auto', filter: 'brightness(0) invert(1)' }} />
+            <Image src="/images/logo.webp" alt="That Laundry Shop" width={280} height={120} unoptimized style={{ height: '120px', width: 'auto', filter: 'brightness(0) invert(1)' }} />
           </h3>
           <p style={{ color: "var(--text-muted)", marginBottom: "1.5rem" }}>
             {t("aboutText")}

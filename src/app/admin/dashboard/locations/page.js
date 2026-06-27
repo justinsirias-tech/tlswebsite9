@@ -209,6 +209,19 @@ export default function LocationsAdminPage() {
     .filter(l => l.name.toLowerCase().includes(searchTerm.toLowerCase()))
     .sort((a,b) => a.name.localeCompare(b.name));
 
+  const hotelCount = locations.filter(l => l.type === "hotel").length;
+  const apartmentCount = locations.filter(l => l.type === "apartment").length;
+  const condoCount = locations.filter(l => l.type === "condo").length;
+
+  const bkkHotelCount = locations.filter(l => l.city === "Bangkok" && l.type === "hotel").length;
+  const ptyHotelCount = locations.filter(l => l.city === "Pattaya" && l.type === "hotel").length;
+
+  const bkkApartmentCount = locations.filter(l => l.city === "Bangkok" && l.type === "apartment").length;
+  const ptyApartmentCount = locations.filter(l => l.city === "Pattaya" && l.type === "apartment").length;
+
+  const bkkCondoCount = locations.filter(l => l.city === "Bangkok" && l.type === "condo").length;
+  const ptyCondoCount = locations.filter(l => l.city === "Pattaya" && l.type === "condo").length;
+
   return (
     <div className={styles.adminPage}>
       <div className={styles.pageHeader}>
@@ -216,6 +229,81 @@ export default function LocationsAdminPage() {
         <button className="btn btn-primary" onClick={() => openModal()}>
           <i className="fa-solid fa-plus"></i> Add Location
         </button>
+      </div>
+
+      {/* Category Summary Stats Badges */}
+      <div style={{ 
+        display: "flex", 
+        gap: "1rem", 
+        marginBottom: "2rem", 
+        flexWrap: "wrap",
+        alignItems: "center"
+      }}>
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "0.6rem",
+          background: "var(--surface)",
+          padding: "0.5rem 1.2rem",
+          borderRadius: "30px",
+          boxShadow: "var(--shadow-sm)",
+          border: "1px solid rgba(0, 0, 0, 0.05)",
+          color: "var(--text-dark)",
+          fontSize: "0.95rem",
+          fontWeight: "600"
+        }}>
+          <i className="fa-solid fa-hotel" style={{ color: "var(--primary)", fontSize: "1.1rem" }}></i>
+          <span>
+            Hotels: <span style={{ color: "var(--primary-light)", fontSize: "1.05rem", fontWeight: "700" }}>{hotelCount}</span>
+            <span style={{ fontSize: "0.8rem", color: "var(--text-light)", marginLeft: "0.5rem", fontWeight: "normal" }}>
+              ({bkkHotelCount} Bangkok • {ptyHotelCount} Pattaya)
+            </span>
+          </span>
+        </div>
+        
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "0.6rem",
+          background: "var(--surface)",
+          padding: "0.5rem 1.2rem",
+          borderRadius: "30px",
+          boxShadow: "var(--shadow-sm)",
+          border: "1px solid rgba(0, 0, 0, 0.05)",
+          color: "var(--text-dark)",
+          fontSize: "0.95rem",
+          fontWeight: "600"
+        }}>
+          <i className="fa-solid fa-building" style={{ color: "var(--primary)", fontSize: "1.1rem" }}></i>
+          <span>
+            Serviced Apartments: <span style={{ color: "var(--primary-light)", fontSize: "1.05rem", fontWeight: "700" }}>{apartmentCount}</span>
+            <span style={{ fontSize: "0.8rem", color: "var(--text-light)", marginLeft: "0.5rem", fontWeight: "normal" }}>
+              ({bkkApartmentCount} Bangkok • {ptyApartmentCount} Pattaya)
+            </span>
+          </span>
+        </div>
+
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "0.6rem",
+          background: "var(--surface)",
+          padding: "0.5rem 1.2rem",
+          borderRadius: "30px",
+          boxShadow: "var(--shadow-sm)",
+          border: "1px solid rgba(0, 0, 0, 0.05)",
+          color: "var(--text-dark)",
+          fontSize: "0.95rem",
+          fontWeight: "600"
+        }}>
+          <i className="fa-solid fa-building-user" style={{ color: "var(--primary)", fontSize: "1.1rem" }}></i>
+          <span>
+            Condominiums: <span style={{ color: "var(--primary-light)", fontSize: "1.05rem", fontWeight: "700" }}>{condoCount}</span>
+            <span style={{ fontSize: "0.8rem", color: "var(--text-light)", marginLeft: "0.5rem", fontWeight: "normal" }}>
+              ({bkkCondoCount} Bangkok • {ptyCondoCount} Pattaya)
+            </span>
+          </span>
+        </div>
       </div>
 
       <div className={styles.tabsContainer} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>

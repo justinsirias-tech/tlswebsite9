@@ -130,8 +130,7 @@
 .categoryBanner {
   position: relative;
   height: 300px;
-  background-size: cover;
-  background-position: center;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -283,7 +282,8 @@
   }
 
   .cardGrid {
-    grid-template-columns: 1fr;
+    flex-direction: column;
+    gap: 1.5rem;
   }
   
   .categorySection {
@@ -291,6 +291,15 @@
     background: transparent;
     box-shadow: none;
     border: none;
+  }
+
+  .categoryBanner {
+    height: 200px;
+    margin-bottom: 1rem;
+  }
+
+  .categoryBannerTitle {
+    font-size: 2rem;
   }
 
   .heroBannerPrice {

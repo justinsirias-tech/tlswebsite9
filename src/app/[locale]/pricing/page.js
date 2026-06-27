@@ -26,11 +26,26 @@ export default async function PricingPage({ params }) {
   const t = await getTranslations({ locale, namespace: "Pricing" });
   const allPricing = await prisma.pricing.findMany();
   
+  const sortPricingItems = (items) => {
+    const toppers = [];
+    const others = [];
+    items.forEach(item => {
+      if (item.name && item.name.toLowerCase().includes("topper")) {
+        toppers.push(item);
+      } else {
+        others.push(item);
+      }
+    });
+    // Sort toppers alphabetically so 3.5FT < 5.0FT < 6.0FT
+    toppers.sort((a, b) => a.name.localeCompare(b.name));
+    return [...others, ...toppers];
+  };
+
   // Group pricing by category for PricingTabs
   const priceData = {
     weight: allPricing.filter(p => p.category === "weight"),
     garments: allPricing.filter(p => p.category === "garments"),
-    linen: allPricing.filter(p => p.category === "linen"),
+    linen: sortPricingItems(allPricing.filter(p => p.category === "linen")),
     ironing: allPricing.filter(p => p.category === "ironing"),
     dryclean: allPricing.filter(p => p.category === "dryclean"),
   };

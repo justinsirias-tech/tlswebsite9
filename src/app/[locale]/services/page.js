@@ -1,6 +1,7 @@
 import styles from "./page.module.css";
 import Link from "next/link";
 import Script from "next/script";
+import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 
 export async function generateMetadata({ params }) {
@@ -76,7 +77,9 @@ export default async function ServicesPage({ params }) {
 
           <div className={styles.serviceGrid}>
             <div className={`${styles.serviceCard} hover-lift`}>
-              <div className={styles.serviceImage} style={{ background: "url('/assets/wash_and_fold.png') center/cover" }}></div>
+              <div className={styles.serviceImage}>
+                <Image src="/assets/wash_and_fold.webp" alt={t("washFold")} fill style={{ objectFit: "cover" }} sizes="(max-width: 992px) 100vw, 50vw" />
+              </div>
               <div className={styles.serviceContent}>
                 <h3 className={styles.serviceTitle}>{t("washFold")}</h3>
                 <p className={styles.serviceDesc}>
@@ -87,7 +90,9 @@ export default async function ServicesPage({ params }) {
             </div>
 
             <div className={`${styles.serviceCard} hover-lift`}>
-              <div className={styles.serviceImage} style={{ background: "url('/assets/dry_clean.png') center/cover" }}></div>
+              <div className={styles.serviceImage}>
+                <Image src="/assets/dry_clean.webp" alt={t("dryClean")} fill style={{ objectFit: "cover" }} sizes="(max-width: 992px) 100vw, 50vw" />
+              </div>
               <div className={styles.serviceContent}>
                 <h3 className={styles.serviceTitle}>{t("dryClean")}</h3>
                 <p className={styles.serviceDesc}>
@@ -98,7 +103,9 @@ export default async function ServicesPage({ params }) {
             </div>
 
             <div className={`${styles.serviceCard} hover-lift`}>
-              <div className={styles.serviceImage} style={{ background: "url('/assets/service_ironing.png') center/cover" }}></div>
+              <div className={styles.serviceImage}>
+                <Image src="/assets/service_ironing.webp" alt={t("ironing")} fill style={{ objectFit: "cover" }} sizes="(max-width: 992px) 100vw, 50vw" />
+              </div>
               <div className={styles.serviceContent}>
                 <h3 className={styles.serviceTitle}>{t("ironing")}</h3>
                 <p className={styles.serviceDesc}>
@@ -109,7 +116,9 @@ export default async function ServicesPage({ params }) {
             </div>
 
             <div className={`${styles.serviceCard} hover-lift`}>
-              <div className={styles.serviceImage} style={{ background: "url('/assets/service_carpet.png') center/cover" }}></div>
+              <div className={styles.serviceImage}>
+                <Image src="/assets/service_carpet.webp" alt={t("carpet")} fill style={{ objectFit: "cover" }} sizes="(max-width: 992px) 100vw, 50vw" />
+              </div>
               <div className={styles.serviceContent}>
                 <h3 className={styles.serviceTitle}>{t("carpet")}</h3>
                 <p className={styles.serviceDesc}>
@@ -129,7 +138,9 @@ export default async function ServicesPage({ params }) {
 
           <div className={styles.serviceGrid}>
             <div className={`${styles.serviceCard} hover-lift`}>
-              <div className={styles.serviceImage} style={{ background: "url('/assets/service_corporate.png') center/cover" }}></div>
+              <div className={styles.serviceImage}>
+                <Image src="/assets/service_corporate.webp" alt={t("corpLaundry")} fill style={{ objectFit: "cover" }} sizes="(max-width: 992px) 100vw, 50vw" />
+              </div>
               <div className={styles.serviceContent}>
                 <h3 className={styles.serviceTitle}>{t("corpLaundry")}</h3>
                 <p className={styles.serviceDesc}>
@@ -140,7 +151,9 @@ export default async function ServicesPage({ params }) {
             </div>
 
             <div className={`${styles.serviceCard} hover-lift`}>
-              <div className={styles.serviceImage} style={{ background: "url('/assets/service_commercial.png') center/cover" }}></div>
+              <div className={styles.serviceImage}>
+                <Image src="/assets/service_commercial.webp" alt={t("commLaundry")} fill style={{ objectFit: "cover" }} sizes="(max-width: 992px) 100vw, 50vw" />
+              </div>
               <div className={styles.serviceContent}>
                 <h3 className={styles.serviceTitle}>{t("commLaundry")}</h3>
                 <p className={styles.serviceDesc}>
@@ -151,7 +164,9 @@ export default async function ServicesPage({ params }) {
             </div>
 
             <div className={`${styles.serviceCard} hover-lift`}>
-              <div className={styles.serviceImage} style={{ background: "url('/assets/service_hotel.png') center/cover" }}></div>
+              <div className={styles.serviceImage}>
+                <Image src="/assets/service_hotel.webp" alt={t("hotelLaundry")} fill style={{ objectFit: "cover" }} sizes="(max-width: 992px) 100vw, 50vw" />
+              </div>
               <div className={styles.serviceContent}>
                 <h3 className={styles.serviceTitle}>{t("hotelLaundry")} <span style={{fontSize:"1rem", fontWeight:"400", opacity:0.8}}>{t("hotelLaundryPattayaOnly")}</span></h3>
                 <p className={styles.serviceDesc}>
@@ -162,7 +177,9 @@ export default async function ServicesPage({ params }) {
             </div>
 
             <div className={`${styles.serviceCard} hover-lift`}>
-              <div className={styles.serviceImage} style={{ background: "url('/assets/service_fb.png') center/cover" }}></div>
+              <div className={styles.serviceImage}>
+                <Image src="/assets/service_fb.webp" alt={t("fbLaundry")} fill style={{ objectFit: "cover" }} sizes="(max-width: 992px) 100vw, 50vw" />
+              </div>
               <div className={styles.serviceContent}>
                 <h3 className={styles.serviceTitle}>{t("fbLaundry")}</h3>
                 <p className={styles.serviceDesc}>

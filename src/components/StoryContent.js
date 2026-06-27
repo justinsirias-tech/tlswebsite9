@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from 'react';
+import Image from 'next/image';
 
 export default function StoryContent() {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -62,7 +63,7 @@ export default function StoryContent() {
 
       <h2 style={{ fontSize: "2rem", color: "var(--primary)", marginTop: "3rem", marginBottom: "1.5rem" }}>Chapter 4: The Unwavering Commitment to Sustainability and Eco-Friendly Practices</h2>
       <div style={{ margin: "2.5rem 0", borderRadius: "16px", overflow: "hidden", boxShadow: "0 15px 35px rgba(0,0,0,0.1)" }}>
-        <img src="/assets/story_eco.png" alt="Pure Eco-Friendly Solvent" style={{ width: "100%", display: "block" }} />
+        <Image src="/assets/story_eco.webp" alt="Pure Eco-Friendly Solvent" width={800} height={500} style={{ width: "100%", height: "auto", display: "block" }} />
       </div>
       <p style={{ marginBottom: "1.5rem" }}>
         In today's world, luxury and premium quality must be inextricably linked with environmental responsibility. At That Laundry Shop, we recognized early on that the traditional laundry and dry cleaning industry is one of the most environmentally taxing sectors, known for excessive water consumption, high energy usage, and the emission of toxic volatile organic compounds (VOCs). We made a fundamental, uncompromising decision that our pursuit of the perfect clean would never come at the expense of our planet. This commitment to sustainability is woven into the very fabric of our operational model. We have entirely eliminated the use of Perchloroethylene (Perc), a toxic, carcinogenic solvent that is still shockingly common in standard dry cleaners. Instead, we utilize premium, biodegradable, and non-toxic liquid silicone and hydrocarbon alternatives. These eco-friendly solvents degrade naturally into sand, water, and trace amounts of carbon dioxide, posing absolutely zero threat to the soil, the groundwater, or the ozone layer. 
@@ -73,7 +74,7 @@ export default function StoryContent() {
 
       <h2 style={{ fontSize: "2rem", color: "var(--primary)", marginTop: "3rem", marginBottom: "1.5rem" }}>Chapter 5: The White-Glove Experience: Redefining Convenience and Customer Care</h2>
       <div style={{ margin: "2.5rem 0", borderRadius: "16px", overflow: "hidden", boxShadow: "0 15px 35px rgba(0,0,0,0.1)" }}>
-        <img src="/assets/story_delivery.png" alt="White Glove Concierge Delivery" style={{ width: "100%", display: "block" }} />
+        <Image src="/assets/story_delivery.webp" alt="White Glove Concierge Delivery" width={800} height={500} style={{ width: "100%", height: "auto", display: "block" }} />
       </div>
       <p style={{ marginBottom: "1.5rem" }}>
         We understand that our clientele includes some of the busiest, most demanding professionals and expatriates in Thailand. For them, time is the ultimate luxury. Therefore, we designed That Laundry Shop not just as a cleaning facility, but as a comprehensive, white-glove logistics and concierge service. The experience begins the moment you schedule a pickup through our streamlined digital platform. Our dedicated fleet of custom-fitted delivery vehicles, driven by our courteous, uniformed logistics professionals, arrives precisely at your scheduled time. We do not just collect your laundry; our drivers are trained to handle your garments with the utmost respect from the first interaction, placing them carefully into protective transit bags designed to prevent any creasing or damage during transport. 
@@ -84,7 +85,7 @@ export default function StoryContent() {
 
       <h2 style={{ fontSize: "2rem", color: "var(--primary)", marginTop: "3rem", marginBottom: "1.5rem" }}>Chapter 6: A Trusted Partner to the Hospitality Industry</h2>
       <div style={{ margin: "2.5rem 0", borderRadius: "16px", overflow: "hidden", boxShadow: "0 15px 35px rgba(0,0,0,0.1)" }}>
-        <img src="/assets/story_hospitality.png" alt="Luxury Hotel Towels" style={{ width: "100%", display: "block" }} />
+        <Image src="/assets/story_hospitality.webp" alt="Luxury Hotel Towels" width={800} height={500} style={{ width: "100%", height: "auto", display: "block" }} />
       </div>
       <p style={{ marginBottom: "1.5rem" }}>
         While our direct-to-consumer service is the public face of That Laundry Shop, our expertise and reliability have made us the trusted, behind-the-scenes partner for some of Thailand's most prestigious luxury hotels, boutique resorts, and high-end serviced apartments. The hospitality industry operates on a standard of absolute perfection; a single stained towel or a poorly pressed uniform can irrevocably tarnish a five-star reputation. These elite institutions entrust their guest laundry, staff uniforms, and delicate linens to us because they know we operate with military precision and artisanal care. 

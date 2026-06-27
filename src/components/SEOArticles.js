@@ -2,13 +2,13 @@
 
 import React, { useState } from 'react';
 import styles from './SEOArticles.module.css';
-
+import Image from 'next/image';
 import Link from 'next/link';
 
 const getFirstImage = (html) => {
-  if (!html) return "/assets/hero_laundry.png";
+  if (!html) return "/assets/hero_laundry.webp";
   const match = html.match(/<img[^>]+src="([^">]+)"/);
-  return match ? match[1] : "/assets/hero_laundry.png";
+  return match ? match[1] : "/assets/hero_laundry.webp";
 };
 
 const stripHtml = (html) => {
@@ -24,7 +24,7 @@ const ArticleCard = ({ id, title, content }) => {
     <article className={styles.articleCard}>
       {imageUrl && (
         <div className={styles.cardImageContainer}>
-          <img src={imageUrl} alt={title} className={styles.cardImage} />
+          <Image src={imageUrl} alt={title} fill className={styles.cardImage} sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" priority={false} />
         </div>
       )}
       <h3 className={styles.articleTitle}>{title}</h3>

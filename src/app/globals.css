@@ -267,17 +267,33 @@ header .container {
     left: 1rem;
     right: 1rem;
     padding: 2rem;
-    border-radius: var(--radius);
+    border-radius: var(--radius-lg);
     text-align: center;
+    background: rgba(255, 255, 255, 0.98);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    gap: 1.5rem;
+    z-index: 1000;
   }
   .nav-links.active {
     display: flex;
+  }
+  .nav-links a.btn.nav-book-btn {
+    margin-left: 0 !important;
+    width: 100%;
+    justify-content: center;
   }
   .mobile-menu-btn {
     display: block;
   }
   .section {
     padding: 4rem 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0 1rem;
   }
 }
 

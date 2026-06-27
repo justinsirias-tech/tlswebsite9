@@ -2,6 +2,7 @@ import prisma from "../../../../lib/prisma";
 import { notFound } from "next/navigation";
 import styles from "../../hotels/[slug]/page.module.css";
 import Link from "next/link";
+import Image from "next/image";
 import Script from "next/script";
 import { getTranslations } from "next-intl/server";
 
@@ -102,10 +103,15 @@ export default async function CondoArticlePage({ params }) {
       />
 
       {/* Hero Section with Condo Image */}
-      <div 
-        className={styles.heroSection} 
-        style={{ backgroundImage: `url('${condo.image || "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=1200&q=80"}')` }}
-      >
+      <div className={styles.heroSection}>
+        <Image
+          src={condo.image || "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=1200&q=80"}
+          alt={name}
+          fill
+          priority
+          unoptimized
+          style={{ objectFit: 'cover', objectPosition: 'center' }}
+        />
         <div className={styles.heroOverlay}></div>
         <div className={styles.heroContent}>
           <h1 className={styles.hotelTitle}>{name}</h1>
