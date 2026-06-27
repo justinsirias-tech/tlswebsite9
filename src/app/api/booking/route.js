@@ -227,7 +227,7 @@ async function sendConfirmationEmail(booking) {
           
           <!-- Header -->
           <div style="background-color: #ffffff; padding: 25px; text-align: center; border-bottom: 1px solid #edf2f7;">
-            <img src="https://www.thatlaundryshop.com/images/logo.webp" alt="That Laundry Shop" style="height: 60px; width: auto; display: inline-block; margin-bottom: 5px;" />
+            <img src="https://tlswebsite9.vercel.app/images/logo.webp" alt="That Laundry Shop" style="height: 60px; width: auto; display: inline-block; margin-bottom: 5px;" />
             <p style="color: #64748b; margin: 5px 0 0 0; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;">
               Premium Laundry & Dry Cleaning
             </p>
