@@ -226,11 +226,9 @@ async function sendConfirmationEmail(booking) {
         <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); overflow: hidden; border: 1px solid #eaeaea;">
           
           <!-- Header -->
-          <div style="background: linear-gradient(135deg, #222945 0%, #3a4b7c 100%); padding: 30px; text-align: center;">
-            <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase;">
-              That Laundry Shop
-            </h1>
-            <p style="color: #cbd5e1; margin: 5px 0 0 0; font-size: 12px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;">
+          <div style="background-color: #ffffff; padding: 25px; text-align: center; border-bottom: 1px solid #edf2f7;">
+            <img src="https://www.thatlaundryshop.com/images/logo.webp" alt="That Laundry Shop" style="height: 60px; width: auto; display: inline-block; margin-bottom: 5px;" />
+            <p style="color: #64748b; margin: 5px 0 0 0; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;">
               Premium Laundry & Dry Cleaning
             </p>
           </div>
