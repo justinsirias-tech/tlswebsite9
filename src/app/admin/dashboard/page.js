@@ -37,6 +37,16 @@ export default async function AdminDashboard() {
     console.error("Error reading dashboard stats:", err);
   }
 
+  const formatDate = (dateInput) => {
+    if (!dateInput) return "";
+    const d = new Date(dateInput);
+    if (isNaN(d.getTime())) return "";
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
   return (
     <div>
       <div className={styles.pageHeader}>
@@ -107,7 +117,7 @@ export default async function AdminDashboard() {
                 <div key={booking.id} style={{ padding: "1rem", background: "var(--background)", borderRadius: "8px" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.5rem" }}>
                     <strong>{booking.customerName}</strong>
-                    <span style={{ fontSize: "0.8rem", color: "var(--accent)" }}>{new Date(booking.createdAt).toLocaleDateString()}</span>
+                    <span style={{ fontSize: "0.8rem", color: "var(--accent)" }}>{formatDate(booking.createdAt)}</span>
                   </div>
                   <div style={{ fontSize: "0.9rem", color: "var(--text-light)" }}>
                     {booking.service} • {booking.phone}
@@ -129,7 +139,7 @@ export default async function AdminDashboard() {
                 <div key={req.id} style={{ padding: "1rem", background: "var(--background)", borderRadius: "8px" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.5rem" }}>
                     <strong>{req.name}</strong>
-                    <span style={{ fontSize: "0.8rem", color: "var(--accent)" }}>{new Date(req.createdAt).toLocaleDateString()}</span>
+                    <span style={{ fontSize: "0.8rem", color: "var(--accent)" }}>{formatDate(req.createdAt)}</span>
                   </div>
                   <div style={{ fontSize: "0.9rem", color: "var(--text-light)", textTransform: "capitalize", fontWeight: "600" }}>
                     {req.tier} Package • {req.term}
@@ -154,7 +164,7 @@ export default async function AdminDashboard() {
                 <div key={contact.id} style={{ padding: "1rem", background: "var(--background)", borderRadius: "8px" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.5rem" }}>
                     <strong>{contact.name}</strong>
-                    <span style={{ fontSize: "0.8rem", color: "var(--text-light)" }}>{new Date(contact.createdAt).toLocaleDateString()}</span>
+                    <span style={{ fontSize: "0.8rem", color: "var(--text-light)" }}>{formatDate(contact.createdAt)}</span>
                   </div>
                   <div style={{ fontSize: "0.9rem", color: "var(--text-color)" }}>
                     {contact.message.length > 50 ? contact.message.substring(0, 50) + "..." : contact.message}

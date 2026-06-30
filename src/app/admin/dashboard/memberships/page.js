@@ -19,6 +19,16 @@ export default async function MembershipsAdminPage() {
     orderBy: { createdAt: "desc" }
   });
 
+  const formatDate = (dateInput) => {
+    if (!dateInput) return "";
+    const d = new Date(dateInput);
+    if (isNaN(d.getTime())) return "";
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
   return (
     <div>
       <div className={styles.pageHeader} style={{ marginBottom: "2rem" }}>
@@ -53,7 +63,7 @@ export default async function MembershipsAdminPage() {
                     }}>
                       {req.status}
                     </span>
-                    <span style={{ fontSize: "0.9rem", color: "var(--text-light)" }}>{new Date(req.createdAt).toLocaleDateString()}</span>
+                    <span style={{ fontSize: "0.9rem", color: "var(--text-light)" }}>{formatDate(req.createdAt)}</span>
                   </div>
                 </div>
 

@@ -31,6 +31,16 @@ export default async function ArticleDetails({ params }) {
 
   if (!article) return notFound();
 
+  const formatDate = (dateInput) => {
+    if (!dateInput) return "";
+    const d = new Date(dateInput);
+    if (isNaN(d.getTime())) return "";
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
   return (
     <>
       <div style={{ background: "var(--background)", paddingTop: "8rem", paddingBottom: "2rem" }}>
@@ -39,7 +49,7 @@ export default async function ArticleDetails({ params }) {
             &larr; Back to Articles
           </Link>
           <h1 style={{ fontSize: "2.5rem", color: "var(--primary)", marginBottom: "1rem" }}>{article.title}</h1>
-          <p style={{ color: "var(--text-light)", fontSize: "0.9rem" }}>Published on {new Date(article.createdAt).toLocaleDateString()}</p>
+          <p style={{ color: "var(--text-light)", fontSize: "0.9rem" }}>Published on {formatDate(article.createdAt)}</p>
         </div>
       </div>
       <section style={{ padding: "4rem 0" }}>

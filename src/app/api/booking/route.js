@@ -214,12 +214,10 @@ async function sendConfirmationEmail(booking) {
       : '<span style="color: #64748b; font-size: 14px;">No specified services.</span>';
 
     const pickupDateObj = new Date(booking.pickupDate);
-    const formattedDateString = pickupDateObj.toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
+    const day = String(pickupDateObj.getDate()).padStart(2, '0');
+    const month = String(pickupDateObj.getMonth() + 1).padStart(2, '0');
+    const year = pickupDateObj.getFullYear();
+    const formattedDateString = `${day}/${month}/${year}`;
 
     const emailHtml = `
       <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f8fafc; padding: 40px 10px; color: #1e293b;">

@@ -4,6 +4,18 @@ import { useState, useEffect } from "react";
 import styles from "../../admin.module.css";
 
 export default function BookingsPage() {
+  const formatDateTime = (dateInput) => {
+    if (!dateInput) return "";
+    const d = new Date(dateInput);
+    if (isNaN(d.getTime())) return "";
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    const hours = String(d.getHours()).padStart(2, '0');
+    const minutes = String(d.getMinutes()).padStart(2, '0');
+    return `${day}/${month}/${year} ${hours}:${minutes}`;
+  };
+
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -211,14 +223,8 @@ export default function BookingsPage() {
   const exportToPDF = (booking) => {
     const printWindow = window.open('', '_blank');
     const details = parseServiceDetails(booking.service);
-    const formattedPickupDate = new Date(booking.pickupDate).toLocaleString('en-US', {
-      dateStyle: 'medium',
-      timeStyle: 'short'
-    });
-    const formattedCreatedDate = new Date(booking.createdAt).toLocaleString('en-US', {
-      dateStyle: 'medium',
-      timeStyle: 'short'
-    });
+    const formattedPickupDate = formatDateTime(booking.pickupDate);
+    const formattedCreatedDate = formatDateTime(booking.createdAt);
 
     const serviceList = parseServiceList(details.services);
 
@@ -571,10 +577,7 @@ export default function BookingsPage() {
             {filteredBookings.map(booking => {
               const details = parseServiceDetails(booking.service);
               const serviceList = parseServiceList(details.services);
-              const formattedPickup = new Date(booking.pickupDate).toLocaleString(undefined, {
-                dateStyle: "medium",
-                timeStyle: "short"
-              });
+              const formattedPickup = formatDateTime(booking.pickupDate);
               const isWhatsapp = booking.phone.includes("WhatsApp");
               
               const primaryPhone = booking.phone.split("|")[0];
@@ -725,7 +728,7 @@ export default function BookingsPage() {
                         <div>
                           <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: "600", textTransform: "uppercase" }}>Placed On</div>
                           <div style={{ fontSize: "0.85rem", color: "var(--text-light)", marginTop: "0.15rem" }}>
-                            {new Date(booking.createdAt).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}
+                            {formatDateTime(booking.createdAt)}
                           </div>
                         </div>
                       </div>

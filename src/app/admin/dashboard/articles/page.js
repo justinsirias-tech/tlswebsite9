@@ -4,6 +4,16 @@ import { useState, useEffect } from "react";
 import styles from "../../admin.module.css";
 
 export default function ManageArticles() {
+  const formatDate = (dateInput) => {
+    if (!dateInput) return "";
+    const d = new Date(dateInput);
+    if (isNaN(d.getTime())) return "";
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
   const [articles, setArticles] = useState([]);
   const [queue, setQueue] = useState([]);
   
@@ -207,7 +217,7 @@ export default function ManageArticles() {
                 <div>
                   <h3 style={{ fontSize: "1.2rem", marginBottom: "0.5rem" }}>{article.title}</h3>
                   <p style={{ color: "var(--text-light)", fontSize: "0.9rem" }}>
-                    Published: {new Date(article.createdAt).toLocaleDateString()}
+                    Published: {formatDate(article.createdAt)}
                   </p>
                 </div>
                 <button 
