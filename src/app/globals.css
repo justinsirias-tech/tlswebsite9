@@ -416,4 +416,9 @@ header .container {
   transform: translateY(-3px);
 }
 
+/* Ensure Google Places Autocomplete dropdown displays above modals and other fixed elements */
+.pac-container {
+  z-index: 99999 !important;
+}
+
 

@@ -90,6 +90,12 @@ export default function BookingClient() {
   };
 
   useEffect(() => {
+    if (window.google && window.google.maps && window.google.maps.places) {
+      initAutocomplete();
+    }
+  }, []);
+
+  useEffect(() => {
     if (isDifferentDeliveryAddress && window.google && window.google.maps && window.google.maps.places && deliveryAutocompleteRef.current) {
       const autocomplete = new window.google.maps.places.Autocomplete(deliveryAutocompleteRef.current, {
         fields: ["formatted_address", "name"],
@@ -201,7 +207,7 @@ Notes: ${specialInst}`.trim();
     <>
       <Script 
         src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`} 
-        strategy="lazyOnload"
+        strategy="afterInteractive"
         onLoad={initAutocomplete}
       />
       <section className={styles.bookingSection}>
