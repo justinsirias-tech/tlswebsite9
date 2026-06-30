@@ -246,7 +246,8 @@
     "bookingError": "There was an error submitting your booking. Please try again.",
     "networkError": "Network error.",
     "errorServiceRequired": "Please select at least one type of laundry service.",
-    "selectTimeSlot": "Select pickup time slot..."
+    "selectTimeSlot": "Select pickup time slot...",
+    "timeDisclaimer": "Timing might be subject to availability and changes without prior notice."
   },
   "Directory": {
     "searchPlaceholder": "Search by building name...",

@@ -246,7 +246,8 @@
     "bookingError": "提交您的预订时出现错误。请再试一次。",
     "networkError": "网络错误。",
     "errorServiceRequired": "请选择至少一种洗衣服务类型。",
-    "selectTimeSlot": "选择取件时间段..."
+    "selectTimeSlot": "选择取件时间段...",
+    "timeDisclaimer": "服务时间可能取决于可用性，如有更改，恕不另行通知。"
   },
   "Directory": {
     "searchPlaceholder": "按大楼名称搜索...",

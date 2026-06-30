@@ -54,24 +54,11 @@ export default function BookingClient() {
   const [pickupMethod, setPickupMethod] = useState("");
 
   const generateTimeSlots = () => {
-    const slots = [];
-    let currentHour = 9;
-    let currentMinute = 0;
-    while (currentHour < 19) {
-      const startStr = `${String(currentHour).padStart(2, '0')}:${String(currentMinute).padStart(2, '0')}`;
-      let endHour = currentHour;
-      let endMinute = currentMinute + 30;
-      if (endMinute >= 60) {
-        endHour += 1;
-        endMinute = 0;
-      }
-      const endStr = `${String(endHour).padStart(2, '0')}:${String(endMinute).padStart(2, '0')}`;
-      slots.push(`${startStr} - ${endStr}`);
-      
-      currentHour = endHour;
-      currentMinute = endMinute;
-    }
-    return slots;
+    return [
+      "10:30 - 13:00",
+      "13:30 - 16:00",
+      "16:30 - 18:00"
+    ];
   };
 
   const initAutocomplete = () => {
@@ -611,8 +598,11 @@ Notes: ${specialInst}`.trim();
                       <option key={slot} value={slot}>{slot}</option>
                     ))}
                   </select>
-                  <i className="fa-solid fa-chevron-down" style={{ position: "absolute", right: "15px", top: "50%", transform: "translateY(-50%)", color: "var(--text-light)", pointerEvents: "none", zIndex: 5 }}></i>
+                   <i className="fa-solid fa-chevron-down" style={{ position: "absolute", right: "15px", top: "50%", transform: "translateY(-50%)", color: "var(--text-light)", pointerEvents: "none", zIndex: 5 }}></i>
                 </div>
+                <p style={{ fontSize: "0.85rem", color: "var(--text-light)", marginTop: "6px", fontStyle: "italic", lineHeight: "1.4" }}>
+                  * {t("timeDisclaimer") || "Timing might be subject to availability and changes without prior notice."}
+                </p>
               </div>
 
               <div className={styles.fullWidth} style={{ marginTop: "1rem" }}>
