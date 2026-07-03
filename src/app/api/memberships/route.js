@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import prisma from "../../../lib/prisma";
 import nodemailer from "nodemailer";
 
@@ -15,6 +15,7 @@ async function sendAdminNotification(request) {
     if (hasSmtpConfig) {
       const port = parseInt(process.env.SMTP_PORT || "587", 10);
       transporter = nodemailer.createTransport({
+        pool: true,
         host: process.env.SMTP_HOST,
         port: port,
         secure: port === 465,
@@ -144,9 +145,13 @@ export async function POST(req) {
       }
     });
 
-    // Send email notification in background
-    sendAdminNotification(membershipRequest).catch(err => {
-      console.error("Failed to send background membership email:", err);
+    // Send email notification in background using Next.js after() to prevent Vercel container freezing
+    after(async () => {
+      try {
+        await sendAdminNotification(membershipRequest);
+      } catch (err) {
+        console.error("Failed to send background membership email:", err);
+      }
     });
 
     return NextResponse.json({

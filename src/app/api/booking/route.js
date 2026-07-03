@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import prisma from "../../../lib/prisma";
 import nodemailer from "nodemailer";
 import { GoogleGenAI } from "@google/genai";
@@ -177,7 +177,8 @@ async function sendConfirmationEmail(booking) {
 
     if (hasSmtpConfig) {
       const port = parseInt(process.env.SMTP_PORT || "587", 10);
-      transporter = nodemailer.createTransport({
+       transporter = nodemailer.createTransport({
+        pool: true,
         host: process.env.SMTP_HOST,
         port: port,
         secure: port === 465, // true for port 465, false for other ports
@@ -421,9 +422,13 @@ export async function POST(req) {
       }
     });
 
-    // Send the confirmation email in the background so it doesn't block the response
-    sendConfirmationEmail(booking).catch(err => {
-      console.error("Failed to send background email:", err);
+    // Send the confirmation email in the background using Next.js after() to prevent Vercel container freezing
+    after(async () => {
+      try {
+        await sendConfirmationEmail(booking);
+      } catch (err) {
+        console.error("Failed to send background email:", err);
+      }
     });
 
     return NextResponse.json({ 

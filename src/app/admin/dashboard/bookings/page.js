@@ -99,6 +99,8 @@ export default function BookingsPage() {
       delivery: "",
       pickupMethod: "",
       time: "",
+      paymentMethod: "",
+      expressService: "",
       notes: "",
       roomNo: "",
       deliveryRoomNo: ""
@@ -133,6 +135,10 @@ export default function BookingsPage() {
         details.pickupMethod = trimmed.replace("Pickup Method:", "").trim();
       } else if (trimmed.startsWith("Time:")) {
         details.time = trimmed.replace("Time:", "").trim();
+      } else if (trimmed.startsWith("Payment Method:")) {
+        details.paymentMethod = trimmed.replace("Payment Method:", "").trim();
+      } else if (trimmed.startsWith("Express Service:")) {
+        details.expressService = trimmed.replace("Express Service:", "").trim();
       } else if (trimmed.startsWith("Notes:")) {
         details.notes = trimmed.replace("Notes:", "").trim();
       }
@@ -394,6 +400,14 @@ export default function BookingsPage() {
               <div class="info-group">
                 <div class="info-label">Preferred Time</div>
                 <div class="info-value">${details.time || 'N/A'}</div>
+              </div>
+              <div class="info-group">
+                <div class="info-label">Payment Method</div>
+                <div class="info-value">${details.paymentMethod || 'N/A'}</div>
+              </div>
+              <div class="info-group">
+                <div class="info-label">Express Option</div>
+                <div class="info-value">${details.expressService || 'Standard'}</div>
               </div>
             </div>
           </div>
@@ -722,6 +736,20 @@ export default function BookingsPage() {
                           <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: "600", textTransform: "uppercase" }}>Pickup Method</div>
                           <div style={{ fontSize: "0.95rem", fontWeight: "500", color: "var(--text-dark)", marginTop: "0.15rem" }}>
                             {details.pickupMethod || "Not specified"}
+                          </div>
+                        </div>
+
+                        <div>
+                          <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: "600", textTransform: "uppercase" }}>Payment Method</div>
+                          <div style={{ fontSize: "0.95rem", fontWeight: "600", color: "var(--accent)", marginTop: "0.15rem" }}>
+                            <i className="fa-solid fa-credit-card" style={{ marginRight: "6px" }}></i> {details.paymentMethod || "Not specified"}
+                          </div>
+                        </div>
+
+                        <div>
+                          <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: "600", textTransform: "uppercase" }}>Express Service</div>
+                          <div style={{ fontSize: "0.95rem", fontWeight: "600", color: details.expressService && details.expressService !== "Standard" ? "var(--warning)" : "var(--text-light)", marginTop: "0.15rem" }}>
+                            <i className="fa-solid fa-bolt" style={{ marginRight: "6px" }}></i> {details.expressService || "Standard"}
                           </div>
                         </div>
 

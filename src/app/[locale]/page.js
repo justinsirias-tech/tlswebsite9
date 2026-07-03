@@ -74,7 +74,7 @@ export default function Home() {
             alt="Premium laundry shop backdrop"
             fill
             priority
-            unoptimized
+            sizes="100vw"
             style={{ objectFit: "cover", objectPosition: "center" }}
           />
           <div className={styles.heroOverlay}></div>

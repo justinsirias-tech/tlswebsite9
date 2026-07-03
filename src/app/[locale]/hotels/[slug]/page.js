@@ -90,12 +90,49 @@ export default async function HotelArticlePage({ params }) {
   // SEO Schema
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "Article",
-    "headline": `Premium Laundry Service for ${hotel.name} Guests`,
-    "publisher": {
-      "@type": "Organization",
-      "name": "That Laundry Shop"
-    }
+    "@graph": [
+      {
+        "@type": "DryCleaningOrLaundry",
+        "@id": "https://www.thatlaundryshop.com/#localbusiness",
+        "name": "That Laundry Shop",
+        "image": "https://www.thatlaundryshop.com/assets/hero_laundry.webp",
+        "url": "https://www.thatlaundryshop.com",
+        "telephone": "+6621234567",
+        "priceRange": "$$"
+      },
+      {
+        "@type": "LodgingBusiness",
+        "@id": `https://www.thatlaundryshop.com/hotels/${hotel.slug}#hotel`,
+        "name": name,
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": address || "",
+          "addressLocality": city,
+          "addressRegion": "Bangkok",
+          "addressCountry": "TH"
+        }
+      },
+      {
+        "@type": "Article",
+        "@id": `https://www.thatlaundryshop.com/hotels/${hotel.slug}#article`,
+        "headline": `Premium Laundry Service for ${name} Guests | That Laundry Shop`,
+        "description": `Enjoy premium laundry service with convenient pickup and delivery directly to your room at ${name} in ${city}.`,
+        "image": hotel.image || "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1200&q=80",
+        "datePublished": hotel.createdAt,
+        "dateModified": hotel.updatedAt,
+        "author": {
+          "@type": "Organization",
+          "name": "That Laundry Shop"
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "That Laundry Shop"
+        },
+        "about": {
+          "@id": `https://www.thatlaundryshop.com/hotels/${hotel.slug}#hotel`
+        }
+      }
+    ]
   };
 
   return (

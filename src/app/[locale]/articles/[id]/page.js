@@ -1,6 +1,7 @@
 import prisma from "../../../../lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Script from "next/script";
 
 export const dynamic = "force-dynamic";
 
@@ -41,8 +42,39 @@ export default async function ArticleDetails({ params }) {
     return `${day}/${month}/${year}`;
   };
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": article.title,
+    "description": article.content.substring(0, 150).replace(/<[^>]+>/g, '') + '...',
+    "datePublished": article.createdAt,
+    "dateModified": article.updatedAt,
+    "author": {
+      "@type": "Organization",
+      "name": "That Laundry Shop",
+      "url": "https://www.thatlaundryshop.com"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "That Laundry Shop",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://www.thatlaundryshop.com/images/logo.png"
+      }
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": `https://www.thatlaundryshop.com/articles/${article.id}`
+    }
+  };
+
   return (
     <>
+      <Script
+        id={`schema-article-${article.id}`}
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <div style={{ background: "var(--background)", paddingTop: "8rem", paddingBottom: "2rem" }}>
         <div className="container" style={{ maxWidth: "800px" }}>
           <Link href="/articles" style={{ color: "var(--accent)", textDecoration: "none", fontWeight: "600", display: "inline-block", marginBottom: "1.5rem" }}>

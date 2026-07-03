@@ -91,12 +91,49 @@ export default async function CondoArticlePage({ params }) {
   // SEO Schema
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "Article",
-    "headline": `Premium Laundry Service for ${condo.name} Residents`,
-    "publisher": {
-      "@type": "Organization",
-      "name": "That Laundry Shop"
-    }
+    "@graph": [
+      {
+        "@type": "DryCleaningOrLaundry",
+        "@id": "https://www.thatlaundryshop.com/#localbusiness",
+        "name": "That Laundry Shop",
+        "image": "https://www.thatlaundryshop.com/assets/hero_laundry.webp",
+        "url": "https://www.thatlaundryshop.com",
+        "telephone": "+6621234567",
+        "priceRange": "$$"
+      },
+      {
+        "@type": "ApartmentComplex",
+        "@id": `https://www.thatlaundryshop.com/condominiums/${condo.slug}#condo`,
+        "name": name,
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": address || "",
+          "addressLocality": city,
+          "addressRegion": "Bangkok",
+          "addressCountry": "TH"
+        }
+      },
+      {
+        "@type": "Article",
+        "@id": `https://www.thatlaundryshop.com/condominiums/${condo.slug}#article`,
+        "headline": `Premium Laundry Service for ${name} Residents | That Laundry Shop`,
+        "description": `Enjoy premium laundry and dry cleaning service with convenient pickup and delivery directly to your residence at ${name} in ${city}.`,
+        "image": condo.image || "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=1200&q=80",
+        "datePublished": condo.createdAt,
+        "dateModified": condo.updatedAt,
+        "author": {
+          "@type": "Organization",
+          "name": "That Laundry Shop"
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "That Laundry Shop"
+        },
+        "about": {
+          "@id": `https://www.thatlaundryshop.com/condominiums/${condo.slug}#condo`
+        }
+      }
+    ]
   };
 
   return (

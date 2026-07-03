@@ -52,6 +52,7 @@ export default function BookingClient() {
   const [pickupDate, setPickupDate] = useState("");
   const [pickupTime, setPickupTime] = useState("");
   const [pickupMethod, setPickupMethod] = useState("");
+  const [expressService, setExpressService] = useState("Standard: Next Day");
 
   const generateTimeSlots = () => {
     return [
@@ -133,6 +134,12 @@ export default function BookingClient() {
       return;
     }
 
+    const paymentMethods = formData.getAll('paymentMethod');
+    if (paymentMethods.length === 0) {
+      alert(t("errorPaymentRequired") || "Please select at least one preferred payment method.");
+      return;
+    }
+
     setIsSubmitting(true);
     
     try {
@@ -143,6 +150,8 @@ Address: ${buildingName}, Room ${roomNo}, ${fullAddress}
 Delivery: ${isDifferentDeliveryAddress ? `${deliveryBuildingName}, Room ${deliveryRoomNo}, ${deliveryFullAddress}` : 'Same as pickup'}
 Pickup Method: ${pickupMethod}
 Time: ${pickupTime}
+Payment Method: ${paymentMethods.join(', ')}
+Express Service: ${expressService}
 Notes: ${specialInst}`.trim();
 
       const [d, m, y] = pickupDate.split('/');
@@ -488,14 +497,14 @@ Notes: ${specialInst}`.trim();
               </div>
 
               <div className={styles.fullWidth}>
-                <label className={styles.checkboxItem} style={{ border: "none", padding: "0.5rem 0", background: "transparent", marginTop: "0" }}>
+                <label className={styles.checkboxItem}>
                   <input 
                     type="checkbox" 
                     checked={isDifferentDeliveryAddress} 
                     onChange={(e) => setIsDifferentDeliveryAddress(e.target.checked)} 
                   />
                   <span className={styles.checkmark}></span>
-                  <span className={styles.labelName} style={{ color: "var(--text)", fontWeight: "500" }}>{t("differentDelivery")}</span>
+                  <span className={styles.labelName}>{t("differentDelivery")}</span>
                 </label>
               </div>
 
@@ -634,6 +643,124 @@ Notes: ${specialInst}`.trim();
                     />
                     <span className={styles.checkmark} style={{ borderRadius: "50%" }}></span>
                     <span className={styles.labelName}>{t("leaveConcierge")}</span>
+                  </label>
+                </div>
+              </div>
+
+              <div className={styles.fullWidth} style={{ marginTop: "1.5rem" }}>
+                <label style={{ fontSize: "1.1rem", fontWeight: "600", color: "var(--primary)", marginBottom: "1rem", display: "block" }}>
+                  {t("paymentMethodLabel")}
+                </label>
+                <div className={styles.paymentGrid}>
+                  <label className={styles.checkboxItem} style={{ flexDirection: "column", gap: "0.5rem", padding: "1rem" }}>
+                    <input 
+                      type="checkbox" 
+                      name="paymentMethod" 
+                      value="Cash" 
+                    />
+                    <img src="/images/logo_cash.svg" alt="Cash" className={`${styles.paymentLogo} ${styles.svgLogo}`} style={{ height: "28px" }} />
+                    <span className={styles.labelName} style={{ fontSize: "0.85rem", fontWeight: "600" }}>{t("cash")}</span>
+                  </label>
+
+                  <label className={styles.checkboxItem} style={{ flexDirection: "column", gap: "0.5rem", padding: "1rem" }}>
+                    <input 
+                      type="checkbox" 
+                      name="paymentMethod" 
+                      value="Card" 
+                    />
+                    <div style={{ display: "flex", gap: "0.4rem", alignItems: "center" }}>
+                      <img src="/images/logo_visa.svg" alt="Visa" className={`${styles.paymentLogo} ${styles.svgLogo}`} style={{ height: "16px" }} />
+                      <img src="/images/logo_mastercard.svg" alt="Mastercard" className={`${styles.paymentLogo} ${styles.svgLogo}`} style={{ height: "20px" }} />
+                    </div>
+                    <span className={styles.labelName} style={{ fontSize: "0.85rem", fontWeight: "600" }}>{t("card")}</span>
+                  </label>
+
+                  <label className={styles.checkboxItem} style={{ flexDirection: "column", gap: "0.5rem", padding: "1rem" }}>
+                    <input 
+                      type="checkbox" 
+                      name="paymentMethod" 
+                      value="Wise" 
+                    />
+                    <img src="/images/logo_wise.svg" alt="Wise" className={`${styles.paymentLogo} ${styles.svgLogo}`} style={{ height: "22px" }} />
+                    <span className={styles.labelName} style={{ fontSize: "0.85rem", fontWeight: "600" }}>{t("wise")}</span>
+                  </label>
+
+                  <label className={styles.checkboxItem} style={{ flexDirection: "column", gap: "0.5rem", padding: "1rem" }}>
+                    <input 
+                      type="checkbox" 
+                      name="paymentMethod" 
+                      value="Bank Transfer" 
+                    />
+                    <img src="/images/logo_bank.svg" alt="Bank Transfer" className={`${styles.paymentLogo} ${styles.svgLogo}`} style={{ height: "24px" }} />
+                    <span className={styles.labelName} style={{ fontSize: "0.85rem", fontWeight: "600" }}>{t("bankTransfer")}</span>
+                  </label>
+
+                  <label className={styles.checkboxItem} style={{ flexDirection: "column", gap: "0.5rem", padding: "1rem" }}>
+                    <input 
+                      type="checkbox" 
+                      name="paymentMethod" 
+                      value="QR" 
+                    />
+                    <img src="/images/logo_qr.png" alt="PromptPay" className={styles.paymentLogo} style={{ height: "24px" }} />
+                    <span className={styles.labelName} style={{ fontSize: "0.85rem", fontWeight: "600" }}>{t("qrCode")}</span>
+                  </label>
+                </div>
+              </div>
+
+              <div className={styles.fullWidth} style={{ marginTop: "1.5rem" }}>
+                <label style={{ fontSize: "1.1rem", fontWeight: "600", color: "var(--primary)", marginBottom: "1rem", display: "block" }}>
+                  {t("expressServiceLabel")}
+                </label>
+                <div className={styles.expressGrid}>
+                  <label className={styles.checkboxItem}>
+                    <input 
+                      type="checkbox" 
+                      name="expressService" 
+                      value="Express 50: Same Day before 18:00" 
+                      checked={expressService === "Express 50: Same Day before 18:00"}
+                      onChange={(e) => setExpressService(e.target.checked ? "Express 50: Same Day before 18:00" : "Standard: Next Day")}
+                    />
+                    <span className={styles.checkmark}></span>
+                    <span className={styles.labelName} style={{ display: "flex", flexDirection: "column", gap: "0.25rem", width: "100%" }}>
+                      <span style={{ fontWeight: "600", fontSize: "0.95rem" }}>{t("express50SameDayTitle")}</span>
+                      {t("express50SameDaySub") && (
+                        <span style={{ fontSize: "0.75rem", opacity: 0.8, fontStyle: "italic", fontWeight: "normal" }}>{t("express50SameDaySub")}</span>
+                      )}
+                    </span>
+                  </label>
+
+                  <label className={styles.checkboxItem}>
+                    <input 
+                      type="checkbox" 
+                      name="expressService" 
+                      value="Express 50 (Next Day): Next Day at 12:00" 
+                      checked={expressService === "Express 50 (Next Day): Next Day at 12:00"}
+                      onChange={(e) => setExpressService(e.target.checked ? "Express 50 (Next Day): Next Day at 12:00" : "Standard: Next Day")}
+                    />
+                    <span className={styles.checkmark}></span>
+                    <span className={styles.labelName} style={{ display: "flex", flexDirection: "column", gap: "0.25rem", width: "100%" }}>
+                      <span style={{ fontWeight: "600", fontSize: "0.95rem" }}>{t("express50NextDayTitle")}</span>
+                      {t("express50NextDaySub") && (
+                        <span style={{ fontSize: "0.75rem", opacity: 0.8, fontStyle: "italic", fontWeight: "normal" }}>{t("express50NextDaySub")}</span>
+                      )}
+                    </span>
+                  </label>
+
+                  <label className={styles.checkboxItem}>
+                    <input 
+                      type="checkbox" 
+                      name="expressService" 
+                      value="Express 100: Same Day before 19:00" 
+                      checked={expressService === "Express 100: Same Day before 19:00"}
+                      onChange={(e) => setExpressService(e.target.checked ? "Express 100: Same Day before 19:00" : "Standard: Next Day")}
+                    />
+                    <span className={styles.checkmark}></span>
+                    <span className={styles.labelName} style={{ display: "flex", flexDirection: "column", gap: "0.25rem", width: "100%" }}>
+                      <span style={{ fontWeight: "600", fontSize: "0.95rem" }}>{t("express100SameDay4hTitle")}</span>
+                      {t("express100SameDay4hSub") && (
+                        <span style={{ fontSize: "0.75rem", opacity: 0.8, fontStyle: "italic", fontWeight: "normal" }}>{t("express100SameDay4hSub")}</span>
+                      )}
+                    </span>
                   </label>
                 </div>
               </div>

@@ -158,16 +158,19 @@
   position: relative;
   display: flex;
   align-items: center;
-  padding: 1rem;
+  justify-content: center;
+  text-align: center;
+  padding: 1.1rem 1rem;
   border: 2px solid rgba(0,0,0,0.08);
   border-radius: var(--radius);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   background: white;
+  user-select: none;
 }
 
 .checkboxItem:hover {
-  border-color: rgba(58, 123, 213, 0.5);
+  border-color: #222945;
 }
 
 .checkboxItem input {
@@ -177,32 +180,22 @@
 }
 
 .checkboxItem .checkmark {
-  width: 24px;
-  height: 24px;
-  border: 2px solid rgba(0,0,0,0.2);
-  border-radius: 6px;
-  margin-right: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
+  display: none !important;
 }
 
-.checkboxItem input:checked ~ .checkmark {
-  background: var(--accent);
-  border-color: var(--accent);
+/* Checked button state styles */
+.checkboxItem:has(input:checked) {
+  background: #222945 !important;
+  border-color: #222945 !important;
 }
 
-.checkboxItem input:checked ~ .checkmark::after {
-  content: '\f00c';
-  font-family: 'Font Awesome 6 Free';
-  font-weight: 900;
-  color: white;
-  font-size: 12px;
+.checkboxItem:has(input:checked) .labelName {
+  color: #ffffff !important;
+  font-weight: 600;
 }
 
 .checkboxItem input:checked ~ .labelName {
-  color: var(--accent);
+  color: #ffffff !important;
   font-weight: 600;
 }
 
@@ -355,5 +348,54 @@
   }
   .formWrapper {
     padding: 2rem 1.5rem;
+  }
+}
+
+.paymentLogo {
+  height: 24px;
+  max-width: 100px;
+  object-fit: contain;
+  transition: all 0.2s ease;
+}
+
+.checkboxItem:has(input:checked) .svgLogo {
+  filter: brightness(0) invert(1);
+}
+
+.paymentGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 992px) {
+  .paymentGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .paymentGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 400px) {
+  .paymentGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.expressGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .expressGrid {
+    grid-template-columns: 1fr;
   }
 }

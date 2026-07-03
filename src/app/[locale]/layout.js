@@ -21,7 +21,9 @@ export default async function RootLayout({ children, params }) {
     <html lang={locale} suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
-        <script dangerouslySetInnerHTML={{ __html: `
+        <link rel="preconnect" href="https://maps.googleapis.com" />
+        <link rel="preconnect" href="https://maps.gstatic.com" />
+        <script suppressHydrationWarning={true} dangerouslySetInnerHTML={{ __html: `
           (function() {
             var link = document.createElement('link');
             link.rel = 'stylesheet';
