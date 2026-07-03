@@ -496,6 +496,63 @@ Notes: ${specialInst}`.trim();
                 />
               </div>
 
+              <div className={styles.inputGroup}>
+                <label>{t("date")}</label>
+                <div style={{ position: "relative" }}>
+                  <input 
+                    type="text" 
+                    placeholder="dd/mm/yyyy" 
+                    value={pickupDate}
+                    onChange={handleDateChange}
+                    required 
+                    maxLength={10}
+                  />
+                  <input 
+                    type="date"
+                    style={{ position: 'absolute', opacity: 0, right: 0, top: 0, bottom: 0, width: '50px', cursor: 'pointer', zIndex: 10 }}
+                    onChange={(e) => {
+                      const val = e.target.value; // YYYY-MM-DD
+                      if(val) {
+                        const [y, m, d] = val.split('-');
+                        setPickupDate(`${d}/${m}/${y}`);
+                      }
+                    }}
+                  />
+                  <i className="fa-regular fa-calendar" style={{ position: "absolute", right: "15px", top: "50%", transform: "translateY(-50%)", color: "var(--text-light)", pointerEvents: "none", zIndex: 5 }}></i>
+                </div>
+              </div>
+
+              <div className={styles.inputGroup}>
+                <label>{t("time")}</label>
+                <div style={{ position: "relative" }}>
+                  <select 
+                    value={pickupTime}
+                    onChange={(e) => setPickupTime(e.target.value)}
+                    required
+                    style={{
+                      width: "100%",
+                      padding: "1rem",
+                      borderRadius: "var(--radius-sm)",
+                      border: "1px solid rgba(0,0,0,0.1)",
+                      outline: "none",
+                      fontSize: "1rem",
+                      background: "white",
+                      cursor: "pointer",
+                      appearance: "none"
+                    }}
+                  >
+                    <option value="" disabled hidden>{t("selectTimeSlot") || "Select a time slot"}</option>
+                    {generateTimeSlots().map(slot => (
+                      <option key={slot} value={slot}>{slot}</option>
+                    ))}
+                  </select>
+                   <i className="fa-solid fa-chevron-down" style={{ position: "absolute", right: "15px", top: "50%", transform: "translateY(-50%)", color: "var(--text-light)", pointerEvents: "none", zIndex: 5 }}></i>
+                </div>
+                <p style={{ fontSize: "0.85rem", color: "var(--text-light)", marginTop: "6px", fontStyle: "italic", lineHeight: "1.4" }}>
+                  * {t("timeDisclaimer") || "Timing might be subject to availability and changes without prior notice."}
+                </p>
+              </div>
+
               <div className={styles.fullWidth}>
                 <label className={styles.checkboxItem}>
                   <input 
@@ -556,63 +613,6 @@ Notes: ${specialInst}`.trim();
                   </div>
                 </>
               )}
-
-              <div className={styles.inputGroup}>
-                <label>{t("date")}</label>
-                <div style={{ position: "relative" }}>
-                  <input 
-                    type="text" 
-                    placeholder="dd/mm/yyyy" 
-                    value={pickupDate}
-                    onChange={handleDateChange}
-                    required 
-                    maxLength={10}
-                  />
-                  <input 
-                    type="date"
-                    style={{ position: 'absolute', opacity: 0, right: 0, top: 0, bottom: 0, width: '50px', cursor: 'pointer', zIndex: 10 }}
-                    onChange={(e) => {
-                      const val = e.target.value; // YYYY-MM-DD
-                      if(val) {
-                        const [y, m, d] = val.split('-');
-                        setPickupDate(`${d}/${m}/${y}`);
-                      }
-                    }}
-                  />
-                  <i className="fa-regular fa-calendar" style={{ position: "absolute", right: "15px", top: "50%", transform: "translateY(-50%)", color: "var(--text-light)", pointerEvents: "none", zIndex: 5 }}></i>
-                </div>
-              </div>
-
-              <div className={styles.inputGroup}>
-                <label>{t("time")}</label>
-                <div style={{ position: "relative" }}>
-                  <select 
-                    value={pickupTime}
-                    onChange={(e) => setPickupTime(e.target.value)}
-                    required
-                    style={{
-                      width: "100%",
-                      padding: "1rem",
-                      borderRadius: "var(--radius-sm)",
-                      border: "1px solid rgba(0,0,0,0.1)",
-                      outline: "none",
-                      fontSize: "1rem",
-                      background: "white",
-                      cursor: "pointer",
-                      appearance: "none"
-                    }}
-                  >
-                    <option value="" disabled hidden>{t("selectTimeSlot") || "Select a time slot"}</option>
-                    {generateTimeSlots().map(slot => (
-                      <option key={slot} value={slot}>{slot}</option>
-                    ))}
-                  </select>
-                   <i className="fa-solid fa-chevron-down" style={{ position: "absolute", right: "15px", top: "50%", transform: "translateY(-50%)", color: "var(--text-light)", pointerEvents: "none", zIndex: 5 }}></i>
-                </div>
-                <p style={{ fontSize: "0.85rem", color: "var(--text-light)", marginTop: "6px", fontStyle: "italic", lineHeight: "1.4" }}>
-                  * {t("timeDisclaimer") || "Timing might be subject to availability and changes without prior notice."}
-                </p>
-              </div>
 
               <div className={styles.fullWidth} style={{ marginTop: "1rem" }}>
                 <label style={{ fontSize: "1.1rem", fontWeight: "600", color: "var(--primary)", marginBottom: "1rem", display: "block" }}>
