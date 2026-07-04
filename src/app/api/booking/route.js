@@ -419,6 +419,7 @@ export async function POST(req) {
         phone: data.phone,
         pickupDate: new Date(data.pickupDate),
         service: translatedService,
+        memberId: data.memberId || null,
       }
     });
 

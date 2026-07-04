@@ -59,6 +59,8 @@ model Booking {
   status       String   @default("PENDING")
   assignedToId String?
   assignedTo   AdminUser? @relation(fields: [assignedToId], references: [id], onDelete: SetNull)
+  memberId     String?
+  member       Member?    @relation(fields: [memberId], references: [id], onDelete: SetNull)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
@@ -117,4 +119,30 @@ model MembershipRequest {
   status    String   @default("PENDING")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Member {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  phone        String?
+  balance      Float    @default(0.0)
+  tier         String   @default("None") // "None", "Silver", "Gold", "Platinum"
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  bookings     Booking[]
+  transactions Transaction[]
+}
+
+model Transaction {
+  id          String   @id @default(uuid())
+  memberId    String
+  member      Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  amount      Float
+  type        String   // "TOPUP" or "PAYMENT"
+  description String
+  status      String   @default("COMPLETED") // "PENDING", "COMPLETED", "FAILED"
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

@@ -10,6 +10,7 @@ import { useTranslations, useLocale } from "next-intl";
 export default function BookingClient() {
   const t = useTranslations("Booking");
   const locale = useLocale();
+  const [member, setMember] = useState(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [countryCode, setCountryCode] = useState("+66");
@@ -30,6 +31,26 @@ export default function BookingClient() {
     }
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    fetch("/api/member/profile")
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setMember(data.member);
+          if (data.member.phone) {
+            const matched = data.member.phone.match(/^(\+\d+)\s(.*)$/);
+            if (matched) {
+              setCountryCode(matched[1]);
+              setPhoneNumber(matched[2]);
+            } else {
+              setPhoneNumber(data.member.phone);
+            }
+          }
+        }
+      })
+      .catch(() => {});
   }, []);
 
   const filteredCountries = countryCodes.filter(c => 
@@ -171,7 +192,8 @@ Notes: ${specialInst}`.trim();
         email: e.target.elements.email.value,
         phone: `${countryCode} ${phoneNumber} ${isWhatsapp ? '(WhatsApp)' : ''} ${thaiMobile ? `| TH: ${thaiMobile}` : ''}`,
         pickupDate: formattedDate.toISOString(),
-        service: fullServiceDesc
+        service: fullServiceDesc,
+        memberId: member ? member.id : null
       };
 
       const res = await fetch('/api/booking', {
@@ -360,12 +382,26 @@ Notes: ${specialInst}`.trim();
               <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
                 <div className={styles.inputGroup}>
                   <label>{t("fullName")}</label>
-                  <input type="text" name="customerName" placeholder={t("fullNamePlaceholder")} required />
+                  <input 
+                    key={member ? member.id : "guest-name"}
+                    type="text" 
+                    name="customerName" 
+                    defaultValue={member ? member.name : ""}
+                    placeholder={t("fullNamePlaceholder")} 
+                    required 
+                  />
                 </div>
 
                 <div className={styles.inputGroup}>
                   <label>{t("email")}</label>
-                  <input type="email" name="email" placeholder={t("emailPlaceholder")} required />
+                  <input 
+                    key={member ? member.id : "guest-email"}
+                    type="email" 
+                    name="email" 
+                    defaultValue={member ? member.email : ""}
+                    placeholder={t("emailPlaceholder")} 
+                    required 
+                  />
                 </div>
               </div>
 

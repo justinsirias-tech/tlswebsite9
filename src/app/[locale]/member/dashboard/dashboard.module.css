@@ -1,0 +1,446 @@
+.dashboardContainer {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #161a2b 0%, #222945 100%);
+  padding: 6.5rem 1rem 4rem 1rem;
+  color: white;
+}
+
+.loadingContainer {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #161a2b;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(255, 255, 255, 0.1);
+  border-top-color: #10b981;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 3rem;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.pageTitle {
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin: 0 0 0.5rem 0;
+}
+
+.welcomeText {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+}
+
+.logoutBtn {
+  padding: 0.6rem 1.2rem;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.logoutBtn:hover {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.statCard {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.statHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.statHeader i {
+  font-size: 1.2rem;
+}
+
+.balanceValue {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #10b981;
+}
+
+.tierValue {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: white;
+}
+
+.bookingsCountValue {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--accent);
+}
+
+.joinedValue {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: white;
+  margin-top: 0.3rem;
+}
+
+/* Metallic Membership Tiers */
+.silverTier {
+  background: linear-gradient(135deg, rgba(160,174,192,0.15) 0%, rgba(203,213,224,0.15) 100%);
+  border-color: rgba(160, 174, 192, 0.4);
+}
+.silverTier .tierValue, .silverTier i {
+  color: #cbd5e0;
+  text-shadow: 0 0 10px rgba(203, 213, 224, 0.3);
+}
+
+.goldTier {
+  background: linear-gradient(135deg, rgba(217,119,6,0.15) 0%, rgba(245,158,11,0.15) 100%);
+  border-color: rgba(245, 158, 11, 0.4);
+}
+.goldTier .tierValue, .goldTier i {
+  color: #fbbf24;
+  text-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+}
+
+.platinumTier {
+  background: linear-gradient(135deg, rgba(31,41,55,0.4) 0%, rgba(75,85,99,0.4) 100%);
+  border-color: rgba(156, 163, 175, 0.5);
+}
+.platinumTier .tierValue, .platinumTier i {
+  color: #e5e7eb;
+  text-shadow: 0 0 10px rgba(229, 231, 235, 0.3);
+}
+
+/* Panel Layout */
+.dashboardPanelGrid {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 2rem;
+}
+
+@media (max-width: 992px) {
+  .dashboardPanelGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.panelCard {
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 18px;
+  padding: 2.2rem;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+}
+
+.panelHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.panelHeader h2 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin: 0;
+  display: flex;
+  align-items: center;
+}
+
+.bookNowBtn {
+  padding: 0.5rem 1rem;
+  border-radius: 30px;
+  border: none;
+  background: var(--accent);
+  color: white;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.2s ease;
+}
+
+.bookNowBtn:hover {
+  background: #f06a0e;
+  transform: translateY(-1px);
+}
+
+.emptyState {
+  text-align: center;
+  padding: 4rem 1rem;
+  color: rgba(255, 255, 255, 0.4);
+  font-style: italic;
+  font-size: 1rem;
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+}
+
+/* Bookings List */
+.bookingsList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.bookingItem {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 12px;
+  padding: 1.2rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.bookingItem:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.bookingService {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0 0 0.4rem 0;
+}
+
+.bookingDate {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+}
+
+.statusBadge {
+  padding: 0.35rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.statusPending {
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: #fbbf24;
+}
+
+.statusClosed {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #34d399;
+}
+
+.statusCancelled {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #f87171;
+}
+
+/* Transactions List */
+.transactionsList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-height: 350px;
+  overflow-y: auto;
+}
+
+.transactionItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.8rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.transactionItem:last-child {
+  border-bottom: none;
+}
+
+.txDesc {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 0.3rem 0;
+}
+
+.txDate {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+}
+
+.txAmount {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.txPositive {
+  color: #10b981;
+}
+
+.txNegative {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* Top up Form */
+.topupForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.inputGroup label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.inputGroup input {
+  padding: 0.9rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  color: white;
+  font-size: 0.95rem;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.inputGroup input:focus {
+  border-color: #10b981;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.presetGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.5rem;
+}
+
+@media (max-width: 480px) {
+  .presetGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.presetBtn {
+  padding: 0.7rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.85rem;
+}
+
+.presetBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.presetActive {
+  background: #10b981 !important;
+  border-color: #10b981 !important;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.cardInfoGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.submitTopupBtn {
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 10px;
+  border: none;
+  background: #10b981;
+  color: white;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+}
+
+.submitTopupBtn:hover {
+  background: #059669;
+  transform: translateY(-1px);
+}
+
+.errorAlert {
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  color: #f87171;
+  padding: 0.8rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.successAlert {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  color: #34d399;
+  padding: 0.8rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+  text-align: center;
+}
