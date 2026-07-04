@@ -658,7 +658,7 @@ Notes: ${specialInst}`.trim();
                       name="paymentMethod" 
                       value="Cash" 
                     />
-                    <img src="/images/logo_cash.svg" alt="Cash" className={`${styles.paymentLogo} ${styles.svgLogo}`} style={{ height: "28px" }} />
+                    <img src="/images/logo_cash.svg" alt="Cash" className={styles.paymentLogo} style={{ height: "28px" }} />
                     <span className={styles.labelName} style={{ fontSize: "0.85rem", fontWeight: "600" }}>{t("cash")}</span>
                   </label>
 
@@ -669,8 +669,8 @@ Notes: ${specialInst}`.trim();
                       value="Card" 
                     />
                     <div style={{ display: "flex", gap: "0.4rem", alignItems: "center" }}>
-                      <img src="/images/logo_visa.svg" alt="Visa" className={`${styles.paymentLogo} ${styles.svgLogo}`} style={{ height: "16px" }} />
-                      <img src="/images/logo_mastercard.svg" alt="Mastercard" className={`${styles.paymentLogo} ${styles.svgLogo}`} style={{ height: "20px" }} />
+                      <img src="/images/logo_visa.svg" alt="Visa" className={styles.paymentLogo} style={{ height: "16px" }} />
+                      <img src="/images/logo_mastercard.svg" alt="Mastercard" className={styles.paymentLogo} style={{ height: "20px" }} />
                     </div>
                     <span className={styles.labelName} style={{ fontSize: "0.85rem", fontWeight: "600" }}>{t("card")}</span>
                   </label>
