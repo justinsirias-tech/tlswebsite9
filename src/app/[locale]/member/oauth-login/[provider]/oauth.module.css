@@ -1,0 +1,222 @@
+.pageContainer {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #0f172a;
+  padding: 6rem 1rem 2rem 1rem;
+}
+
+.authCard {
+  width: 100%;
+  max-width: 440px;
+  background: white;
+  border-radius: 12px;
+  padding: 2.5rem 2rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+  color: #334155;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  transition: all 0.3s ease;
+}
+
+.brandHeader {
+  text-align: center;
+  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.brandLogoCircle {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.providerLogoIcon {
+  font-size: 1.8rem;
+  color: white;
+}
+
+.providerName {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 0 0 0.4rem 0;
+  color: #0f172a;
+}
+
+.subText {
+  font-size: 0.95rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.inputGroup label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.inputGroup input {
+  padding: 0.8rem;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  color: #0f172a;
+  font-size: 0.95rem;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.inputGroup input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.sandboxNotice {
+  font-size: 0.8rem;
+  color: #64748b;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  padding: 0.8rem;
+  border-radius: 6px;
+  margin: 0.5rem 0;
+  line-height: 1.4;
+}
+
+.submitBtn {
+  padding: 0.9rem;
+  border-radius: 6px;
+  border: none;
+  color: white;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.submitBtn:hover {
+  filter: brightness(0.92);
+  transform: translateY(-1px);
+}
+
+.submitBtn:disabled {
+  background: #cbd5e1 !important;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.errorAlert {
+  background: #fee2e2;
+  border: 1px solid #fca5a5;
+  color: #991b1b;
+  padding: 0.8rem;
+  border-radius: 6px;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.footerLink {
+  text-align: center;
+  margin-top: 1.5rem;
+}
+
+.cancelBtn {
+  background: none;
+  border: none;
+  color: #64748b;
+  font-size: 0.9rem;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+}
+
+.cancelBtn:hover {
+  color: #0f172a;
+}
+
+/* Provider Themes customization */
+.googleTheme .brandLogoCircle {
+  background: white;
+  border: 1px solid #e2e8f0;
+}
+.googleTheme .providerLogoIcon {
+  color: #4285F4;
+}
+.googleTheme .submitBtn {
+  background: #4285F4;
+}
+
+.lineTheme {
+  border-top: 5px solid #06C755;
+}
+.lineTheme .brandLogoCircle {
+  background: #06C755;
+}
+.lineTheme .submitBtn {
+  background: #06C755;
+}
+
+.fbTheme {
+  border-top: 5px solid #1877F2;
+}
+.fbTheme .brandLogoCircle {
+  background: #1877F2;
+}
+.fbTheme .submitBtn {
+  background: #1877F2;
+}
+
+.xTheme {
+  background: #000000;
+  color: #e2e8f0;
+  border: 1px solid #334155;
+}
+.xTheme .providerName {
+  color: white;
+}
+.xTheme .brandLogoCircle {
+  background: white;
+}
+.xTheme .providerLogoIcon {
+  color: black;
+}
+.xTheme .inputGroup input {
+  background: #1e293b;
+  border-color: #475569;
+  color: white;
+}
+.xTheme .inputGroup input:focus {
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+}
+.xTheme .sandboxNotice {
+  background: #0f172a;
+  border-color: #334155;
+  color: #94a3b8;
+}
+.xTheme .submitBtn {
+  background: white;
+  color: black;
+}
+.xTheme .cancelBtn:hover {
+  color: white;
+}

@@ -1,0 +1,315 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.requestCard {
+  padding: 1.5rem;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid rgba(34, 41, 69, 0.08);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.requestCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -5px rgba(34, 41, 69, 0.06);
+  border-color: rgba(34, 41, 69, 0.15);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.nameGroup {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.name {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #222945;
+}
+
+.contactInfo {
+  font-size: 0.9rem;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.statusBadge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.badgePENDING {
+  background: rgba(245, 158, 11, 0.1);
+  color: #d97706;
+}
+
+.badgeAPPROVED {
+  background: rgba(16, 185, 129, 0.1);
+  color: #059669;
+}
+
+.badgeREJECTED {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+}
+
+.badgeCLOSED {
+  background: rgba(100, 116, 139, 0.1);
+  color: #475569;
+}
+
+.detailsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.25rem;
+  margin: 1.25rem 0;
+  background: white;
+  padding: 1.25rem;
+  border-radius: 12px;
+  border: 1px solid rgba(34, 41, 69, 0.05);
+}
+
+.gridItemLabel {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #94a3b8;
+  margin-bottom: 0.25rem;
+}
+
+.gridItemValue {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #222945;
+}
+
+.actionRow {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.btn {
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.btnWhatsApp {
+  background: #25d366;
+  color: white;
+}
+
+.btnWhatsApp:hover {
+  background: #128c7e;
+}
+
+.btnManage {
+  background: #222945;
+  color: white;
+}
+
+.btnManage:hover {
+  background: #343e63;
+}
+
+/* Modal Styling */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(34, 41, 69, 0.4);
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  padding: 1rem;
+}
+
+.modalContent {
+  width: 100%;
+  max-width: 680px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 25px 50px -12px rgba(34, 41, 69, 0.25);
+  border: 1px solid rgba(34, 41, 69, 0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+.modalHeader {
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid rgba(34, 41, 69, 0.08);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modalTitle {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #222945;
+  margin: 0;
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.closeBtn:hover {
+  color: #222945;
+}
+
+.modalBody {
+  padding: 2rem;
+  flex-grow: 1;
+}
+
+.tabHeader {
+  display: flex;
+  gap: 1rem;
+  border-bottom: 2px solid rgba(34, 41, 69, 0.05);
+  margin-bottom: 1.5rem;
+}
+
+.tabBtn {
+  background: none;
+  border: none;
+  padding: 0.75rem 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #94a3b8;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: all 0.2s ease;
+}
+
+.tabBtnActive {
+  color: #222945;
+  border-bottom-color: #222945;
+}
+
+/* Forms */
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+}
+
+@media (max-width: 600px) {
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.fullWidth {
+  grid-column: span 2;
+}
+
+@media (max-width: 600px) {
+  .fullWidth {
+    grid-column: span 1;
+  }
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.inputGroup label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #64748b;
+}
+
+.inputGroup input,
+.inputGroup select,
+.inputGroup textarea {
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  border: 1px solid rgba(34, 41, 69, 0.15);
+  font-size: 0.95rem;
+  color: #222945;
+  outline: none;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.inputGroup input:focus,
+.inputGroup select:focus,
+.inputGroup textarea:focus {
+  border-color: #222945;
+  box-shadow: 0 0 0 3px rgba(34, 41, 69, 0.1);
+}
+
+.modalFooter {
+  padding: 1.5rem 2rem;
+  border-top: 1px solid rgba(34, 41, 69, 0.08);
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.btnSecondary {
+  background: rgba(34, 41, 69, 0.05);
+  color: #222945;
+}
+
+.btnSecondary:hover {
+  background: rgba(34, 41, 69, 0.1);
+}
+
+.dateRangeBox {
+  background: rgba(34, 41, 69, 0.03);
+  border: 1px solid rgba(34, 41, 69, 0.08);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-top: 1.25rem;
+}

@@ -8,57 +8,51 @@ import styles from "./login.module.css";
 const localizations = {
   en: {
     signIn: "Member Sign In",
-    signUp: "Create Member Account",
+    forgotTitle: "Forgot Password",
     email: "Email Address",
     password: "Password",
-    name: "Full Name",
-    phone: "Phone Number",
     loginSuccess: "Successfully logged in!",
-    signupSuccess: "Successfully registered! Please sign in.",
-    noAccount: "Don't have an account?",
-    haveAccount: "Already have an account?",
-    loginBtn: "Log In",
-    signupBtn: "Register Account",
     passwordPlaceholder: "••••••••",
     emailPlaceholder: "name@example.com",
-    namePlaceholder: "John Doe",
-    phonePlaceholder: "e.g. 0946916668"
+    membersOnly: "This is meant for members only.",
+    keenToSubscribe: "Keen to be our member? Click here to subscribe",
+    forgotLink: "Forgot Password?",
+    forgotText: "Enter the email address registered with your account. If it is in our system, we will send you a link to reset your password.",
+    forgotSubmitBtn: "Send Reset Link",
+    backToLogin: "Back to Login",
+    loginBtn: "Log In"
   },
   th: {
     signIn: "เข้าสู่ระบบสมาชิก",
-    signUp: "สมัครบัญชีสมาชิก",
+    forgotTitle: "ลืมรหัสผ่าน",
     email: "ที่อยู่อีเมล",
     password: "รหัสผ่าน",
-    name: "ชื่อ-นามสกุล",
-    phone: "เบอร์โทรศัพท์",
     loginSuccess: "เข้าสู่ระบบสำเร็จ!",
-    signupSuccess: "สมัครสมาชิกสำเร็จ! กรุณาเข้าสู่ระบบ",
-    noAccount: "ยังไม่มีบัญชี?",
-    haveAccount: "มีบัญชีอยู่แล้ว?",
-    loginBtn: "เข้าสู่ระบบ",
-    signupBtn: "สมัครสมาชิก",
     passwordPlaceholder: "••••••••",
     emailPlaceholder: "name@example.com",
-    namePlaceholder: "สมชาย ดีใจ",
-    phonePlaceholder: "เช่น 0946916668"
+    membersOnly: "หน้านี้สำหรับสมาชิกเท่านั้น",
+    keenToSubscribe: "สนใจสมัครเป็นสมาชิกกับเรา? คลิกที่นี่เพื่อสมัครสมาชิก",
+    forgotLink: "ลืมรหัสผ่าน?",
+    forgotText: "กรอกอีเมลที่ลงทะเบียนไว้กับระบบ หากมีอีเมลนี้ในระบบ เราจะส่งลิงก์สำหรับรีเซ็ตรหัสผ่านไปให้คุณทางอีเมล",
+    forgotSubmitBtn: "ส่งลิงก์รีเซ็ตรหัสผ่าน",
+    backToLogin: "กลับไปหน้าเข้าสู่ระบบ",
+    loginBtn: "เข้าสู่ระบบ"
   },
   cn: {
     signIn: "会员登录",
-    signUp: "注册会员账号",
+    forgotTitle: "忘记密码",
     email: "电子邮箱",
     password: "密码",
-    name: "完整姓名",
-    phone: "电话号码",
     loginSuccess: "登录成功！",
-    signupSuccess: "注册成功！请登录。",
-    noAccount: "还没有账号？",
-    haveAccount: "已有账号？",
-    loginBtn: "登录",
-    signupBtn: "注册账号",
     passwordPlaceholder: "••••••••",
     emailPlaceholder: "name@example.com",
-    namePlaceholder: "张三",
-    phonePlaceholder: "例如 0946916668"
+    membersOnly: "本页面仅限会员访问。",
+    keenToSubscribe: "想要成为我们的会员？点击这里订阅",
+    forgotLink: "忘记密码？",
+    forgotText: "输入您注册的电子邮箱地址。如果该邮箱存在于我们的系统中，我们将为您发送重置密码的链接。",
+    forgotSubmitBtn: "发送重置链接",
+    backToLogin: "返回登录",
+    loginBtn: "登录"
   }
 };
 
@@ -68,11 +62,9 @@ export default function MemberLoginPage() {
   const locale = params.locale || "en";
   const t = localizations[locale] || localizations.en;
 
-  const [isLogin, setIsLogin] = useState(true);
+  const [view, setView] = useState("login"); // "login" or "forgot"
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
   
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -97,7 +89,7 @@ export default function MemberLoginPage() {
     setMessage("");
 
     try {
-      if (isLogin) {
+      if (view === "login") {
         // Handle Login
         const res = await fetch("/api/member/login", {
           method: "POST",
@@ -107,23 +99,30 @@ export default function MemberLoginPage() {
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || "Login failed");
         
+        if (data.forcePasswordReset) {
+          setMessage(locale === "th" ? "คุณจำเป็นต้องตั้งรหัสผ่านใหม่ กำลังนำทาง..." : locale === "cn" ? "您需要设置新密码。正在重定向..." : "You need to set a new password. Redirecting...");
+          setTimeout(() => {
+            router.push(`/${locale}/member/reset-password?force=true`);
+          }, 1000);
+          return;
+        }
+
         setMessage(t.loginSuccess);
         setTimeout(() => {
           router.push(`/${locale}/member/dashboard`);
         }, 1000);
       } else {
-        // Handle Signup
-        const res = await fetch("/api/member/signup", {
+        // Handle Forgot Password
+        const res = await fetch("/api/member/forgot-password", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name, email, password, phone })
+          body: JSON.stringify({ email, locale })
         });
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error || "Registration failed");
-
-        setMessage(t.signupSuccess);
-        setIsLogin(true);
-        setPassword("");
+        if (!res.ok) throw new Error(data.error || "Request failed");
+        
+        setMessage(data.message);
+        setEmail("");
       }
     } catch (err) {
       setError(err.message);
@@ -132,74 +131,105 @@ export default function MemberLoginPage() {
     }
   };
 
+  const switchView = (newView) => {
+    setView(newView);
+    setError("");
+    setMessage("");
+  };
+
   return (
     <div className={styles.pageContainer}>
       <div className={styles.glassCard}>
         <div className={styles.header}>
-          <h1 className={styles.title}>{isLogin ? t.signIn : t.signUp}</h1>
+          <h1 className={styles.title}>
+            {view === "login" ? t.signIn : t.forgotTitle}
+          </h1>
         </div>
 
         {error && <div className={styles.errorAlert}>{error}</div>}
         {message && <div className={styles.successAlert}>{message}</div>}
 
-        <form onSubmit={handleSubmit} className={styles.form}>
-          {!isLogin && (
+        {view === "login" ? (
+          <form onSubmit={handleSubmit} className={styles.form}>
             <div className={styles.inputGroup}>
-              <label>{t.name}</label>
+              <label>{t.email}</label>
               <input 
-                type="text" 
-                value={name} 
-                onChange={(e) => setName(e.target.value)} 
-                placeholder={t.namePlaceholder}
+                type="email" 
+                value={email} 
+                onChange={(e) => setEmail(e.target.value)} 
+                placeholder={t.emailPlaceholder}
                 required 
               />
             </div>
-          )}
 
-          <div className={styles.inputGroup}>
-            <label>{t.email}</label>
-            <input 
-              type="email" 
-              value={email} 
-              onChange={(e) => setEmail(e.target.value)} 
-              placeholder={t.emailPlaceholder}
-              required 
-            />
-          </div>
-
-          {!isLogin && (
             <div className={styles.inputGroup}>
-              <label>{t.phone}</label>
+              <label>{t.password}</label>
               <input 
-                type="text" 
-                value={phone} 
-                onChange={(e) => setPhone(e.target.value)} 
-                placeholder={t.phonePlaceholder}
+                type="password" 
+                value={password} 
+                onChange={(e) => setPassword(e.target.value)} 
+                placeholder={t.passwordPlaceholder}
+                required 
+              />
+              <button 
+                type="button" 
+                onClick={() => switchView("forgot")} 
+                className={styles.forgotBtn}
+              >
+                {t.forgotLink}
+              </button>
+            </div>
+
+            <button type="submit" disabled={loading} className={styles.submitBtn}>
+              {loading ? "..." : t.loginBtn}
+            </button>
+          </form>
+        ) : (
+          <form onSubmit={handleSubmit} className={styles.form}>
+            <p style={{ fontSize: "0.95rem", lineHeight: "1.5", color: "rgba(34, 41, 69, 0.8)", margin: "0 0 1rem 0" }}>
+              {t.forgotText}
+            </p>
+            
+            <div className={styles.inputGroup}>
+              <label>{t.email}</label>
+              <input 
+                type="email" 
+                value={email} 
+                onChange={(e) => setEmail(e.target.value)} 
+                placeholder={t.emailPlaceholder}
+                required 
               />
             </div>
-          )}
 
-          <div className={styles.inputGroup}>
-            <label>{t.password}</label>
-            <input 
-              type="password" 
-              value={password} 
-              onChange={(e) => setPassword(e.target.value)} 
-              placeholder={t.passwordPlaceholder}
-              required 
-            />
-          </div>
+            <button type="submit" disabled={loading} className={styles.submitBtn}>
+              {loading ? "..." : t.forgotSubmitBtn}
+            </button>
 
-          <button type="submit" disabled={loading} className={styles.submitBtn}>
-            {loading ? "..." : isLogin ? t.loginBtn : t.signupBtn}
-          </button>
-        </form>
+            <button 
+              type="button" 
+              onClick={() => switchView("login")} 
+              style={{
+                background: "none",
+                border: "none",
+                color: "#222945",
+                fontWeight: "600",
+                cursor: "pointer",
+                textAlign: "center",
+                marginTop: "0.5rem",
+                textDecoration: "underline",
+                fontSize: "0.95rem"
+              }}
+            >
+              {t.backToLogin}
+            </button>
+          </form>
+        )}
 
-        <div className={styles.toggleText}>
-          {isLogin ? t.noAccount : t.haveAccount}{" "}
-          <button onClick={() => setIsLogin(!isLogin)} className={styles.toggleBtn}>
-            {isLogin ? t.signUp : t.signIn}
-          </button>
+        <div className={styles.subscribeSection}>
+          <p className={styles.membersOnlyText}>{t.membersOnly}</p>
+          <Link href={`/${locale}/promotions`} className={styles.subscribeLink}>
+            {t.keenToSubscribe} <i className="fa-solid fa-arrow-right-long" style={{ marginLeft: '4px' }}></i>
+          </Link>
         </div>
       </div>
     </div>

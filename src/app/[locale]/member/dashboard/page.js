@@ -120,6 +120,10 @@ export default function MemberDashboardPage() {
         router.push(`/${locale}/member/login`);
         return;
       }
+      if (data.member && data.member.forcePasswordReset) {
+        router.push(`/${locale}/member/reset-password?force=true`);
+        return;
+      }
       setMember(data.member);
     } catch (err) {
       setError("Failed to load profile. Please try logging in again.");

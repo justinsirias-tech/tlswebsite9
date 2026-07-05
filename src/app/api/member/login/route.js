@@ -50,7 +50,11 @@ export async function POST(request) {
       sameSite: "lax"
     });
 
-    return NextResponse.json({ success: true, member: { id: member.id, name: member.name, email: member.email } }, { status: 200 });
+    return NextResponse.json({ 
+      success: true, 
+      forcePasswordReset: member.forcePasswordReset || false,
+      member: { id: member.id, name: member.name, email: member.email } 
+    }, { status: 200 });
   } catch (error) {
     console.error("Login error:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

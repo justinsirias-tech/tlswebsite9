@@ -54,16 +54,17 @@ export default function Header() {
       padding: scrolled ? "0.5rem 0" : "1rem 0",
       backgroundColor: "rgba(255, 255, 255, 0.98)",
       backdropFilter: "blur(10px)",
-      boxShadow: scrolled ? "0 4px 20px rgba(0,0,0,0.08)" : "none",
+      boxShadow: scrolled ? "0 10px 30px rgba(0,0,0,0.05)" : "none",
       borderBottom: "1px solid rgba(0,0,0,0.05)",
       transition: "all 0.3s ease"
     }}>
       <div className="container" style={{ 
         display: "flex", 
         justifyContent: "space-between", 
-        alignItems: "center"
+        alignItems: "center",
+        maxWidth: "1400px"
       }}>
-        <Link href="/" className="logo">
+        <Link href="/" className="logo" style={{ marginRight: "3rem", flexShrink: 0 }}>
           <Image src="/images/logo.webp" alt="That Laundry Shop" width={180} height={70} style={{ height: scrolled ? '55px' : '70px', width: 'auto', transition: 'height 0.3s ease' }} priority unoptimized />
         </Link>
         
@@ -93,7 +94,7 @@ export default function Header() {
                 padding: '0.4rem 0.8rem',
                 cursor: 'pointer', 
                 fontWeight: '600',
-                color: 'var(--primary)',
+                color: '#222945',
                 transition: 'all 0.2s ease',
               }}
               className="lang-trigger-btn"
@@ -146,7 +147,7 @@ export default function Header() {
                       cursor: 'pointer',
                       textAlign: 'left',
                       fontWeight: locale === 'en' ? '600' : '500',
-                      color: locale === 'en' ? 'var(--primary)' : 'var(--text-light)',
+                      color: locale === 'en' ? '#222945' : '#475569',
                     }}
                     className="lang-item-btn"
                   >
@@ -172,7 +173,7 @@ export default function Header() {
                       cursor: 'pointer',
                       textAlign: 'left',
                       fontWeight: locale === 'th' ? '600' : '500',
-                      color: locale === 'th' ? 'var(--primary)' : 'var(--text-light)',
+                      color: locale === 'th' ? '#222945' : '#475569',
                     }}
                     className="lang-item-btn"
                   >
@@ -198,7 +199,7 @@ export default function Header() {
                       cursor: 'pointer',
                       textAlign: 'left',
                       fontWeight: locale === 'cn' ? '600' : '500',
-                      color: locale === 'cn' ? 'var(--primary)' : 'var(--text-light)',
+                      color: locale === 'cn' ? '#222945' : '#475569',
                     }}
                     className="lang-item-btn"
                   >
@@ -209,6 +210,7 @@ export default function Header() {
               </div>
             )}
           </div>
+
           {member ? (
             <>
               <Link 
@@ -218,14 +220,14 @@ export default function Header() {
                   display: 'flex', 
                   alignItems: 'center', 
                   gap: '0.4rem', 
-                  color: 'var(--primary)', 
+                  color: '#222945', 
                   fontWeight: '600', 
                   textDecoration: 'none', 
                   marginLeft: '1rem', 
                   fontSize: '0.9rem' 
                 }}
               >
-                <i className="fa-solid fa-circle-user" style={{ color: 'var(--accent)' }}></i> 
+                <i className="fa-solid fa-circle-user" style={{ color: '#475569' }}></i> 
                 {member.name.split(' ')[0]} (฿{Math.round(member.balance)})
               </Link>
               <button 
@@ -254,7 +256,7 @@ export default function Header() {
                 display: 'flex', 
                 alignItems: 'center', 
                 gap: '0.4rem', 
-                color: 'var(--primary)', 
+                color: '#222945', 
                 fontWeight: '600', 
                 textDecoration: 'none', 
                 marginLeft: '1rem', 

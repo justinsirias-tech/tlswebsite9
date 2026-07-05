@@ -106,33 +106,45 @@ model AdminUser {
 }
 
 model MembershipRequest {
-  id        String   @id @default(uuid())
-  name      String
-  email     String
-  phone     String
-  tier      String
-  term      String
-  notes     String?
-  dob       String?
-  address   String?
-  roomNo    String?
-  status    String   @default("PENDING")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(uuid())
+  name        String
+  email       String
+  phone       String
+  tier        String
+  term        String
+  notes       String?
+  dob         String?
+  address     String?
+  roomNo      String?
+  status      String   @default("PENDING")
+  startDate   String?
+  endDate     String?
+  attachments String[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Member {
-  id           String   @id @default(uuid())
-  name         String
-  email        String   @unique
-  passwordHash String
-  phone        String?
-  balance      Float    @default(0.0)
-  tier         String   @default("None") // "None", "Silver", "Gold", "Platinum"
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  bookings     Booking[]
-  transactions Transaction[]
+  id                 String   @id @default(uuid())
+  name               String
+  email              String   @unique
+  passwordHash       String?  // Made optional for social logins
+  phone              String?
+  dob                String?  // Date of birth
+  address            String?  // Google address
+  roomNo             String?  // Unit number
+  provider           String   @default("local") // "local", "google", "line", "facebook", "x"
+  providerId         String?  // OAuth unique ID
+  balance            Float    @default(0.0)
+  tier               String   @default("None") // "None", "Silver", "Gold", "Platinum"
+  startDate          String?
+  endDate            String?
+  attachments        String[]
+  forcePasswordReset Boolean  @default(false)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  bookings           Booking[]
+  transactions       Transaction[]
 }
 
 model Transaction {
