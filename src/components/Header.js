@@ -211,62 +211,6 @@ export default function Header() {
             )}
           </div>
 
-          {member ? (
-            <>
-              <Link 
-                href="/member/dashboard" 
-                onClick={() => setIsMenuOpen(false)} 
-                style={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  gap: '0.4rem', 
-                  color: '#222945', 
-                  fontWeight: '600', 
-                  textDecoration: 'none', 
-                  marginLeft: '1rem', 
-                  fontSize: '0.9rem' 
-                }}
-              >
-                <i className="fa-solid fa-circle-user" style={{ color: '#475569' }}></i> 
-                {member.name.split(' ')[0]} (฿{Math.round(member.balance)})
-              </Link>
-              <button 
-                onClick={() => { handleLogout(); setIsMenuOpen(false); }} 
-                style={{ 
-                  background: 'none', 
-                  border: 'none', 
-                  color: '#ef4444', 
-                  fontWeight: '600', 
-                  cursor: 'pointer', 
-                  marginLeft: '0.8rem', 
-                  fontSize: '0.9rem',
-                  display: 'flex',
-                  alignItems: 'center'
-                }}
-                title="Logout"
-              >
-                <i className="fa-solid fa-arrow-right-from-bracket"></i>
-              </button>
-            </>
-          ) : (
-            <Link 
-              href="/member/login" 
-              onClick={() => setIsMenuOpen(false)} 
-              style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: '0.4rem', 
-                color: '#222945', 
-                fontWeight: '600', 
-                textDecoration: 'none', 
-                marginLeft: '1rem', 
-                fontSize: '0.9rem' 
-              }}
-            >
-              <i className="fa-solid fa-user-lock"></i> 
-              {locale === 'th' ? 'เข้าสู่ระบบ' : locale === 'cn' ? '登录' : 'Login'}
-            </Link>
-          )}
           <Link href="/booking" onClick={() => setIsMenuOpen(false)} className="btn btn-primary nav-book-btn" style={{ padding: "0.5rem 1.5rem", marginLeft: "1rem" }}>{t('bookNow')}</Link>
         </nav>
 
