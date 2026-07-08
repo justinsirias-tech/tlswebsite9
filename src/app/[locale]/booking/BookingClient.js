@@ -512,6 +512,7 @@ Notes: ${specialInst}`.trim();
                     value={buildingName}
                     onChange={(e) => setBuildingName(e.target.value)}
                     required 
+                    autoComplete="new-password"
                     style={{ paddingRight: "40px" }}
                   />
                 </div>
@@ -628,6 +629,7 @@ Notes: ${specialInst}`.trim();
                         value={deliveryBuildingName}
                         onChange={(e) => setDeliveryBuildingName(e.target.value)}
                         required={isDifferentDeliveryAddress}
+                        autoComplete="new-password"
                         style={{ paddingRight: "40px" }}
                       />
                     </div>
