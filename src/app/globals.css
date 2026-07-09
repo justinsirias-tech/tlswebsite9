@@ -421,4 +421,9 @@ header .container {
   z-index: 99999 !important;
 }
 
+/* Fix for Google Maps Autocomplete Error Icon Repeating */
+input.gm-err-autocomplete {
+  background-repeat: no-repeat !important;
+  background-position: right 15px center !important;
+}
 
