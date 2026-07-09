@@ -463,7 +463,7 @@ export default function LocationsAdminPage() {
                 <div className="form-group">
                   <label className="form-label">Location Name (EN)</label>
                   <Autocomplete
-                    apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}
+                    apiKey={"AIzaSyBLTYPqZKBOhAcHWbsUS6W7R8BA53iRCvE"}
                     className="form-input"
                     onPlaceSelected={(place) => {
                       const placeName = toTitleCase(place.name || editingItem.name);
