@@ -423,6 +423,35 @@ export async function POST(req) {
       }
     });
 
+    // Create a corresponding Job record in the shared POS database
+    // so it shows up automatically in the POS system's "All Jobs" list
+    try {
+      const details = parseServiceDetails(translatedService);
+      await prisma.job.create({
+        data: {
+          type: "full_service",
+          customerId: data.memberId || null,
+          customerName: data.customerName,
+          customerPhone: data.phone,
+          pickupLocation: details.address || "Website Booking",
+          dropoffLocation: details.delivery || details.address || "Website Booking",
+          pickupLat: 13.736717,
+          pickupLng: 100.523186,
+          dropoffLat: 13.736717,
+          dropoffLng: 100.523186,
+          distance: 0.0,
+          fee: 0.0,
+          status: "pending",
+          scheduledAt: new Date(data.pickupDate),
+          source: "website",
+          remark: `Booking ID: ${booking.id}\nServices: ${details.services || "Not specified"}\nNotes: ${details.notes || "None"}`
+        }
+      });
+    } catch (jobError) {
+      console.error("Failed to create corresponding Job in POS table:", jobError);
+      // We don't fail the booking request if creating a job log fails
+    }
+
     // Send the confirmation email in the background using Next.js after() to prevent Vercel container freezing
     after(async () => {
       try {
