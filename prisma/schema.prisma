@@ -105,7 +105,7 @@ model WebsiteAdminUser {
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
-  @@map("website_admin_users")
+  @@map("AdminUser")
 }
 
 model MembershipRequest {

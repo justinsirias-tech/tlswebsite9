@@ -31,7 +31,7 @@ export async function POST(request) {
           providerId,
           balance: 0.0,
           tier: "None",
-          defaultAddress: "",
+          address: "",
           defaultLat: 13.736717,
           defaultLng: 100.523186,
           isMember: true,
