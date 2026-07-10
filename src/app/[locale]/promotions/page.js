@@ -119,33 +119,7 @@ export default async function PromotionsPage({ params }) {
             />
           </div>
 
-          {/* PROMOTIONS SECTION */}
-          <div style={{ marginTop: "2rem" }}>
-            <h2 className={styles.sectionTitle}>{t("currentPromos")}</h2>
-            <div className={styles.promoBannerGrid}>
-              
-              {/* Promo 1 */}
-              <div className={styles.promoBanner}>
-                <div className={styles.promoTag}>{t("firstTime")}</div>
-                <h3 className={styles.promoTitle}>{t("firstTimeTitle")}</h3>
-                <p className={styles.promoDesc}>
-                  {t("firstTimeDesc")}
-                </p>
-                <div className={styles.promoCode}>WELCOME20</div>
-              </div>
 
-              {/* Promo 2 */}
-              <div className={styles.promoBanner} style={{ background: "linear-gradient(135deg, var(--accent) 0%, #1e293b 100%)" }}>
-                <div className={styles.promoTag}>{t("seasonalDeal")}</div>
-                <h3 className={styles.promoTitle}>{t("duvetTitle")}</h3>
-                <p className={styles.promoDesc}>
-                  {t("duvetDesc")}
-                </p>
-                <div className={styles.promoCode}>FREEDUVET</div>
-              </div>
-
-            </div>
-          </div>
 
         </div>
       </section>
