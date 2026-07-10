@@ -84,7 +84,8 @@ export async function PUT(request) {
             tier: formattedTier,
             startDate,
             endDate,
-            attachments: attachments || []
+            attachments: attachments || [],
+            isMember: true
           }
         });
       } else {

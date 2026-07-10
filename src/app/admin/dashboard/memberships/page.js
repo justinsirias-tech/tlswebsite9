@@ -10,6 +10,7 @@ export default async function MembershipsAdminPage() {
   });
 
   const members = await prisma.member.findMany({
+    where: { isMember: true },
     orderBy: { createdAt: "desc" }
   });
 

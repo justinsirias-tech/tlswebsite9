@@ -19,6 +19,7 @@ export async function POST(request) {
     // Find member by email or phone
     const member = await prisma.member.findFirst({
       where: {
+        isMember: true,
         OR: [
           { email: email },
           { phone: email }
