@@ -441,7 +441,7 @@ export async function POST(req) {
           dropoffLng: 100.523186,
           distance: 0.0,
           fee: 0.0,
-          status: "pending",
+          status: "tba",
           scheduledAt: new Date(data.pickupDate),
           source: "website",
           remark: `Booking ID: ${booking.id}\nServices: ${details.services || "Not specified"}\nNotes: ${details.notes || "None"}`
