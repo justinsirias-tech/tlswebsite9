@@ -101,7 +101,10 @@ export async function PUT(request) {
             balance: 0.0,
             startDate,
             endDate,
-            attachments: attachments || []
+            attachments: attachments || [],
+            defaultLat: 13.736717,
+            defaultLng: 100.523186,
+            isMember: true
           }
         });
       }

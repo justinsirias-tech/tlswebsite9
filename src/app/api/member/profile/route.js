@@ -25,9 +25,6 @@ export async function GET() {
         tier: true,
         forcePasswordReset: true,
         createdAt: true,
-        bookings: {
-          orderBy: { createdAt: "desc" }
-        },
         transactions: {
           orderBy: { createdAt: "desc" }
         }
@@ -37,6 +34,47 @@ export async function GET() {
     if (!member) {
       return NextResponse.json({ error: "Member not found" }, { status: 404 });
     }
+
+    // Fetch jobs for this customer from the shared Postgres Job table
+    const jobs = await prisma.job.findMany({
+      where: { customerId: member.id },
+      orderBy: { createdAt: "desc" }
+    });
+
+    // Map jobs to the booking structure expected by the frontend
+    const mappedBookings = jobs.map(job => {
+      let serviceName = "Laundry Service";
+      if (job.serviceType) {
+        const mapping = {
+          "wash_fold": "Wash & Fold",
+          "wash_iron_fold": "Wash, Iron & Fold",
+          "wash_iron_hang": "Wash, Iron & Hang",
+          "dry_clean": "Dry Cleaning",
+          "dry_cleaning": "Dry Cleaning",
+          "linens_beddings": "Linens & Beddings"
+        };
+        serviceName = mapping[job.serviceType.toLowerCase()] || job.serviceType.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+      } else if (job.type) {
+        serviceName = job.type.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+      }
+
+      let bookingStatus = "PENDING";
+      if (job.status === "completed") {
+        bookingStatus = "CLOSED";
+      } else if (job.status === "cancel") {
+        bookingStatus = "CANCELLED";
+      }
+
+      return {
+        id: job.id,
+        service: serviceName,
+        pickupDate: job.scheduledAt || job.createdAt,
+        status: bookingStatus,
+        createdAt: job.createdAt
+      };
+    });
+
+    member.bookings = mappedBookings;
 
     return NextResponse.json({ success: true, member }, { status: 200 });
   } catch (error) {

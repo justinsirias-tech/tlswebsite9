@@ -36,7 +36,7 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const users = await prisma.adminUser.findMany({
+  const users = await prisma.websiteAdminUser.findMany({
     select: { id: true, name: true, email: true, role: true, permissions: true, createdAt: true }
   });
   return NextResponse.json(users);
@@ -49,11 +49,11 @@ export async function POST(request) {
 
   try {
     const data = await request.json();
-    const existingUser = await prisma.adminUser.findUnique({ where: { email: data.email } });
+    const existingUser = await prisma.websiteAdminUser.findUnique({ where: { email: data.email } });
     if (existingUser) return NextResponse.json({ error: "Email already in use" }, { status: 400 });
 
     const passwordHash = await bcrypt.hash(data.password, 10);
-    const user = await prisma.adminUser.create({
+    const user = await prisma.websiteAdminUser.create({
       data: {
         name: data.name,
         email: data.email,

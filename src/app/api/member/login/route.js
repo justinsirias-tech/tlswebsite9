@@ -16,8 +16,15 @@ export async function POST(request) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    // Find member
-    const member = await prisma.member.findUnique({ where: { email } });
+    // Find member by email or phone
+    const member = await prisma.member.findFirst({
+      where: {
+        OR: [
+          { email: email },
+          { phone: email }
+        ]
+      }
+    });
     if (!member) {
       return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
     }

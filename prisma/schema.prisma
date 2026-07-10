@@ -1,8 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,30 +9,34 @@ datasource db {
   provider = "postgresql"
 }
 
+// =========================================================================
+// WEBSITE-SPECIFIC MODELS
+// =========================================================================
+
 model Location {
-  id           String   @id @default(uuid())
-  slug         String   @unique
-  name         String
-  name_th      String?
-  city         String
-  city_th      String?
-  type         String
-  stars        Int
-  totalRooms   Int
-  averagePrice String
-  transport    String
-  transport_th String?
-  image        String?
-  mapLink      String?
-  address      String?
-  address_th   String?
-  website      String?
-  article      String?
-  article_th   String?
-  nearbyAmenities String[]
+  id                 String   @id @default(uuid())
+  slug               String   @unique
+  name               String
+  name_th            String?
+  city               String
+  city_th            String?
+  type               String
+  stars              Int
+  totalRooms         Int
+  averagePrice       String
+  transport          String
+  transport_th       String?
+  image              String?
+  mapLink            String?
+  address            String?
+  address_th         String?
+  website            String?
+  article            String?
+  article_th         String?
+  nearbyAmenities    String[]
   nearbyAmenities_th String[]
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 }
 
 model Pricing {
@@ -50,29 +52,29 @@ model Pricing {
 }
 
 model Booking {
-  id           String   @id @default(uuid())
+  id           String            @id @default(uuid())
   customerName String
   email        String
   phone        String
   pickupDate   DateTime
   service      String
-  status       String   @default("PENDING")
+  status       String            @default("PENDING")
   assignedToId String?
-  assignedTo   AdminUser? @relation(fields: [assignedToId], references: [id], onDelete: SetNull)
+  assignedTo   WebsiteAdminUser? @relation(fields: [assignedToId], references: [id], onDelete: SetNull)
   memberId     String?
-  member       Member?    @relation(fields: [memberId], references: [id], onDelete: SetNull)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  member       Member?           @relation(fields: [memberId], references: [id], onDelete: SetNull)
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
 }
 
 model Article {
-  id        String   @id @default(uuid())
+  id         String   @id @default(uuid())
   title      String
   title_th   String?
   content    String
   content_th String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
 
 model KeywordQueue {
@@ -93,16 +95,18 @@ model ContactRequest {
   updatedAt DateTime @updatedAt
 }
 
-model AdminUser {
-  id           String   @id @default(uuid())
+model WebsiteAdminUser {
+  id           String    @id @default(uuid())
   name         String
-  email        String   @unique
+  email        String    @unique
   passwordHash String
-  role         String   @default("EDITOR")
+  role         String    @default("EDITOR")
   permissions  String[]
   bookings     Booking[]
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@map("website_admin_users")
 }
 
 model MembershipRequest {
@@ -125,26 +129,45 @@ model MembershipRequest {
 }
 
 model Member {
-  id                 String   @id @default(uuid())
+  id                 String        @id @default(uuid())
   name               String
-  email              String   @unique
-  passwordHash       String?  // Made optional for social logins
+  email              String?       @unique
+  passwordHash       String? // Made optional for social logins
   phone              String?
-  dob                String?  // Date of birth
-  address            String?  // Google address
-  roomNo             String?  // Unit number
-  provider           String   @default("local") // "local", "google", "line", "facebook", "x"
-  providerId         String?  // OAuth unique ID
-  balance            Float    @default(0.0)
-  tier               String   @default("None") // "None", "Silver", "Gold", "Platinum"
+  dob                String? // Date of birth
+  address            String?       @map("defaultAddress")
+  roomNo             String? // Unit number
+  provider           String        @default("local") // "local", "google", "line", "facebook", "x"
+  providerId         String? // OAuth unique ID
+  balance            Float         @default(0.0) @map("creditBalance")
+  tier               String?       @default("None") // "None", "Silver", "Gold", "Platinum"
   startDate          String?
   endDate            String?
   attachments        String[]
-  forcePasswordReset Boolean  @default(false)
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+  forcePasswordReset Boolean       @default(false)
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
   bookings           Booking[]
   transactions       Transaction[]
+  jobs               Job[]
+
+  // POS-specific Customer columns
+  defaultLat       Float         @default(13.736717)
+  defaultLng       Float         @default(100.523186)
+  priceListId      String?
+  isMember         Boolean       @default(false)
+  memberId         String?       @unique
+  isVIP            Boolean       @default(false)
+  isCorporate      Boolean       @default(false)
+  isWhatsapp       Boolean       @default(false)
+  lineId           String?
+  language         String?
+  remark           String?
+  secondaryAddress String?
+  taxId            String?
+  companyName      String?
+
+  @@map("Customer")
 }
 
 model Transaction {
@@ -152,9 +175,229 @@ model Transaction {
   memberId    String
   member      Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
   amount      Float
-  type        String   // "TOPUP" or "PAYMENT"
+  type        String // "TOPUP" or "PAYMENT"
   description String
   status      String   @default("COMPLETED") // "PENDING", "COMPLETED", "FAILED"
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+// =========================================================================
+// SHARED POS-SYSTEM MODELS (COPIED FROM POS SCHEMA TO AVOID DELETION)
+// =========================================================================
+
+model Job {
+  id                     String    @id @default(uuid())
+  type                   String // "pickup" | "delivery" | "full_service"
+  customerId             String?
+  customerName           String?
+  customerPhone          String?
+  pickupLocation         String
+  dropoffLocation        String
+  pickupLat              Float
+  pickupLng              Float
+  dropoffLat             Float
+  dropoffLng             Float
+  distance               Float
+  fee                    Float
+  status                 String // "tba" | "pending" | "pickup" | "billing" | "delivery" | "completed" | "cancel" | "return"
+  subStatus              String? // "wash" | "dry" | "iron" | "ready"
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @default(now()) @updatedAt
+  scheduledAt            DateTime
+  completedAt            DateTime?
+  proofImageUrl          String?
+  pickupProofImageUrl    String?
+  deliveryProofImageUrl  String?
+  riderId                String?
+  bagImageUrl            String?
+  billImageUrl           String?
+  serviceType            String? // "wash_fold" | "wash_iron_fold"
+  laundryTypes           String? // comma-separated "W,I,H,D,L,P"
+  source                 String? // "app" | "pos"
+  totalAmount            Float?
+  paymentMethod          String? // "cash" | "transfer" | "credit" | "card"
+  paymentChannel         String?
+  isPaid                 Boolean   @default(false)
+  discount               Float?    @default(0)
+  pickupDistance         Float?
+  deliveryDistance       Float?
+  pickupCommission       Float?
+  deliveryCommission     Float?
+  pickupScheduledAt      DateTime?
+  pickupScheduledEndAt   DateTime?
+  deliveryScheduledAt    DateTime?
+  deliveryScheduledEndAt DateTime?
+  pickupRiderId          String?
+  deliveryRiderId        String?
+
+  itemsJson      String? // Array of { name, quantity, price }
+  legsJson       String? // JobLegs object
+  remark         String?
+  adminNotesJson String? // Array of AdminNoteLog objects
+
+  branchId   String?
+  createdBy  String?
+  cashPlaced Boolean @default(false)
+  isStuck    Boolean @default(false)
+
+  customer Member?       @relation(fields: [customerId], references: [id])
+  branch   ShopLocation? @relation(fields: [branchId], references: [id])
+  shiftId  String?
+  shift    CashierShift? @relation(fields: [shiftId], references: [id], onDelete: SetNull)
+
+  @@map("Job")
+}
+
+model ServiceItem {
+  id          String  @id @default(uuid())
+  name        String
+  nameEn      String?
+  price       Float
+  memberPrice Float
+  category    String
+  unit        String?
+
+  @@map("ServiceItem")
+}
+
+model Rider {
+  id                String  @id @default(uuid())
+  name              String
+  nickname          String?
+  phone             String
+  status            String // "online" | "offline" | "busy"
+  currentLat        Float?
+  currentLng        Float?
+  avatarUrl         String?
+  rating            Float   @default(5.0)
+  completedJobs     Int     @default(0)
+  commissionBalance Float   @default(0)
+  nationalId        String?
+  vehicleType       String? // "motorcycle" | "car" | "truck"
+  vehiclePlate      String?
+  branchId          String? // The ShopLocation ID the rider is assigned to
+  color             String? @default("#3b82f6") // Google Calendar style color hex
+
+  transactions RiderTransaction[]
+  branch       ShopLocation?      @relation(fields: [branchId], references: [id])
+
+  @@map("Rider")
+}
+
+model RiderTransaction {
+  id        String   @id @default(uuid())
+  riderId   String
+  jobId     String?
+  amount    Float
+  type      String // "commission_pickup" | "commission_delivery" | "payout"
+  detail    String? // e.g. "Job 001 - ไปรับผ้า"
+  createdAt DateTime @default(now())
+
+  rider Rider @relation(fields: [riderId], references: [id])
+
+  @@map("RiderTransaction")
+}
+
+model PriceList {
+  id            String  @id @default(uuid())
+  name          String
+  isDefault     Boolean @default(false)
+  servicePrices String // JSON string: Record<string, number>
+
+  @@map("PriceList")
+}
+
+model ShopLocation {
+  id           String      @id @default(uuid())
+  name         String
+  address      String
+  lat          Float
+  lng          Float
+  noCommission Boolean     @default(false)
+  area         String      @default("BKK")
+  logoUrl      String?
+  phone        String?
+  taxId        String?
+  riders       Rider[]
+  jobs         Job[]
+  shifts       CashierShift[]
+  staff        AdminUser[]
+
+  @@map("ShopLocation")
+}
+
+model POI {
+  id            String  @id @default(uuid())
+  name          String
+  address       String
+  lat           Float
+  lng           Float
+  placeId       String?
+  closestShopId String?
+  distanceKm    Float?
+
+  @@map("POI")
+}
+
+model Setting {
+  id    String @id @default(uuid())
+  key   String @unique
+  value String
+
+  @@map("Setting")
+}
+
+model ActivityLog {
+  id         String   @id @default(uuid())
+  entityId   String // e.g. Job ID
+  entityType String // e.g. "job", "customer"
+  action     String // e.g. "create", "update", "status_change"
+  details    String? // JSON string containing changes
+  userId     String?
+  userName   String?
+  createdAt  DateTime @default(now())
+
+  @@map("ActivityLog")
+}
+
+model AdminUser {
+  id          String   @id @default(uuid())
+  email       String   @unique
+  password    String
+  name        String
+  role        String   @default("staff") // "admin", "manager", "cso", "staff"
+  permissions String // JSON string array of allowed menu keys: '["jobs", "crm"]'
+  area        String? // e.g. "BKK", "PTY"
+  branchId    String? // Optional branch location ID for staff/managers
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  branch ShopLocation? @relation(fields: [branchId], references: [id])
+
+  @@map("AdminUser")
+}
+
+model CashierShift {
+  id              String    @id @default(uuid())
+  branchId        String // The ShopLocation ID the shift belongs to
+  userId          String // Cashier user ID (AdminUser ID)
+  userName        String // Cashier name (AdminUser name)
+  openedAt        DateTime  @default(now())
+  closedAt        DateTime?
+  startingCash    Float // Cash in drawer at start
+  expectedCash    Float     @default(0) // Calculated: startingCash + cashSales
+  actualCash      Float? // Declared cash by cashier on close
+  cashSales       Float     @default(0) // Total cash sales in this shift
+  transferSales   Float     @default(0) // Total bank transfer sales in this shift
+  cardSales       Float     @default(0) // Total credit card sales in this shift
+  creditSales     Float     @default(0) // Total store credit sales in this shift
+  shortageOverage Float? // Difference: actualCash - expectedCash
+  status          String    @default("open") // "open" | "closed"
+  notes           String?
+
+  branch ShopLocation @relation(fields: [branchId], references: [id])
+  jobs   Job[]
+
+  @@map("CashierShift")
 }

@@ -39,7 +39,7 @@ export async function PUT(request, { params }) {
       updateData.passwordHash = await bcrypt.hash(data.password, 10);
     }
 
-    const updatedUser = await prisma.adminUser.update({
+    const updatedUser = await prisma.websiteAdminUser.update({
       where: { id },
       data: updateData,
       select: { id: true, name: true, email: true, role: true, permissions: true }
@@ -58,7 +58,7 @@ export async function DELETE(request, { params }) {
 
   try {
     const { id } = await params;
-    await prisma.adminUser.delete({ where: { id } });
+    await prisma.websiteAdminUser.delete({ where: { id } });
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (error) {
     return NextResponse.json({ error: "Failed to delete user" }, { status: 500 });

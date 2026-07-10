@@ -30,7 +30,12 @@ export async function POST(request) {
           provider,
           providerId,
           balance: 0.0,
-          tier: "None"
+          tier: "None",
+          defaultAddress: "",
+          defaultLat: 13.736717,
+          defaultLng: 100.523186,
+          isMember: true,
+          phone: ""
         }
       });
       isNew = true;

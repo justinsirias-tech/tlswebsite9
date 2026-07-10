@@ -13,10 +13,10 @@ export async function POST(request) {
     const password = rawData.password || "";
 
     // Check if any users exist, if not seed the default superadmin
-    const userCount = await prisma.adminUser.count();
+    const userCount = await prisma.websiteAdminUser.count();
     if (userCount === 0) {
       const defaultHash = await bcrypt.hash("tls@2026", 10);
-      await prisma.adminUser.create({
+      await prisma.websiteAdminUser.create({
         data: {
           name: "Justin (Superadmin)",
           email: "justin@thatlaundryshop.com",
@@ -28,7 +28,7 @@ export async function POST(request) {
     }
 
     // Find user
-    const user = await prisma.adminUser.findUnique({ where: { email } });
+    const user = await prisma.websiteAdminUser.findUnique({ where: { email } });
     if (!user) {
       console.log(`User not found: ${email}`);
       return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });

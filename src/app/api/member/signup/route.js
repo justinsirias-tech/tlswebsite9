@@ -23,7 +23,7 @@ export async function POST(request) {
     // Hash password
     const passwordHash = await bcrypt.hash(password, 10);
 
-    // Create member
+    // Create member (mapped to Customer table)
     const member = await prisma.member.create({
       data: {
         name,
@@ -31,7 +31,11 @@ export async function POST(request) {
         passwordHash,
         phone,
         balance: 0.0,
-        tier: "None"
+        tier: "None",
+        defaultAddress: "",
+        defaultLat: 13.736717,
+        defaultLng: 100.523186,
+        isMember: true
       }
     });
 
