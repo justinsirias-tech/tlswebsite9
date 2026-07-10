@@ -427,8 +427,25 @@ export async function POST(req) {
     // so it shows up automatically in the POS system's "All Jobs" list
     try {
       const details = parseServiceDetails(translatedService);
+
+      // Generate sequential Job ID matching POS system format (Format: YYYYxxxxxx, e.g. 2026000045)
+      const year = new Date().getFullYear().toString();
+      const latestJob = await prisma.job.findFirst({
+        where: { id: { startsWith: year } },
+        orderBy: { id: 'desc' }
+      });
+      
+      let jobId = `${year}000001`;
+      if (latestJob && latestJob.id.length >= 10) {
+        const lastNum = parseInt(latestJob.id.substring(4), 10);
+        if (!isNaN(lastNum)) {
+          jobId = `${year}${(lastNum + 1).toString().padStart(6, '0')}`;
+        }
+      }
+
       await prisma.job.create({
         data: {
+          id: jobId,
           type: "full_service",
           customerId: data.memberId || null,
           customerName: data.customerName,
