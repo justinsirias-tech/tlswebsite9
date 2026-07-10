@@ -1,4 +1,5 @@
 import prisma from "../../../../lib/prisma";
+import prismaWebapp from "../../../../lib/prisma-webapp";
 import styles from "../../admin.module.css";
 import MembershipRequestsList from "./RequestsList";
 
@@ -9,7 +10,7 @@ export default async function MembershipsAdminPage() {
     orderBy: { createdAt: "desc" }
   });
 
-  const members = await prisma.member.findMany({
+  const members = await prismaWebapp.member.findMany({
     where: { isMember: true },
     orderBy: { createdAt: "desc" }
   });

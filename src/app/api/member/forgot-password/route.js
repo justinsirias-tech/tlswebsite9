@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { SignJWT } from "jose";
 import nodemailer from "nodemailer";
-import prisma from "../../../../lib/prisma";
+import prisma from "../../../../lib/prisma-webapp";
 
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || "tls-secret-key-2026");
 

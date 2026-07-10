@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getMemberFromSession } from "../../../../lib/memberAuth";
 import bcrypt from "bcryptjs";
-import prisma from "../../../../lib/prisma";
+import prisma from "../../../../lib/prisma-webapp";
 
 export async function POST(request) {
   try {

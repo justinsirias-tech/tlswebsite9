@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { jwtVerify } from "jose";
 import prisma from "../../../../lib/prisma";
+import prismaWebapp from "../../../../lib/prisma-webapp";
 
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || "tls-secret-key-2026");
 
@@ -71,9 +72,9 @@ export async function PUT(request) {
       const normalizedTier = tier.replace(/ package/i, "");
       const formattedTier = normalizedTier.charAt(0).toUpperCase() + normalizedTier.slice(1);
 
-      const member = await prisma.member.findUnique({ where: { email } });
+      const member = await prismaWebapp.member.findUnique({ where: { email } });
       if (member) {
-        await prisma.member.update({
+        await prismaWebapp.member.update({
           where: { id: member.id },
           data: {
             name,
@@ -85,11 +86,12 @@ export async function PUT(request) {
             startDate,
             endDate,
             attachments: attachments || [],
-            isMember: true
+            isMember: true,
+            priceListId: "PL-MP56NWKW"
           }
         });
       } else {
-        await prisma.member.create({
+        await prismaWebapp.member.create({
           data: {
             name,
             email,
@@ -105,7 +107,8 @@ export async function PUT(request) {
             attachments: attachments || [],
             defaultLat: 13.736717,
             defaultLng: 100.523186,
-            isMember: true
+            isMember: true,
+            priceListId: "PL-MP56NWKW"
           }
         });
       }

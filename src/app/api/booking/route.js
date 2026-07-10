@@ -1,5 +1,6 @@
 import { NextResponse, after } from "next/server";
 import prisma from "../../../lib/prisma";
+import prismaWebapp from "../../../lib/prisma-webapp";
 import nodemailer from "nodemailer";
 import { GoogleGenAI } from "@google/genai";
 
@@ -430,7 +431,7 @@ export async function POST(req) {
 
       // Generate sequential Job ID matching POS system format (Format: YYYYxxxxxx, e.g. 2026000045)
       const year = new Date().getFullYear().toString();
-      const latestJob = await prisma.job.findFirst({
+      const latestJob = await prismaWebapp.job.findFirst({
         where: { id: { startsWith: year } },
         orderBy: { id: 'desc' }
       });
@@ -443,7 +444,7 @@ export async function POST(req) {
         }
       }
 
-      await prisma.job.create({
+      await prismaWebapp.job.create({
         data: {
           id: jobId,
           type: "full_service",

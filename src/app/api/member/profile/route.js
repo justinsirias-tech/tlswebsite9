@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getMemberFromSession } from "../../../../lib/memberAuth";
-import prisma from "../../../../lib/prisma";
+import prisma from "../../../../lib/prisma-webapp";
 
 export async function GET() {
   try {
