@@ -6,7 +6,27 @@ import Image from "next/image";
 import Script from "next/script";
 import { getTranslations } from "next-intl/server";
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600;
+
+export async function generateStaticParams() {
+  const locales = ['en', 'th', 'cn'];
+  try {
+    const locations = await prisma.location.findMany({
+      where: { type: 'condo' },
+      select: { slug: true }
+    });
+    const paths = [];
+    for (const locale of locales) {
+      for (const loc of locations) {
+        paths.push({ locale, slug: loc.slug });
+      }
+    }
+    return paths;
+  } catch (error) {
+    console.error("Failed to generate static params for condominiums:", error);
+    return [];
+  }
+}
 
 // Dynamic metadata for SEO
 export async function generateMetadata({ params }) {

@@ -1,6 +1,10 @@
 import BookingClient from "./BookingClient";
 import { getTranslations } from "next-intl/server";
 
+export function generateStaticParams() {
+  return [{ locale: 'en' }, { locale: 'th' }, { locale: 'cn' }];
+}
+
 export async function generateMetadata({ params }) {
   const resolvedParams = await params;
   const locale = resolvedParams.locale;
