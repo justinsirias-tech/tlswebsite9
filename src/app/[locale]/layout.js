@@ -2,6 +2,7 @@ import { Inter } from "next/font/google";
 import "../globals.css";
 import {NextIntlClientProvider} from 'next-intl';
 import {getMessages} from 'next-intl/server';
+import Script from "next/script";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -30,6 +31,18 @@ export default async function RootLayout({ children, params }) {
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" precedence="default" />
       </head>
       <body className={inter.className} suppressHydrationWarning>
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-7JX9JKLWCQ"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-7JX9JKLWCQ');
+          `}
+        </Script>
         <NextIntlClientProvider messages={messages}>
           <LayoutWrapper>
             {children}
