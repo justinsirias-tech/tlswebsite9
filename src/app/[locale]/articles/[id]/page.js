@@ -3,7 +3,24 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import Script from "next/script";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
+
+export async function generateStaticParams() {
+  const locales = ['en', 'th', 'cn'];
+  try {
+    const articles = await prisma.article.findMany({ select: { id: true } });
+    const paths = [];
+    for (const locale of locales) {
+      for (const article of articles) {
+        paths.push({ locale, id: article.id });
+      }
+    }
+    return paths;
+  } catch (error) {
+    console.error("Failed to generate static params for articles:", error);
+    return [];
+  }
+}
 
 export async function generateMetadata({ params }) {
   const { id } = await params;

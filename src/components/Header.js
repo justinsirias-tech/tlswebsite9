@@ -83,7 +83,9 @@ export default function Header() {
             className="lang-dropdown-wrapper"
           >
             <button 
-              onClick={() => setIsLangOpen(!isLangOpen)}
+              onClick={() => {
+                setIsLangOpen(!isLangOpen);
+              }}
               style={{ 
                 display: 'flex', 
                 alignItems: 'center', 
@@ -100,7 +102,7 @@ export default function Header() {
               className="lang-trigger-btn"
             >
               <Image 
-                src={`https://flagcdn.com/w40/${locale === 'en' ? 'gb' : locale === 'th' ? 'th' : 'cn'}.png`} 
+                src={`/images/flags/${locale === 'en' ? 'gb' : locale === 'th' ? 'th' : 'cn'}.png`} 
                 alt={locale.toUpperCase()} 
                 width={16}
                 height={16}
@@ -151,7 +153,7 @@ export default function Header() {
                     }}
                     className="lang-item-btn"
                   >
-                    <Image src="https://flagcdn.com/w40/gb.png" alt="English" width={14} height={14} style={{ width: '14px', height: '14px', borderRadius: '50%', objectFit: 'cover' }} />
+                    <Image src="/images/flags/gb.png" alt="English" width={14} height={14} style={{ width: '14px', height: '14px', borderRadius: '50%', objectFit: 'cover' }} />
                     <span style={{ fontSize: '0.85rem' }}>English</span>
                   </button>
 
@@ -177,7 +179,7 @@ export default function Header() {
                     }}
                     className="lang-item-btn"
                   >
-                    <Image src="https://flagcdn.com/w40/th.png" alt="Thai" width={14} height={14} style={{ width: '14px', height: '14px', borderRadius: '50%', objectFit: 'cover' }} />
+                    <Image src="/images/flags/th.png" alt="Thai" width={14} height={14} style={{ width: '14px', height: '14px', borderRadius: '50%', objectFit: 'cover' }} />
                     <span style={{ fontSize: '0.85rem' }}>ไทย</span>
                   </button>
 
@@ -203,7 +205,7 @@ export default function Header() {
                     }}
                     className="lang-item-btn"
                   >
-                    <Image src="https://flagcdn.com/w40/cn.png" alt="Chinese" width={14} height={14} style={{ width: '14px', height: '14px', borderRadius: '50%', objectFit: 'cover' }} />
+                    <Image src="/images/flags/cn.png" alt="Chinese" width={14} height={14} style={{ width: '14px', height: '14px', borderRadius: '50%', objectFit: 'cover' }} />
                     <span style={{ fontSize: '0.85rem' }}>中文</span>
                   </button>
                 </div>

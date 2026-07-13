@@ -5,7 +5,11 @@ import prisma from "../../../lib/prisma";
 import DirectorySearch from "../../../components/DirectorySearch";
 import { getTranslations } from "next-intl/server";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
+
+export function generateStaticParams() {
+  return [{ locale: 'en' }, { locale: 'th' }, { locale: 'cn' }];
+}
 
 export async function generateMetadata({ params }) {
   const resolvedParams = await params;

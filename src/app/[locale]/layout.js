@@ -2,6 +2,7 @@ import { Inter } from "next/font/google";
 import "../globals.css";
 import {NextIntlClientProvider} from 'next-intl';
 import {getMessages} from 'next-intl/server';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -11,6 +12,10 @@ export const metadata = {
   title: "Premium Laundry Service & Dry Cleaning | That Laundry Shop",
   description: "Professional laundry services, dry cleaning, and ironing in Bangkok. Fast, reliable, and premium care for your clothes.",
 };
+
+export function generateStaticParams() {
+  return [{ locale: 'en' }, { locale: 'th' }, { locale: 'cn' }];
+}
 
 export default async function RootLayout({ children, params }) {
   const resolvedParams = await params;
@@ -23,15 +28,14 @@ export default async function RootLayout({ children, params }) {
         <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
         <link rel="preconnect" href="https://maps.googleapis.com" />
         <link rel="preconnect" href="https://maps.gstatic.com" />
-        <script suppressHydrationWarning={true} dangerouslySetInnerHTML={{ __html: `
-          (function() {
-            var link = document.createElement('link');
-            link.rel = 'stylesheet';
-            link.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css';
-            link.media = 'print';
-            link.onload = function() { this.media = 'all'; };
-            document.head.appendChild(link);
-          })();
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" precedence="default" />
+        {/* Google tag (gtag.js) */}
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-7JX9JKLWCQ"></script>
+        <script dangerouslySetInnerHTML={{ __html: `
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-7JX9JKLWCQ');
         ` }} />
       </head>
       <body className={inter.className} suppressHydrationWarning>
@@ -40,6 +44,7 @@ export default async function RootLayout({ children, params }) {
             {children}
           </LayoutWrapper>
         </NextIntlClientProvider>
+        <SpeedInsights />
       </body>
     </html>
   );

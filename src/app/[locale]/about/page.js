@@ -5,6 +5,10 @@ import StoryContent from "../../../components/StoryContent";
 import StoryContentTh from "../../../components/StoryContentTh";
 import StoryContentCn from "../../../components/StoryContentCn";
 
+export function generateStaticParams() {
+  return [{ locale: 'en' }, { locale: 'th' }, { locale: 'cn' }];
+}
+
 export async function generateMetadata({ params }) {
   const resolvedParams = await params;
   const locale = resolvedParams.locale;
