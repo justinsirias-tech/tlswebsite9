@@ -73,7 +73,7 @@ export default function BookingClient() {
   const [pickupDate, setPickupDate] = useState("");
   const [pickupTime, setPickupTime] = useState("");
   const [pickupMethod, setPickupMethod] = useState("");
-  const [expressService, setExpressService] = useState("Regular: Next Day");
+  const [expressService, setExpressService] = useState("Regular: Next Day Deliver Any Time Before 18:00 (No Fix Time)");
 
   const generateTimeSlots = () => {
     return [
@@ -752,9 +752,9 @@ Notes: ${specialInst}`.trim();
                     <input 
                       type="radio" 
                       name="expressService" 
-                      value="Regular: Next Day" 
-                      checked={expressService === "Regular: Next Day" || expressService === "Standard: Next Day"}
-                      onChange={() => setExpressService("Regular: Next Day")}
+                      value="Regular: Next Day Deliver Any Time Before 18:00 (No Fix Time)" 
+                      checked={expressService === "Regular: Next Day Deliver Any Time Before 18:00 (No Fix Time)" || expressService === "Regular: Next Day" || expressService === "Standard: Next Day"}
+                      onChange={() => setExpressService("Regular: Next Day Deliver Any Time Before 18:00 (No Fix Time)")}
                     />
                     <span className={styles.checkmark}></span>
                     <span className={styles.labelName} style={{ display: "flex", flexDirection: "column", gap: "0.25rem", width: "100%" }}>
@@ -769,9 +769,9 @@ Notes: ${specialInst}`.trim();
                     <input 
                       type="radio" 
                       name="expressService" 
-                      value="Express 50: Same Day before 18:00" 
-                      checked={expressService === "Express 50: Same Day before 18:00"}
-                      onChange={() => setExpressService("Express 50: Same Day before 18:00")}
+                      value="Express 50: Deliver Same Day Before at 18:00 (Pickup before 12:00)" 
+                      checked={expressService === "Express 50: Deliver Same Day Before at 18:00 (Pickup before 12:00)" || expressService === "Express 50: Same Day before 18:00"}
+                      onChange={() => setExpressService("Express 50: Deliver Same Day Before at 18:00 (Pickup before 12:00)")}
                     />
                     <span className={styles.checkmark}></span>
                     <span className={styles.labelName} style={{ display: "flex", flexDirection: "column", gap: "0.25rem", width: "100%" }}>
@@ -786,9 +786,9 @@ Notes: ${specialInst}`.trim();
                     <input 
                       type="radio" 
                       name="expressService" 
-                      value="Express 50 (Next Day): Next Day at 12:00" 
-                      checked={expressService === "Express 50 (Next Day): Next Day at 12:00"}
-                      onChange={() => setExpressService("Express 50 (Next Day): Next Day at 12:00")}
+                      value="Express 50: Deliver (Next Day) at 12:00" 
+                      checked={expressService === "Express 50: Deliver (Next Day) at 12:00" || expressService === "Express 50 (Next Day): Next Day at 12:00"}
+                      onChange={() => setExpressService("Express 50: Deliver (Next Day) at 12:00")}
                     />
                     <span className={styles.checkmark}></span>
                     <span className={styles.labelName} style={{ display: "flex", flexDirection: "column", gap: "0.25rem", width: "100%" }}>
@@ -803,9 +803,9 @@ Notes: ${specialInst}`.trim();
                     <input 
                       type="radio" 
                       name="expressService" 
-                      value="Express 100: Same Day before 19:00" 
-                      checked={expressService === "Express 100: Same Day before 19:00"}
-                      onChange={() => setExpressService("Express 100: Same Day before 19:00")}
+                      value="Express 100: Deliver Same Day Before 19:00 (+100% Surcharge Pickup anytime before 15:00-Subject to availability)" 
+                      checked={expressService === "Express 100: Deliver Same Day Before 19:00 (+100% Surcharge Pickup anytime before 15:00-Subject to availability)" || expressService === "Express 100: Same Day before 19:00"}
+                      onChange={() => setExpressService("Express 100: Deliver Same Day Before 19:00 (+100% Surcharge Pickup anytime before 15:00-Subject to availability)")}
                     />
                     <span className={styles.checkmark}></span>
                     <span className={styles.labelName} style={{ display: "flex", flexDirection: "column", gap: "0.25rem", width: "100%" }}>
