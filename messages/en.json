@@ -234,7 +234,7 @@
     "bankTransfer": "Bank Transfer",
     "qrCode": "QR / PromptPay",
     "expressServiceLabel": "Express Service Option *",
-    "expressStandardTitle": "Regular: Next Day",
+    "expressStandardTitle": "Regular: Next Day Any Time Before 6 p.m.",
     "expressStandardSub": "",
     "express50SameDayTitle": "Express 50: Same Day before 18:00",
     "express50SameDaySub": "(+50% Surcharge, if picked up before 12:00)",
