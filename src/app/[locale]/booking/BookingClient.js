@@ -73,7 +73,7 @@ export default function BookingClient() {
   const [pickupDate, setPickupDate] = useState("");
   const [pickupTime, setPickupTime] = useState("");
   const [pickupMethod, setPickupMethod] = useState("");
-  const [expressService, setExpressService] = useState("Regular: Next Day Deliver Any Time Before 18:00 (No Fix Time)");
+  const [expressService, setExpressService] = useState("Standard: Next Day Deliver Any Time Before 18:00 (No Fixed Time)");
 
   const generateTimeSlots = () => {
     return [
@@ -752,9 +752,9 @@ Notes: ${specialInst}`.trim();
                     <input 
                       type="radio" 
                       name="expressService" 
-                      value="Regular: Next Day Deliver Any Time Before 18:00 (No Fix Time)" 
-                      checked={expressService === "Regular: Next Day Deliver Any Time Before 18:00 (No Fix Time)" || expressService === "Regular: Next Day" || expressService === "Standard: Next Day"}
-                      onChange={() => setExpressService("Regular: Next Day Deliver Any Time Before 18:00 (No Fix Time)")}
+                      value="Standard: Next Day Deliver Any Time Before 18:00 (No Fixed Time)" 
+                      checked={expressService === "Standard: Next Day Deliver Any Time Before 18:00 (No Fixed Time)" || expressService === "Standard: Next Day Deliver Any Time Before 18:00 (No Fix Time)" || expressService === "Regular: Next Day Deliver Any Time Before 18:00 (No Fix Time)" || expressService === "Regular: Next Day" || expressService === "Standard: Next Day"}
+                      onChange={() => setExpressService("Standard: Next Day Deliver Any Time Before 18:00 (No Fixed Time)")}
                     />
                     <span className={styles.checkmark}></span>
                     <span className={styles.labelName} style={{ display: "flex", flexDirection: "column", gap: "0.25rem", width: "100%" }}>

@@ -234,7 +234,7 @@
     "bankTransfer": "银行转账",
     "qrCode": "QR 扫码支付 / PromptPay",
     "expressServiceLabel": "加急服务选项",
-    "expressStandardTitle": "普通服务 (Regular): 次日 18:00 前送达 (无固定时间)",
+    "expressStandardTitle": "标准服务 (Standard): 次日 18:00 前送达 (无固定时间)",
     "expressStandardSub": "",
     "express50SameDayTitle": "Express 50: 当天 18:00 前送达",
     "express50SameDaySub": "(需在 12:00 前取件)",
