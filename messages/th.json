@@ -234,7 +234,7 @@
     "bankTransfer": "โอนเงินผ่านธนาคาร",
     "qrCode": "สแกน QR / PromptPay",
     "expressServiceLabel": "ตัวเลือกบริการด่วนพิเศษ *",
-    "expressStandardTitle": "บริการมาตรฐาน: ส่งวันถัดไป",
+    "expressStandardTitle": "บริการปกติ (Regular): ส่งวันถัดไป",
     "expressStandardSub": "",
     "express50SameDayTitle": "Express 50: ส่งวันเดียวกันก่อน 18:00 น.",
     "express50SameDaySub": "(ค่าบริการเพิ่ม +50%, หากรับผ้าก่อน 12:00 น.)",

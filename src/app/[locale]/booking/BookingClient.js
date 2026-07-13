@@ -73,7 +73,7 @@ export default function BookingClient() {
   const [pickupDate, setPickupDate] = useState("");
   const [pickupTime, setPickupTime] = useState("");
   const [pickupMethod, setPickupMethod] = useState("");
-  const [expressService, setExpressService] = useState("Standard: Next Day");
+  const [expressService, setExpressService] = useState("Regular: Next Day");
 
   const generateTimeSlots = () => {
     return [
@@ -750,11 +750,28 @@ Notes: ${specialInst}`.trim();
                 <div className={styles.expressGrid}>
                   <label className={styles.checkboxItem}>
                     <input 
-                      type="checkbox" 
+                      type="radio" 
+                      name="expressService" 
+                      value="Regular: Next Day" 
+                      checked={expressService === "Regular: Next Day" || expressService === "Standard: Next Day"}
+                      onChange={() => setExpressService("Regular: Next Day")}
+                    />
+                    <span className={styles.checkmark}></span>
+                    <span className={styles.labelName} style={{ display: "flex", flexDirection: "column", gap: "0.25rem", width: "100%" }}>
+                      <span style={{ fontWeight: "600", fontSize: "0.95rem" }}>{t("expressStandardTitle")}</span>
+                      {t("expressStandardSub") && (
+                        <span style={{ fontSize: "0.75rem", opacity: 0.8, fontStyle: "italic", fontWeight: "normal" }}>{t("expressStandardSub")}</span>
+                      )}
+                    </span>
+                  </label>
+
+                  <label className={styles.checkboxItem}>
+                    <input 
+                      type="radio" 
                       name="expressService" 
                       value="Express 50: Same Day before 18:00" 
                       checked={expressService === "Express 50: Same Day before 18:00"}
-                      onChange={(e) => setExpressService(e.target.checked ? "Express 50: Same Day before 18:00" : "Standard: Next Day")}
+                      onChange={() => setExpressService("Express 50: Same Day before 18:00")}
                     />
                     <span className={styles.checkmark}></span>
                     <span className={styles.labelName} style={{ display: "flex", flexDirection: "column", gap: "0.25rem", width: "100%" }}>
@@ -767,11 +784,11 @@ Notes: ${specialInst}`.trim();
 
                   <label className={styles.checkboxItem}>
                     <input 
-                      type="checkbox" 
+                      type="radio" 
                       name="expressService" 
                       value="Express 50 (Next Day): Next Day at 12:00" 
                       checked={expressService === "Express 50 (Next Day): Next Day at 12:00"}
-                      onChange={(e) => setExpressService(e.target.checked ? "Express 50 (Next Day): Next Day at 12:00" : "Standard: Next Day")}
+                      onChange={() => setExpressService("Express 50 (Next Day): Next Day at 12:00")}
                     />
                     <span className={styles.checkmark}></span>
                     <span className={styles.labelName} style={{ display: "flex", flexDirection: "column", gap: "0.25rem", width: "100%" }}>
@@ -784,11 +801,11 @@ Notes: ${specialInst}`.trim();
 
                   <label className={styles.checkboxItem}>
                     <input 
-                      type="checkbox" 
+                      type="radio" 
                       name="expressService" 
                       value="Express 100: Same Day before 19:00" 
                       checked={expressService === "Express 100: Same Day before 19:00"}
-                      onChange={(e) => setExpressService(e.target.checked ? "Express 100: Same Day before 19:00" : "Standard: Next Day")}
+                      onChange={() => setExpressService("Express 100: Same Day before 19:00")}
                     />
                     <span className={styles.checkmark}></span>
                     <span className={styles.labelName} style={{ display: "flex", flexDirection: "column", gap: "0.25rem", width: "100%" }}>
