@@ -187,7 +187,7 @@
     "disclaimerTurnaroundDesc1": "标准服务：次日送达",
     "disclaimerTurnaroundDesc2": "加急50：当日18:00前送达（+50%附加费，需在12:00前取件）",
     "disclaimerTurnaroundDesc3": "加急50（次日）：次日12:00送达（+50%附加费，需在16:00前取件）",
-    "disclaimerTurnaroundDesc4": "加急100：当日19:00前送达（+100%附加费，需在16:00前取件）",
+    "disclaimerTurnaroundDesc4": "加急100：当日19:00前送达（+100%附加费，需在 15:00 前取件 - 视空闲情况而定）",
     "disclaimerExpressNote": "注意：任何要求快于标准次日周转时间的洗衣服务将自动收取加急附加费。",
     "disclaimerLogistics": "🚗 取件与送件物流费",
     "disclaimerLogisticsDesc": "所有运输服务均采用基于距离的分级计费。最终费用取以下两者中的较高值：",

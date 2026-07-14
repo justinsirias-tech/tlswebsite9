@@ -187,7 +187,7 @@
     "disclaimerTurnaroundDesc1": "Standard Service: Next Day",
     "disclaimerTurnaroundDesc2": "Express 50: Same Day before 18:00 (+50% Surcharge, if picked up before 12:00)",
     "disclaimerTurnaroundDesc3": "Express 50 (Next Day): Next Day at 12:00 (+50% Surcharge, if picked up before 16:00)",
-    "disclaimerTurnaroundDesc4": "Express 100: Same Day before 19:00 (+100% Surcharge, if picked up before 16:00)",
+    "disclaimerTurnaroundDesc4": "Express 100: Same Day before 19:00 (+100% Surcharge, if picked up before 15:00-Subject to availability)",
     "disclaimerExpressNote": "Note: Any laundry requested faster than standard next-day turnaround automatically triggers an Express surcharge.",
     "disclaimerLogistics": "🚗 Pickup & Delivery Logistics Fee",
     "disclaimerLogisticsDesc": "All transport services use a distance-based tier. The final cost is the higher of:",
