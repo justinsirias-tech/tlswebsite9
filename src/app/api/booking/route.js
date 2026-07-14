@@ -426,7 +426,8 @@ export async function POST(req) {
 
     // Create a corresponding Job record in the shared POS database if enabled
     // so it shows up automatically in the POS system's "All Jobs" list
-    const enableSync = process.env.ENABLE_WEBAPP_SYNC !== "false";
+    // Temporarily disabled in code as requested by the user, but keeping the function structure.
+    const enableSync = false;
     if (enableSync) {
       try {
         const details = parseServiceDetails(translatedService);
