@@ -424,50 +424,55 @@ export async function POST(req) {
       }
     });
 
-    // Create a corresponding Job record in the shared POS database
+    // Create a corresponding Job record in the shared POS database if enabled
     // so it shows up automatically in the POS system's "All Jobs" list
-    try {
-      const details = parseServiceDetails(translatedService);
+    const enableSync = process.env.ENABLE_WEBAPP_SYNC !== "false";
+    if (enableSync) {
+      try {
+        const details = parseServiceDetails(translatedService);
 
-      // Generate sequential Job ID matching POS system format (Format: YYYYxxxxxx, e.g. 2026000045)
-      const year = new Date().getFullYear().toString();
-      const latestJob = await prismaWebapp.job.findFirst({
-        where: { id: { startsWith: year } },
-        orderBy: { id: 'desc' }
-      });
-      
-      let jobId = `${year}000001`;
-      if (latestJob && latestJob.id.length >= 10) {
-        const lastNum = parseInt(latestJob.id.substring(4), 10);
-        if (!isNaN(lastNum)) {
-          jobId = `${year}${(lastNum + 1).toString().padStart(6, '0')}`;
+        // Generate sequential Job ID matching POS system format (Format: YYYYxxxxxx, e.g. 2026000045)
+        const year = new Date().getFullYear().toString();
+        const latestJob = await prismaWebapp.job.findFirst({
+          where: { id: { startsWith: year } },
+          orderBy: { id: 'desc' }
+        });
+        
+        let jobId = `${year}000001`;
+        if (latestJob && latestJob.id.length >= 10) {
+          const lastNum = parseInt(latestJob.id.substring(4), 10);
+          if (!isNaN(lastNum)) {
+            jobId = `${year}${(lastNum + 1).toString().padStart(6, '0')}`;
+          }
         }
+
+        await prismaWebapp.job.create({
+          data: {
+            id: jobId,
+            type: "full_service",
+            customerId: data.memberId || null,
+            customerName: data.customerName,
+            customerPhone: data.phone,
+            pickupLocation: details.address || "Website Booking",
+            dropoffLocation: details.delivery || details.address || "Website Booking",
+            pickupLat: 13.736717,
+            pickupLng: 100.523186,
+            dropoffLat: 13.736717,
+            dropoffLng: 100.523186,
+            distance: 0.0,
+            fee: 0.0,
+            status: "tba",
+            scheduledAt: new Date(data.pickupDate),
+            source: "website",
+            remark: `Booking ID: ${booking.id}\nServices: ${details.services || "Not specified"}\nNotes: ${details.notes || "None"}`
+          }
+        });
+      } catch (jobError) {
+        console.error("Failed to create corresponding Job in POS table:", jobError);
+        // We don't fail the booking request if creating a job log fails
       }
-
-      await prismaWebapp.job.create({
-        data: {
-          id: jobId,
-          type: "full_service",
-          customerId: data.memberId || null,
-          customerName: data.customerName,
-          customerPhone: data.phone,
-          pickupLocation: details.address || "Website Booking",
-          dropoffLocation: details.delivery || details.address || "Website Booking",
-          pickupLat: 13.736717,
-          pickupLng: 100.523186,
-          dropoffLat: 13.736717,
-          dropoffLng: 100.523186,
-          distance: 0.0,
-          fee: 0.0,
-          status: "tba",
-          scheduledAt: new Date(data.pickupDate),
-          source: "website",
-          remark: `Booking ID: ${booking.id}\nServices: ${details.services || "Not specified"}\nNotes: ${details.notes || "None"}`
-        }
-      });
-    } catch (jobError) {
-      console.error("Failed to create corresponding Job in POS table:", jobError);
-      // We don't fail the booking request if creating a job log fails
+    } else {
+      console.log("Webapp Job sync is disabled via ENABLE_WEBAPP_SYNC=false. Skipping POS Job creation.");
     }
 
     // Send the confirmation email in the background using Next.js after() to prevent Vercel container freezing
