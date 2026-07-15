@@ -56,6 +56,11 @@ export default async function AdminLayout({ children }) {
               <i className="fa-solid fa-tags"></i> Pricing Menu
             </Link>
           )}
+          {hasPerm('pricing') && (
+            <Link href="/admin/dashboard/popups" className={styles.navLink}>
+              <i className="fa-solid fa-window-restore"></i> Promotion Popups
+            </Link>
+          )}
           {hasPerm('articles') && (
             <Link href="/admin/dashboard/articles" className={styles.navLink}>
               <i className="fa-solid fa-file-lines"></i> Articles

@@ -126,3 +126,14 @@ model MembershipRequest {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
+
+model PopupTemplate {
+  id        String   @id @default(uuid())
+  name      String
+  imageUrl  String
+  startDate DateTime
+  endDate   DateTime
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

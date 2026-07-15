@@ -7,6 +7,7 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 const inter = Inter({ subsets: ["latin"] });
 
 import LayoutWrapper from "../../components/LayoutWrapper";
+import PopupBanner from "../../components/PopupBanner";
 
 export const metadata = {
   title: "Premium Laundry Service & Dry Cleaning | That Laundry Shop",
@@ -43,6 +44,7 @@ export default async function RootLayout({ children, params }) {
           <LayoutWrapper>
             {children}
           </LayoutWrapper>
+          <PopupBanner />
         </NextIntlClientProvider>
         <SpeedInsights />
       </body>
