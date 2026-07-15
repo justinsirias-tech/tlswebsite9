@@ -17,6 +17,7 @@ export default function PopupsAdminPage() {
   });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [localPreviewUrl, setLocalPreviewUrl] = useState("");
 
   useEffect(() => {
     fetchPopups();
@@ -39,6 +40,10 @@ export default function PopupsAdminPage() {
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
+
+    // Create a local blob URL for instant preview in the browser
+    const localUrl = URL.createObjectURL(file);
+    setLocalPreviewUrl(localUrl);
 
     setUploading(true);
     setError("");
@@ -116,6 +121,7 @@ export default function PopupsAdminPage() {
       if (res.ok && data.success) {
         setPopups(prev => [data.popup, ...prev]);
         setShowForm(false);
+        setLocalPreviewUrl("");
         setFormData({
           name: "",
           imageUrl: "",
@@ -165,6 +171,7 @@ export default function PopupsAdminPage() {
         <button 
           onClick={() => {
             setShowForm(!showForm);
+            setLocalPreviewUrl("");
             setError("");
             setSuccess("");
           }}
@@ -213,11 +220,11 @@ export default function PopupsAdminPage() {
                 style={{ color: "white" }}
               />
               {uploading && <p style={{ color: "var(--text-light)", fontSize: "0.85rem" }}>Uploading image...</p>}
-              {formData.imageUrl && (
+              {(formData.imageUrl || localPreviewUrl) && (
                 <div style={{ marginTop: "1rem" }}>
                   <p style={{ color: "var(--text-light)", fontSize: "0.85rem", marginBottom: "0.5rem" }}>Image Preview:</p>
                   <img 
-                    src={formData.imageUrl} 
+                    src={localPreviewUrl || formData.imageUrl} 
                     alt="Upload preview" 
                     style={{ maxHeight: "200px", maxWidth: "100%", borderRadius: "8px", border: "1px solid rgba(255, 255, 255, 0.1)" }}
                   />
