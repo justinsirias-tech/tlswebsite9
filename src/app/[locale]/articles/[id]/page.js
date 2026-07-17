@@ -39,15 +39,18 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function ArticleDetails({ params }) {
-  const { id } = await params;
-  let article = null;
   try {
-    article = await prisma.article.findUnique({ where: { id } });
-  } catch(e) {
-    console.error(e);
-  }
+    const { id } = await params;
+    const article = await prisma.article.findUnique({ where: { id } });
 
-  if (!article) return notFound();
+    if (!article) {
+      return (
+        <div style={{ padding: "10rem 2rem", textAlign: "center", background: "white" }}>
+          <h1>Article not found in database</h1>
+          <p>ID requested: {id}</p>
+        </div>
+      );
+    }
 
   const formatDate = (dateInput) => {
     if (!dateInput) return "";
@@ -112,4 +115,18 @@ export default async function ArticleDetails({ params }) {
       </section>
     </>
   );
+  } catch (error) {
+    return (
+      <div style={{ padding: "10rem 2rem", background: "white", color: "red", minHeight: "100vh" }}>
+        <div className="container" style={{ maxWidth: "800px" }}>
+          <h1 style={{ fontSize: "2rem", marginBottom: "1rem" }}>Rendering Error</h1>
+          <p style={{ fontWeight: "bold" }}>Error message: {error.message}</p>
+          <p>Stack Trace:</p>
+          <pre style={{ background: "#f8f9fa", padding: "1rem", borderRadius: "8px", overflowX: "auto", fontSize: "0.85rem" }}>
+            {error.stack}
+          </pre>
+        </div>
+      </div>
+    );
+  }
 }

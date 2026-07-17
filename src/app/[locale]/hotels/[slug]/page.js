@@ -59,20 +59,22 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function HotelArticlePage({ params }) {
-  const resolvedParams = await params;
-  const locale = resolvedParams.locale;
-  const t = await getTranslations({ locale, namespace: "Directory" });
-
-  let hotel = null;
   try {
-    hotel = await prisma.location.findUnique({ where: { slug: resolvedParams.slug } });
-  } catch (error) {
-    console.error("Failed to fetch hotel details at build time:", error);
-  }
+    const resolvedParams = await params;
+    const locale = resolvedParams.locale;
+    const t = await getTranslations({ locale, namespace: "Directory" });
 
-  if (!hotel) {
-    notFound();
-  }
+    const hotel = await prisma.location.findUnique({ where: { slug: resolvedParams.slug } });
+
+    if (!hotel) {
+      return (
+        <div style={{ padding: "10rem 2rem", textAlign: "center", background: "white" }}>
+          <h1>Hotel not found in database</h1>
+          <p>Slug requested: {resolvedParams.slug}</p>
+          <pre>{JSON.stringify(resolvedParams, null, 2)}</pre>
+        </div>
+      );
+    }
 
   // Get localized content
   const name = locale === "th" && hotel.name_th ? hotel.name_th : hotel.name;
@@ -341,4 +343,18 @@ export default async function HotelArticlePage({ params }) {
       </section>
     </>
   );
+  } catch (error) {
+    return (
+      <div style={{ padding: "10rem 2rem", background: "white", color: "red", minHeight: "100vh" }}>
+        <div className="container" style={{ maxWidth: "800px" }}>
+          <h1 style={{ fontSize: "2rem", marginBottom: "1rem" }}>Rendering Error</h1>
+          <p style={{ fontWeight: "bold" }}>Error message: {error.message}</p>
+          <p>Stack Trace:</p>
+          <pre style={{ background: "#f8f9fa", padding: "1rem", borderRadius: "8px", overflowX: "auto", fontSize: "0.85rem" }}>
+            {error.stack}
+          </pre>
+        </div>
+      </div>
+    );
+  }
 }
