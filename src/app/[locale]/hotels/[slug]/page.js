@@ -6,7 +6,7 @@ import Script from "next/script";
 import { getTranslations } from "next-intl/server";
 import prisma from "../../../../lib/prisma";
 
-export const revalidate = 3600;
+export const dynamic = 'force-dynamic';
 
 export async function generateStaticParams() {
   const locales = ['en', 'th', 'cn'];

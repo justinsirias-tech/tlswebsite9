@@ -6,7 +6,7 @@ import Image from "next/image";
 import Script from "next/script";
 import { getTranslations } from "next-intl/server";
 
-export const revalidate = 3600;
+export const dynamic = 'force-dynamic';
 
 export async function generateStaticParams() {
   const locales = ['en', 'th', 'cn'];
