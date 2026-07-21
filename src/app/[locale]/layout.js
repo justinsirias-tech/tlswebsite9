@@ -44,7 +44,7 @@ export default async function RootLayout({ children, params }) {
           <LayoutWrapper>
             {children}
           </LayoutWrapper>
-          <PopupBanner />
+          {/* <PopupBanner /> */}
         </NextIntlClientProvider>
         <SpeedInsights />
       </body>

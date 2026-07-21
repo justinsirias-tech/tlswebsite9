@@ -413,16 +413,39 @@ export async function POST(req) {
     // Translate the service details to English if needed
     const translatedService = await translateToEnglish(data.service);
 
-    const booking = await prisma.booking.create({
-      data: {
-        customerName: data.customerName,
-        email: data.email,
-        phone: data.phone,
-        pickupDate: new Date(data.pickupDate),
-        service: translatedService,
-        memberId: data.memberId || null,
+    let booking;
+    try {
+      booking = await Promise.race([
+        prisma.booking.create({
+          data: {
+            customerName: data.customerName,
+            email: data.email,
+            phone: data.phone,
+            pickupDate: new Date(data.pickupDate),
+            service: translatedService,
+            memberId: data.memberId || null,
+          }
+        }),
+        new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 4000))
+      ]);
+    } catch (dbErr) {
+      console.error("Booking creation failed or timed out, retrying:", dbErr);
+      try {
+        booking = await prisma.booking.create({
+          data: {
+            customerName: data.customerName,
+            email: data.email,
+            phone: data.phone,
+            pickupDate: new Date(data.pickupDate),
+            service: translatedService,
+            memberId: data.memberId || null,
+          }
+        });
+      } catch (retryErr) {
+        console.error("Booking creation retry failed:", retryErr);
+        throw retryErr;
       }
-    });
+    }
 
     // Create a corresponding Job record in the shared POS database if enabled
     // so it shows up automatically in the POS system's "All Jobs" list
