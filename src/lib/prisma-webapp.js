@@ -7,11 +7,27 @@ const connectionString = process.env.WEBAPP_DATABASE_URL;
 let prismaWebapp;
 
 if (connectionString) {
-  const pool = new Pool({ 
+  const isSocket = connectionString.includes('host=/cloudsql/');
+
+  const poolConfig = { 
     connectionString,
-    ssl: { rejectUnauthorized: false },
-    max: 2 // Limit connection pool size per worker
+    max: 5, // Limit connection pool size per worker
+    idleTimeoutMillis: 10000,
+    connectionTimeoutMillis: 10000,
+  };
+
+  // Only apply SSL for TCP connections, do not use TLS for Unix domain sockets
+  if (!isSocket) {
+    poolConfig.ssl = { rejectUnauthorized: false };
+  }
+
+  const pool = new Pool(poolConfig);
+
+  // Handle unexpected pool errors
+  pool.on('error', (err) => {
+    console.error('Idle WebApp PG client connection error:', err?.message || err);
   });
+
   const adapter = new PrismaPg(pool);
   prismaWebapp = new PrismaClient({ adapter });
 } else {

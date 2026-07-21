@@ -7,15 +7,23 @@ const connectionString = `${process.env.DATABASE_URL}`;
 const globalForPrisma = globalThis;
 
 if (!globalForPrisma.prisma) {
-  const pool = new Pool({ 
+  const isSocket = connectionString.includes('host=/cloudsql/');
+
+  const poolConfig = { 
     connectionString,
-    ssl: { rejectUnauthorized: false },
     max: 10,
     idleTimeoutMillis: 10000, // Close idle connections after 10s to prevent stale/dead sockets
     connectionTimeoutMillis: 10000,
     keepAlive: true,
     keepAliveInitialDelayMillis: 5000,
-  });
+  };
+
+  // Only apply SSL for TCP connections, do not use TLS for Unix domain sockets
+  if (!isSocket) {
+    poolConfig.ssl = { rejectUnauthorized: false };
+  }
+
+  const pool = new Pool(poolConfig);
 
   // Handle unexpected idle client errors in pool to prevent unhandled socket crashes
   pool.on('error', (err) => {
