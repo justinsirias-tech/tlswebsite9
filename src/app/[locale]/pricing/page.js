@@ -25,20 +25,26 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function PricingPage({ params }) {
+  const resolvedParams = await params;
+  const locale = resolvedParams?.locale || "en";
+
   try {
-    const resolvedParams = await params;
-    const locale = resolvedParams.locale;
     const t = await getTranslations({ locale, namespace: "Pricing" });
     
     let allPricing = [];
     try {
       allPricing = await Promise.race([
         prisma.pricing.findMany(),
-        new Promise((_, reject) => setTimeout(() => reject(new Error("Database query timeout after 4000ms")), 4000))
+        new Promise((_, reject) => setTimeout(() => reject(new Error("Database query timeout after 3000ms")), 3000))
       ]);
     } catch (dbError) {
-      console.error("Pricing DB query timed out or failed:", dbError);
-      allPricing = [];
+      console.error("Pricing DB query timed out or failed, attempting fresh retry:", dbError);
+      try {
+        allPricing = await prisma.pricing.findMany();
+      } catch (retryError) {
+        console.error("Pricing DB retry failed:", retryError);
+        allPricing = [];
+      }
     }
     
     const sortPricingItems = (items) => {
@@ -146,16 +152,14 @@ export default async function PricingPage({ params }) {
       </>
     );
   } catch (error) {
+    console.error("Pricing page render error:", error);
+    const fallbackPriceData = { weight: [], garments: [], linen: [], ironing: [], dryclean: [] };
     return (
-      <div style={{ padding: "10rem 2rem", background: "white", color: "red", minHeight: "100vh" }}>
-        <div className="container" style={{ maxWidth: "800px" }}>
-          <h1 style={{ fontSize: "2rem", marginBottom: "1rem" }}>Pricing Page Error</h1>
-          <p style={{ fontWeight: "bold" }}>Error: {error.message}</p>
-          <pre style={{ background: "#f8f9fa", padding: "1rem", borderRadius: "8px", overflowX: "auto", fontSize: "0.85rem" }}>
-            {error.stack}
-          </pre>
+      <section className="section" style={{ background: "var(--background)", minHeight: "60vh", paddingTop: "8rem" }}>
+        <div className="container">
+          <PricingTabs priceData={fallbackPriceData} locale={locale} />
         </div>
-      </div>
+      </section>
     );
   }
 }

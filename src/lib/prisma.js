@@ -11,9 +11,17 @@ if (!globalForPrisma.prisma) {
     connectionString,
     ssl: { rejectUnauthorized: false },
     max: 10,
-    idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 30000,
+    idleTimeoutMillis: 10000, // Close idle connections after 10s to prevent stale/dead sockets
+    connectionTimeoutMillis: 10000,
+    keepAlive: true,
+    keepAliveInitialDelayMillis: 5000,
   });
+
+  // Handle unexpected idle client errors in pool to prevent unhandled socket crashes
+  pool.on('error', (err) => {
+    console.error('Idle PG client connection error:', err?.message || err);
+  });
+
   const adapter = new PrismaPg(pool);
   globalForPrisma.prisma = new PrismaClient({ adapter });
 }
