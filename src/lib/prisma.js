@@ -4,12 +4,20 @@ import { PrismaClient } from '@prisma/client';
 
 const connectionString = `${process.env.DATABASE_URL}`;
 
-const pool = new Pool({ 
-  connectionString,
-  ssl: { rejectUnauthorized: false },
-  max: 2 // Limit connection pool size per worker
-});
-const adapter = new PrismaPg(pool);
-const prisma = new PrismaClient({ adapter });
+const globalForPrisma = globalThis;
+
+if (!globalForPrisma.prisma) {
+  const pool = new Pool({ 
+    connectionString,
+    ssl: { rejectUnauthorized: false },
+    max: 5,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 5000,
+  });
+  const adapter = new PrismaPg(pool);
+  globalForPrisma.prisma = new PrismaClient({ adapter });
+}
+
+const prisma = globalForPrisma.prisma;
 
 export default prisma;
