@@ -2,7 +2,7 @@ import SEOArticles from "../../../components/SEOArticles";
 import prisma from "../../../lib/prisma";
 import { getTranslations } from "next-intl/server";
 
-export const revalidate = 3600;
+export const dynamic = 'force-dynamic';
 
 export function generateStaticParams() {
   return [{ locale: 'en' }, { locale: 'th' }, { locale: 'cn' }];
