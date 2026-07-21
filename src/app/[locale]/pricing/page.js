@@ -29,12 +29,22 @@ export default async function PricingPage({ params }) {
     const resolvedParams = await params;
     const locale = resolvedParams.locale;
     const t = await getTranslations({ locale, namespace: "Pricing" });
-    const allPricing = await prisma.pricing.findMany();
+    
+    let allPricing = [];
+    try {
+      allPricing = await Promise.race([
+        prisma.pricing.findMany(),
+        new Promise((_, reject) => setTimeout(() => reject(new Error("Database query timeout after 4000ms")), 4000))
+      ]);
+    } catch (dbError) {
+      console.error("Pricing DB query timed out or failed:", dbError);
+      allPricing = [];
+    }
     
     const sortPricingItems = (items) => {
       const toppers = [];
       const others = [];
-      items.forEach(item => {
+      (items || []).forEach(item => {
         if (item.name && item.name.toLowerCase().includes("topper")) {
           toppers.push(item);
         } else {
