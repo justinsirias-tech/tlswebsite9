@@ -10,9 +10,9 @@ if (!globalForPrisma.prisma) {
   const pool = new Pool({ 
     connectionString,
     ssl: { rejectUnauthorized: false },
-    max: 5,
+    max: 10,
     idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 5000,
+    connectionTimeoutMillis: 30000,
   });
   const adapter = new PrismaPg(pool);
   globalForPrisma.prisma = new PrismaClient({ adapter });
