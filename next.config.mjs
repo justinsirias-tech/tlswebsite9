@@ -18,6 +18,19 @@ const nextConfig = {
         hostname: 'flagcdn.com',
       },
     ],
+  async redirects() {
+    return [
+      {
+        source: '/price',
+        destination: '/en/pricing',
+        permanent: true,
+      },
+      {
+        source: '/:locale(en|th|cn)/price',
+        destination: '/:locale/pricing',
+        permanent: true,
+      },
+    ];
   },
 };
 
