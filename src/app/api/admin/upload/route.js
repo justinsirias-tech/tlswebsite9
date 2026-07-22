@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { jwtVerify } from "jose";
 import { writeFile, mkdir } from "fs/promises";
 import { join } from "path";
+import { Storage } from "@google-cloud/storage";
 
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || "tls-secret-key-2026");
 
@@ -34,21 +35,46 @@ export async function POST(request) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Save path inside the public/uploads directory
-    const uploadDir = join(process.cwd(), "public", "uploads");
-    await mkdir(uploadDir, { recursive: true });
-
     // Clean filename and make it unique
     const timestamp = Date.now();
     const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
     const uniqueFilename = `${timestamp}_${sanitizedName}`;
-    const filePath = join(uploadDir, uniqueFilename);
 
-    await writeFile(filePath, buffer);
+    const bucketName = process.env.GCS_BUCKET;
 
-    const fileUrl = `/uploads/${uniqueFilename}`;
+    if (bucketName) {
+      console.log(`Uploading file to GCS Bucket: ${bucketName}...`);
+      
+      // Initialize GCS client. On Cloud Run, it automatically uses the container's service account credentials.
+      const storage = new Storage();
+      const bucket = storage.bucket(bucketName);
+      const gcsFile = bucket.file(`uploads/${uniqueFilename}`);
 
-    return NextResponse.json({ success: true, url: fileUrl, filename: file.name }, { status: 200 });
+      await gcsFile.save(buffer, {
+        metadata: {
+          contentType: file.type || "image/jpeg",
+        },
+      });
+
+      // Construct GCS public URL (Assumes bucket permissions allow allUsers Storage Object Viewer)
+      const fileUrl = `https://storage.googleapis.com/${bucketName}/uploads/${uniqueFilename}`;
+
+      console.log(`GCS Upload success: ${fileUrl}`);
+      return NextResponse.json({ success: true, url: fileUrl, filename: file.name }, { status: 200 });
+    } else {
+      console.log("GCS_BUCKET env variable not configured. Falling back to local filesystem upload...");
+      
+      // Save path inside the public/uploads directory
+      const uploadDir = join(process.cwd(), "public", "uploads");
+      await mkdir(uploadDir, { recursive: true });
+
+      const filePath = join(uploadDir, uniqueFilename);
+      await writeFile(filePath, buffer);
+
+      const fileUrl = `/uploads/${uniqueFilename}`;
+
+      return NextResponse.json({ success: true, url: fileUrl, filename: file.name }, { status: 200 });
+    }
   } catch (error) {
     console.error("File upload API error:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

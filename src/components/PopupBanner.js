@@ -9,8 +9,31 @@ export default function PopupBanner() {
   useEffect(() => {
     async function checkActivePopup() {
       try {
+        const now = Date.now();
+        const cachedData = localStorage.getItem("popup_check_cache");
+        const cachedTime = localStorage.getItem("popup_check_time");
+
+        // 1. Client-Side Cache Defense: If checked in the last 15 minutes, reuse the cached response
+        if (cachedData && cachedTime && (now - parseInt(cachedTime, 10)) < 15 * 60 * 1000) {
+          const parsed = JSON.parse(cachedData);
+          if (parsed.success && parsed.popup) {
+            const closed = sessionStorage.getItem(`closed_popup_${parsed.popup.id}`);
+            if (!closed) {
+              setPopup(parsed.popup);
+              setIsVisible(true);
+            }
+          }
+          return;
+        }
+
+        // 2. Fetch from server if cache is empty or expired
         const res = await fetch("/api/active-popup");
         const data = await res.json();
+        
+        // Save to client-side localStorage cache
+        localStorage.setItem("popup_check_cache", JSON.stringify(data));
+        localStorage.setItem("popup_check_time", String(now));
+
         if (data.success && data.popup) {
           const closed = sessionStorage.getItem(`closed_popup_${data.popup.id}`);
           if (!closed) {
