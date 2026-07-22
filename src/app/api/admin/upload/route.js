@@ -17,8 +17,11 @@ async function verifyAdmin(request) {
   }
 }
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(request) {
   try {
+    console.log("Upload API request received. GCS_BUCKET environment variable is:", process.env.GCS_BUCKET);
     // Check authorization
     const isAuthorized = await verifyAdmin(request);
     if (!isAuthorized) {
