@@ -23,7 +23,7 @@ export default function PopupsAdminPage() {
     fetchPopups();
   }, []);
 
-  const fetchPopups = async () => {
+  async function fetchPopups() {
     try {
       const res = await fetch("/api/admin/popups");
       const data = await res.json();
