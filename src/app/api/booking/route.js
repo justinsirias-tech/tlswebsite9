@@ -415,21 +415,18 @@ export async function POST(req) {
 
     let booking;
     try {
-      booking = await Promise.race([
-        prisma.booking.create({
-          data: {
-            customerName: data.customerName,
-            email: data.email,
-            phone: data.phone,
-            pickupDate: new Date(data.pickupDate),
-            service: translatedService,
-            memberId: data.memberId || null,
-          }
-        }),
-        new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 4000))
-      ]);
+      booking = await prisma.booking.create({
+        data: {
+          customerName: data.customerName,
+          email: data.email,
+          phone: data.phone,
+          pickupDate: new Date(data.pickupDate),
+          service: translatedService,
+          memberId: data.memberId || null,
+        }
+      });
     } catch (dbErr) {
-      console.error("Booking creation failed or timed out, retrying:", dbErr);
+      console.error("Booking creation failed, retrying:", dbErr);
       try {
         booking = await prisma.booking.create({
           data: {
