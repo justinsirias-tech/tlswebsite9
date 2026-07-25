@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "functions": {
+    "/api/cron/auto-generate": {
+      "maxDuration": 60
+    }
+  }
+}

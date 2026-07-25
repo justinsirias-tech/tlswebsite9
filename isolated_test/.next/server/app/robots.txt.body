@@ -1,0 +1,36 @@
+User-Agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+User-Agent: GPTBot
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+User-Agent: ChatGPT-User
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+User-Agent: Google-Extended
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+User-Agent: PerplexityBot
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+User-Agent: ClaudeBot
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+User-Agent: Applebot-Extended
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+Sitemap: https://www.thatlaundryshop.com/sitemap.xml

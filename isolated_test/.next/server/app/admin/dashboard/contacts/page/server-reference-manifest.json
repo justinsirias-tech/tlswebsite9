@@ -1,0 +1,17 @@
+{
+  "node": {
+    "40028d6ba7f55991b4ad70ce5ce6b895346e324609": {
+      "workers": {
+        "app/admin/dashboard/contacts/page": {
+          "moduleId": 674,
+          "async": true,
+          "exportedName": "$$RSC_SERVER_ACTION_0",
+          "filename": "src/app/admin/dashboard/contacts/page.js"
+        }
+      },
+      "exportedName": "$$RSC_SERVER_ACTION_0",
+      "filename": "src/app/admin/dashboard/contacts/page.js"
+    }
+  },
+  "edge": {}
+}
