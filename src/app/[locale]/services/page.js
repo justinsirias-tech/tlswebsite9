@@ -133,6 +133,57 @@ export default async function ServicesPage({ params }) {
             </div>
           </div>
 
+          {/* Infographic How It Works Section */}
+          <div className={styles.infographicWrapper}>
+            <h2 className={styles.infographicTitle}>{t("howItWorksTitle")}</h2>
+
+            <div className={styles.infographicGrid}>
+              <div className={styles.cloudCard}>
+                <div className={styles.stepRibbon}>
+                  <span>Step</span> 1
+                </div>
+                <div className={styles.infographicImage}>
+                  <Image src="/assets/step1_booking_v4.png" alt={t("step1Title")} fill style={{ objectFit: "cover" }} sizes="160px" />
+                </div>
+                <h3 className={styles.cloudTitle}>{t("step1Title")}</h3>
+                <p className={styles.cloudDesc}>{t("step1Desc")}</p>
+              </div>
+
+              <div className={styles.cloudCard}>
+                <div className={styles.stepRibbon}>
+                  <span>Step</span> 2
+                </div>
+                <div className={styles.infographicImage}>
+                  <Image src="/assets/step2_collection_v4.png" alt={t("step2Title")} fill style={{ objectFit: "cover" }} sizes="160px" />
+                </div>
+                <h3 className={styles.cloudTitle}>{t("step2Title")}</h3>
+                <p className={styles.cloudDesc}>{t("step2Desc")}</p>
+              </div>
+
+              <div className={styles.cloudCard}>
+                <div className={styles.stepRibbon}>
+                  <span>Step</span> 3
+                </div>
+                <div className={styles.infographicImage}>
+                  <Image src="/assets/step3_cleaning_v4.png" alt={t("step3Title")} fill style={{ objectFit: "cover" }} sizes="160px" />
+                </div>
+                <h3 className={styles.cloudTitle}>{t("step3Title")}</h3>
+                <p className={styles.cloudDesc}>{t("step3Desc")}</p>
+              </div>
+
+              <div className={styles.cloudCard}>
+                <div className={styles.stepRibbon}>
+                  <span>Step</span> 4
+                </div>
+                <div className={styles.infographicImage}>
+                  <Image src="/assets/step4_delivery_v5.png" alt={t("step4Title")} fill style={{ objectFit: "cover" }} sizes="160px" />
+                </div>
+                <h3 className={styles.cloudTitle}>{t("step4Title")}</h3>
+                <p className={styles.cloudDesc}>{t("step4Desc")}</p>
+              </div>
+            </div>
+          </div>
+
           {/* Corporate Services Section */}
           <div style={{ textAlign: "center", marginTop: "7rem", marginBottom: "4rem" }}>
             <h2 style={{ fontSize: "2.5rem", color: "var(--primary)", fontWeight: "800" }}>{t("corporatePartners")}</h2>

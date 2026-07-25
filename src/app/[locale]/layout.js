@@ -8,6 +8,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 import LayoutWrapper from "../../components/LayoutWrapper";
 import PopupBanner from "../../components/PopupBanner";
+import Script from "next/script";
 
 export const metadata = {
   title: "Premium Laundry Service & Dry Cleaning | That Laundry Shop",
@@ -30,16 +31,17 @@ export default async function RootLayout({ children, params }) {
         <link rel="preconnect" href="https://maps.googleapis.com" />
         <link rel="preconnect" href="https://maps.gstatic.com" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" precedence="default" />
-        {/* Google tag (gtag.js) */}
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-7JX9JKLWCQ"></script>
-        <script dangerouslySetInnerHTML={{ __html: `
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          gtag('config', 'G-7JX9JKLWCQ');
-        ` }} />
       </head>
       <body className={inter.className} suppressHydrationWarning>
+        <Script src="https://www.googletagmanager.com/gtag/js?id=G-7JX9JKLWCQ" strategy="afterInteractive" />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-7JX9JKLWCQ');
+          `}
+        </Script>
         <NextIntlClientProvider messages={messages}>
           <LayoutWrapper>
             {children}

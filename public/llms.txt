@@ -1,0 +1,13 @@
+# That Laundry Shop
+
+> Premium Laundry Service & Dry Cleaning in Bangkok.
+
+This website provides premium laundry services, dry cleaning, and ironing. 
+
+## Services
+We offer wash and fold, expert dry cleaning, and ironing services with free door-to-door delivery. 
+
+## Important Links
+- [Services](/services): Learn about our laundry and dry cleaning process.
+- [Pricing](/pricing): View our complete pricing menu.
+- [Book a Pickup](/booking): Schedule a door-to-door laundry collection.

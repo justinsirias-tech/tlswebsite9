@@ -33,18 +33,10 @@ export default async function PricingPage({ params }) {
     
     let allPricing = [];
     try {
-      allPricing = await Promise.race([
-        prisma.pricing.findMany(),
-        new Promise((_, reject) => setTimeout(() => reject(new Error("Database query timeout after 3000ms")), 3000))
-      ]);
+      allPricing = await prisma.pricing.findMany();
     } catch (dbError) {
-      console.error("Pricing DB query timed out or failed, attempting fresh retry:", dbError);
-      try {
-        allPricing = await prisma.pricing.findMany();
-      } catch (retryError) {
-        console.error("Pricing DB retry failed:", retryError);
-        allPricing = [];
-      }
+      console.error("Pricing DB query failed:", dbError);
+      allPricing = [];
     }
     
     const sortPricingItems = (items) => {
