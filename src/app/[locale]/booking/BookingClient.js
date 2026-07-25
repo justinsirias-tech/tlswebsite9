@@ -175,17 +175,24 @@ Payment Method: ${paymentMethods.join(', ')}
 Express Service: ${expressService}
 Notes: ${specialInst}`.trim();
 
-      const [d, m, y] = pickupDate.split('/');
-      const timeStart = (pickupTime || '12:00').split(' ')[0];
-      const [hour, minute] = timeStart.split(':');
-      
-      const year = parseInt(y, 10);
-      const monthIndex = parseInt(m, 10) - 1;
-      const day = parseInt(d, 10);
-      const hrs = parseInt(hour || '12', 10);
-      const mins = parseInt(minute || '00', 10);
-      
-      const formattedDate = new Date(year, monthIndex, day, hrs, mins);
+      let formattedDate = new Date();
+      if (pickupDate && pickupDate.includes('/')) {
+        const parts = pickupDate.split('/');
+        if (parts.length === 3 && parts[2].length === 4) {
+          const year = parseInt(parts[2], 10);
+          const monthIndex = parseInt(parts[1], 10) - 1;
+          const day = parseInt(parts[0], 10);
+          const timeStart = (pickupTime || '12:00').split(' ')[0];
+          const [hour, minute] = timeStart.split(':');
+          const hrs = parseInt(hour || '12', 10);
+          const mins = parseInt(minute || '00', 10);
+          
+          const parsed = new Date(year, monthIndex, day, hrs, mins);
+          if (!isNaN(parsed.getTime())) {
+            formattedDate = parsed;
+          }
+        }
+      }
 
       const bookingData = {
         customerName: e.target.elements.customerName.value,
