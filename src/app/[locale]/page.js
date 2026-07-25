@@ -85,6 +85,7 @@ export default function Home() {
             fill
             priority
             fetchPriority="high"
+            unoptimized={true}
             sizes="100vw"
             style={{ objectFit: "cover", objectPosition: "center" }}
           />
