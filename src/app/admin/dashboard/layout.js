@@ -57,8 +57,8 @@ export default async function AdminLayout({ children }) {
             </Link>
           )}
           {hasPerm('pricing') && (
-            <Link href="/admin/dashboard/popups" className={styles.navLink}>
-              <i className="fa-solid fa-window-restore"></i> Promotion Popups
+            <Link href="/admin/dashboard/marketing" className={styles.navLink}>
+              <i className="fa-solid fa-bullhorn"></i> Marketing & Analytics
             </Link>
           )}
           {hasPerm('articles') && (
@@ -66,6 +66,9 @@ export default async function AdminLayout({ children }) {
               <i className="fa-solid fa-file-lines"></i> Articles
             </Link>
           )}
+          <Link href="/admin/dashboard/terms" className={styles.navLink}>
+            <i className="fa-solid fa-file-contract"></i> Terms & Conditions
+          </Link>
           {isSuperadmin && (
             <Link href="/admin/dashboard/users" className={styles.navLink}>
               <i className="fa-solid fa-users-gear"></i> User Management

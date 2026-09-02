@@ -29,6 +29,7 @@ export default function Footer() {
             <li><Link href="/hotels" style={{ color: "var(--text-muted)" }}>{nav("hotels")}</Link></li>
             <li><Link href="/condominiums" style={{ color: "var(--text-muted)" }}>{nav("condos")}</Link></li>
             <li><Link href="/articles" style={{ color: "var(--text-muted)" }}>{nav("blog")}</Link></li>
+            <li><Link href="/terms" style={{ color: "var(--text-muted)" }}>{nav("terms")}</Link></li>
           </ul>
         </div>
 

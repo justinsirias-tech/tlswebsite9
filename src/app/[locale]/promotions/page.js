@@ -1,50 +1,67 @@
 import styles from "./page.module.css";
-import Link from "next/link";
+import Image from "next/image";
 import Script from "next/script";
-import { getTranslations } from "next-intl/server";
-import MembershipSection from "./MembershipSection";
-
-const benefits = [
-  { key: "benefitRates", tiers: { silver: true, gold: true, platinum: true } },
-  { key: "benefitDryClean5", tiers: { silver: false, gold: true, platinum: true } },
-  { key: "benefitPriority", tiers: { silver: false, gold: true, platinum: true } },
-  { key: "benefitTransport", tiers: { silver: false, gold: false, platinum: true } },
-  { key: "benefitDuvet", tiers: { silver: false, gold: false, platinum: true } }
-];
+import prisma from "../../../lib/prisma";
+import PromotionsClient from "./PromotionsClient";
 
 export function generateStaticParams() {
   return [{ locale: 'en' }, { locale: 'th' }, { locale: 'cn' }];
 }
 
+export const dynamic = 'force-dynamic';
+
 export async function generateMetadata({ params }) {
   const resolvedParams = await params;
   const locale = resolvedParams.locale;
-  const t = await getTranslations({ locale, namespace: "Promotions" });
 
   return {
-    title: t("metaTitle"),
-    description: t("metaDesc"),
+    title: locale === "th" 
+      ? "โปรโมชั่นและข้อเสนอพิเศษ | That Laundry Shop" 
+      : locale === "cn" 
+        ? "优惠与特别活动 | That Laundry Shop" 
+        : "Promotions & Special Deals | That Laundry Shop",
+    description: locale === "th" 
+      ? "รับข้อเสนอพิเศษ โปรโมชั่นประจำเดือน และโค้ดส่วนลดซักรีดและซักแห้งในกรุงเทพฯ และพัทยา"
+      : locale === "cn"
+        ? "获取曼谷和芭堤雅最新的每月洗衣干洗优惠与专属折扣码。"
+        : "Discover monthly deals, flash discounts, and instant promo codes for laundry and dry cleaning in Bangkok and Pattaya.",
     alternates: {
       canonical: "https://www.thatlaundryshop.com/promotions",
     }
   };
 }
 
+async function getPromotions() {
+  try {
+    const promos = await prisma.promotion.findMany({
+      where: { isActive: true },
+      orderBy: [
+        { sortOrder: "asc" },
+        { createdAt: "desc" }
+      ]
+    });
+    return promos;
+  } catch (err) {
+    console.error("Failed to load promotions from DB:", err);
+    return [];
+  }
+}
+
 export default async function PromotionsPage({ params }) {
   const resolvedParams = await params;
-  const locale = resolvedParams.locale;
-  const t = await getTranslations({ locale, namespace: "Promotions" });
+  const locale = resolvedParams.locale || 'en';
 
-  const silverPriceVal = parseInt(t("silverPrice")) || 199;
-  const goldPriceVal = parseInt(t("goldPrice")) || 299;
-  const vipPriceVal = parseInt(t("vipPrice")) || 399;
+  const dbPromotions = await getPromotions();
 
-  // JSON-LD SEO Schema for Promotions
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "WebPage",
-    "name": "Laundry Service Memberships & Promotions",
-    "description": "Exclusive memberships and seasonal laundry promotions at That Laundry Shop.",
+    "name": locale === "th" ? "โปรโมชั่นและข้อเสนอพิเศษ" : locale === "cn" ? "优惠与特别活动" : "Promotions & Special Deals",
+    "description": "Monthly laundry promotions and discount codes at That Laundry Shop.",
+    "publisher": {
+      "@type": "Organization",
+      "name": "That Laundry Shop"
+    }
   };
 
   return (
@@ -55,76 +72,34 @@ export default async function PromotionsPage({ params }) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
+      {/* Header Banner */}
       <div className={styles.header}>
-        <div className="container">
-          <h1 style={{ fontSize: "3.5rem", marginBottom: "1rem" }}>{t("title")}</h1>
-          <p style={{ fontSize: "1.2rem", color: "var(--text-light)", maxWidth: "700px", margin: "0 auto" }}>
-            {t("subtitle")}
+        <Image
+          src="/assets/hero_bg_v2.webp"
+          alt="That Laundry Shop Special Deals & Promotions"
+          fill
+          priority
+          unoptimized
+          style={{ objectFit: "cover", objectPosition: "center" }}
+        />
+        <div className={styles.headerOverlay}></div>
+        <div className="container" style={{ position: "relative", zIndex: 2 }}>
+          <h1 style={{ fontSize: "3.5rem", marginBottom: "1rem", fontWeight: "800", color: "white" }}>
+            {locale === "th" ? "โปรโมชั่นและข้อเสนอพิเศษ" : locale === "cn" ? "优惠与特别活动" : "Promotions & Special Deals"}
+          </h1>
+          <p style={{ fontSize: "1.2rem", color: "rgba(255,255,255,0.9)", maxWidth: "700px", margin: "0 auto", fontWeight: "400", lineHeight: "1.6" }}>
+            {locale === "th" 
+              ? "รับข้อเสนอพิเศษประจำเดือน โค้ดส่วนลด และสิทธิประโยชน์สำหรับการดูแลเสื้อผ้าในกรุงเทพฯ และพัทยา" 
+              : locale === "cn"
+                ? "探索曼谷与芭堤雅每月最新洗衣干洗优惠、限时折扣与专属优惠码。"
+                : "Discover our monthly deals, flash discounts, and instant promo codes for laundry & dry cleaning in Bangkok and Pattaya."}
           </p>
         </div>
       </div>
 
-      <section className="section" style={{ background: "var(--background)" }}>
-        <div className={`container ${styles.promoContainer}`}>
-          
-          {/* MEMBERSHIP PACKAGES SECTION */}
-          <div>
-            <h2 className={styles.sectionTitle}>{t("membershipPackages")}</h2>
-            <p className={styles.sectionSubtitle}>{t("memberDesc")}</p>
-            <p className={styles.sectionSubtitle} style={{ marginTop: "-2rem", color: "var(--accent)", fontWeight: "600", fontSize: "1.05rem" }}>
-              <i className="fa-solid fa-circle-info" style={{ marginRight: "8px" }}></i>
-              {t("advancePaymentNote")}
-            </p>
-            
-            <MembershipSection 
-              locale={locale}
-              translations={{
-                silverTier: t("silverTier"),
-                silverPrice: t("silverPrice"),
-                goldTier: t("goldTier"),
-                goldPrice: t("goldPrice"),
-                vipTier: t("vipTier"),
-                vipPrice: t("vipPrice"),
-                memberDesc: t("memberDesc"),
-                advancePayment6: t("advancePayment6"),
-                advancePayment12: t("advancePayment12"),
-                oneMonthFree: t("oneMonthFree"),
-                twoMonthsFree: t("twoMonthsFree"),
-                joinSilver: t("joinSilver"),
-                joinGold: t("joinGold"),
-                joinVip: t("joinVip"),
-                benefitRates: t("benefitRates"),
-                benefitDryClean5: t("benefitDryClean5"),
-                benefitPriority: t("benefitPriority"),
-                benefitTransport: t("benefitTransport"),
-                benefitDuvet: t("benefitDuvet"),
-                formTitle: t("formTitle"),
-                formDesc: t("formDesc"),
-                formName: t("formName"),
-                formEmail: t("formEmail"),
-                formPhone: t("formPhone"),
-                formPackage: t("formPackage"),
-                formTerm: t("formTerm"),
-                formDob: t("formDob"),
-                formAddress: t("formAddress"),
-                formRoomNo: t("formRoomNo"),
-                formNotes: t("formNotes"),
-                formConfidentiality: t("formConfidentiality"),
-                formAddressPlaceholder: t("formAddressPlaceholder"),
-                formSubmit: t("formSubmit"),
-                formSubmitting: t("formSubmitting"),
-                formSuccessTitle: t("formSuccessTitle"),
-                formSuccessDesc: t("formSuccessDesc"),
-                formClose: t("formClose")
-              }}
-              silverPriceVal={silverPriceVal}
-              goldPriceVal={goldPriceVal}
-              vipPriceVal={vipPriceVal}
-            />
-          </div>
-
-
-
+      <section className="section" style={{ backgroundColor: "#f8fafc" }}>
+        <div className={styles.promoContainer}>
+          <PromotionsClient locale={locale} initialPromotions={dbPromotions} />
         </div>
       </section>
     </>

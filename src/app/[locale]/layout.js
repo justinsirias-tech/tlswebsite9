@@ -40,13 +40,13 @@ export default async function RootLayout({ children, params }) {
         }} />
       </head>
       <body className={inter.className} suppressHydrationWarning>
-        <Script src="https://www.googletagmanager.com/gtag/js?id=G-7JX9JKLWCQ" strategy="afterInteractive" />
+        <Script src="https://www.googletagmanager.com/gtag/js?id=G-545113254" strategy="afterInteractive" />
         <Script id="google-analytics" strategy="afterInteractive">
           {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-            gtag('config', 'G-7JX9JKLWCQ');
+            gtag('config', 'G-545113254');
           `}
         </Script>
         <NextIntlClientProvider messages={messages}>
