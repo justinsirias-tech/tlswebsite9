@@ -66,7 +66,8 @@ export async function POST(request) {
         minOrderValue: data.minOrderValue ? parseFloat(data.minOrderValue) : 0,
         maxDiscount: data.maxDiscount ? parseFloat(data.maxDiscount) : null,
         usageLimit: data.usageLimit ? parseInt(data.usageLimit) : null,
-        usedCount: data.usedCount ? parseInt(data.usedCount) : 0,
+        startDate: data.startDate ? new Date(data.startDate) : null,
+        endDate: data.endDate ? new Date(data.endDate) : null,
         expiryDate: data.expiryDate || null,
         isActive: data.isActive !== undefined ? Boolean(data.isActive) : true,
         description: data.description || null

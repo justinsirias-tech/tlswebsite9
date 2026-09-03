@@ -176,6 +176,8 @@ model PromoCode {
   maxDiscount    Float?
   usageLimit     Int?
   usedCount      Int       @default(0)
+  startDate      DateTime?
+  endDate        DateTime?
   expiryDate     String?
   isActive       Boolean   @default(true)
   description    String?

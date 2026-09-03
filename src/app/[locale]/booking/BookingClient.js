@@ -20,6 +20,39 @@ export default function BookingClient() {
   const [phoneError, setPhoneError] = useState("");
   const [promoCode, setPromoCode] = useState("");
   const [appliedPromo, setAppliedPromo] = useState(null);
+  const [promoError, setPromoError] = useState("");
+  const [promoInfo, setPromoInfo] = useState(null);
+  const [isValidatingPromo, setIsValidatingPromo] = useState(false);
+
+  const handleApplyPromo = async (codeToApply) => {
+    const code = (codeToApply || promoCode).trim().toUpperCase();
+    if (!code) return;
+    setIsValidatingPromo(true);
+    setPromoError("");
+    try {
+      const res = await fetch("/api/promo-codes/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code })
+      });
+      const data = await res.json();
+      if (res.ok && data.valid) {
+        setAppliedPromo(data.code);
+        setPromoInfo(data);
+        setPromoError("");
+      } else {
+        setAppliedPromo(null);
+        setPromoInfo(null);
+        setPromoError(data.error || (locale === "th" ? "โค้ดส่วนลดไม่ถูกต้องหรือหมดอายุแล้ว" : "Invalid or expired promo code."));
+      }
+    } catch (err) {
+      setAppliedPromo(null);
+      setPromoInfo(null);
+      setPromoError(locale === "th" ? "ไม่สามารถตรวจสอบโค้ดส่วนลดได้" : "Unable to validate promo code.");
+    } finally {
+      setIsValidatingPromo(false);
+    }
+  };
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -28,7 +61,7 @@ export default function BookingClient() {
       if (promoParam) {
         const cleanPromo = promoParam.trim().toUpperCase();
         setPromoCode(cleanPromo);
-        setAppliedPromo(cleanPromo);
+        handleApplyPromo(cleanPromo);
       }
     }
   }, []);
@@ -957,11 +990,8 @@ Notes: ${specialInst}`.trim();
                     />
                     <button 
                       type="button"
-                      onClick={() => {
-                        if (promoCode.trim()) {
-                          setAppliedPromo(promoCode.trim().toUpperCase());
-                        }
-                      }}
+                      disabled={isValidatingPromo}
+                      onClick={() => handleApplyPromo()}
                       style={{
                         padding: "0.85rem 1.5rem",
                         borderRadius: "10px",
@@ -973,15 +1003,26 @@ Notes: ${specialInst}`.trim();
                         whiteSpace: "nowrap"
                       }}
                     >
-                      {locale === "th" ? "ใช้โค้ด" : locale === "cn" ? "使用" : "Apply"}
+                      {isValidatingPromo ? "..." : (locale === "th" ? "ใช้โค้ด" : locale === "cn" ? "使用" : "Apply")}
                     </button>
                   </div>
+
+                  {promoError && (
+                    <div style={{ marginTop: "0.75rem", color: "#991b1b", background: "#fef2f2", border: "1px solid #fecaca", padding: "0.6rem 1rem", borderRadius: "8px", fontSize: "0.9rem", fontWeight: "600", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                      <i className="fa-solid fa-circle-exclamation"></i>
+                      <span>{promoError}</span>
+                    </div>
+                  )}
 
                   {appliedPromo && (
                     <div style={{ marginTop: "0.75rem", color: "#166534", background: "#f0fdf4", border: "1px solid #bbf7d0", padding: "0.6rem 1rem", borderRadius: "8px", fontSize: "0.9rem", fontWeight: "600", display: "flex", alignItems: "center", gap: "0.5rem" }}>
                       <i className="fa-solid fa-circle-check"></i>
                       <span>
-                        {locale === "th" ? `ใช้โค้ดส่วนลด ${appliedPromo} เรียบร้อยแล้ว` : locale === "cn" ? `已成功应用优惠码 ${appliedPromo}` : `Promo code ${appliedPromo} applied to your booking!`}
+                        {locale === "th" 
+                          ? `ใช้โค้ดส่วนลด ${appliedPromo} เรียบร้อยแล้ว ${promoInfo?.discountType === "PERCENTAGE" ? `(ลด ${promoInfo.discountValue}%)` : `(ลด ${promoInfo?.discountValue} บาท)`}`
+                          : locale === "cn" 
+                          ? `已成功应用优惠码 ${appliedPromo}` 
+                          : `Promo code ${appliedPromo} applied! (${promoInfo?.discountType === "PERCENTAGE" ? `${promoInfo.discountValue}% OFF` : `${promoInfo?.discountValue} THB OFF`})`}
                       </span>
                     </div>
                   )}

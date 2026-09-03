@@ -11,6 +11,50 @@ export default function AdminPromoCodesPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  const toInputDateTime = (dateStr) => {
+    if (!dateStr) return "";
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return "";
+    const pad = (n) => String(n).padStart(2, "0");
+    const year = d.getFullYear();
+    const month = pad(d.getMonth() + 1);
+    const day = pad(d.getDate());
+    const hours = pad(d.getHours());
+    const mins = pad(d.getMinutes());
+    return `${year}-${month}-${day}T${hours}:${mins}`;
+  };
+
+  const getPromoStatus = (pc) => {
+    if (!pc.isActive) {
+      return { label: "Disabled", color: "#64748b", bg: "#f1f5f9", border: "#cbd5e1" };
+    }
+    const now = new Date();
+    if (pc.startDate && new Date(pc.startDate) > now) {
+      return { label: "Upcoming (Auto)", color: "#0284c7", bg: "#e0f2fe", border: "#bae6fd" };
+    }
+    if (pc.endDate && new Date(pc.endDate) < now) {
+      return { label: "Expired (Auto)", color: "#dc2626", bg: "#fee2e2", border: "#fecaca" };
+    }
+    return { label: "Active", color: "#16a34a", bg: "#dcfce7", border: "#bbf7d0" };
+  };
+
+  const formatSchedule = (pc) => {
+    const formatDate = (d) => new Date(d).toLocaleString("en-US", {
+      dateStyle: "medium",
+      timeStyle: "short"
+    });
+    if (pc.startDate && pc.endDate) {
+      return `${formatDate(pc.startDate)} → ${formatDate(pc.endDate)}`;
+    }
+    if (pc.startDate) {
+      return `Starts: ${formatDate(pc.startDate)}`;
+    }
+    if (pc.endDate) {
+      return `Ends: ${formatDate(pc.endDate)}`;
+    }
+    return pc.expiryDate || "Immediate & Ongoing";
+  };
+
   const initialForm = {
     code: "",
     discountType: "PERCENTAGE",
@@ -19,6 +63,8 @@ export default function AdminPromoCodesPage() {
     maxDiscount: "",
     usageLimit: "",
     usedCount: 0,
+    startDate: "",
+    endDate: "",
     expiryDate: "",
     isActive: true,
     description: ""
@@ -64,6 +110,8 @@ export default function AdminPromoCodesPage() {
       maxDiscount: pc.maxDiscount !== null ? pc.maxDiscount : "",
       usageLimit: pc.usageLimit !== null ? pc.usageLimit : "",
       usedCount: pc.usedCount || 0,
+      startDate: toInputDateTime(pc.startDate),
+      endDate: toInputDateTime(pc.endDate),
       expiryDate: pc.expiryDate || "",
       isActive: pc.isActive !== undefined ? pc.isActive : true,
       description: pc.description || ""
@@ -335,32 +383,51 @@ export default function AdminPromoCodesPage() {
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
                 <div>
                   <label style={{ display: "block", color: "#222945", fontWeight: "600", fontSize: "0.9rem", marginBottom: "0.4rem" }}>
-                    Expiry Date
+                    <i className="fa-regular fa-calendar-plus" style={{ marginRight: "0.35rem", color: "#64748b" }}></i>
+                    Start Date & Time
                   </label>
                   <input 
-                    type="text" 
-                    placeholder="e.g. Oct 31, 2026 or 2026-10-31"
-                    value={formData.expiryDate}
-                    onChange={(e) => setFormData(prev => ({ ...prev, expiryDate: e.target.value }))}
-                    style={{ width: "100%", padding: "0.75rem", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#f8fafc", color: "#222945" }}
+                    type="datetime-local" 
+                    value={formData.startDate}
+                    onChange={(e) => setFormData(prev => ({ ...prev, startDate: e.target.value }))}
+                    style={{ width: "100%", padding: "0.75rem", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#f8fafc", color: "#222945", fontSize: "0.9rem" }}
                   />
+                  <span style={{ fontSize: "0.75rem", color: "#64748b", marginTop: "0.25rem", display: "block" }}>
+                    Leave empty to start immediately
+                  </span>
                 </div>
 
                 <div>
                   <label style={{ display: "block", color: "#222945", fontWeight: "600", fontSize: "0.9rem", marginBottom: "0.4rem" }}>
-                    Description / Internal Notes
+                    <i className="fa-regular fa-calendar-xmark" style={{ marginRight: "0.35rem", color: "#64748b" }}></i>
+                    End Date & Time (Expiry)
                   </label>
                   <input 
-                    type="text" 
-                    placeholder="e.g. Welcome promo for first order"
-                    value={formData.description}
-                    onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                    style={{ width: "100%", padding: "0.75rem", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#f8fafc", color: "#222945" }}
+                    type="datetime-local" 
+                    value={formData.endDate}
+                    onChange={(e) => setFormData(prev => ({ ...prev, endDate: e.target.value }))}
+                    style={{ width: "100%", padding: "0.75rem", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#f8fafc", color: "#222945", fontSize: "0.9rem" }}
                   />
+                  <span style={{ fontSize: "0.75rem", color: "#64748b", marginTop: "0.25rem", display: "block" }}>
+                    Leave empty for ongoing (no expiry)
+                  </span>
                 </div>
               </div>
 
-              <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginTop: "0.5rem" }}>
+              <div>
+                <label style={{ display: "block", color: "#222945", fontWeight: "600", fontSize: "0.9rem", marginBottom: "0.4rem" }}>
+                  Description / Internal Notes
+                </label>
+                <input 
+                  type="text" 
+                  placeholder="e.g. 20% discount on same-day express turnaround"
+                  value={formData.description}
+                  onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                  style={{ width: "100%", padding: "0.75rem", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#f8fafc", color: "#222945" }}
+                />
+              </div>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.3rem", marginTop: "0.5rem" }}>
                 <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", cursor: "pointer", fontWeight: "600", color: "#222945" }}>
                   <input 
                     type="checkbox"
@@ -370,6 +437,9 @@ export default function AdminPromoCodesPage() {
                   />
                   Active & Redeemable Code
                 </label>
+                <span style={{ fontSize: "0.8rem", color: "#64748b", marginLeft: "1.6rem" }}>
+                  When enabled, the system will automatically activate and deactivate this code based on the scheduled Start and End dates.
+                </span>
               </div>
 
               <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.75rem", marginTop: "1.5rem" }}>
@@ -418,7 +488,7 @@ export default function AdminPromoCodesPage() {
                 <th style={{ padding: "1rem 1.25rem" }}>Discount</th>
                 <th style={{ padding: "1rem 1.25rem" }}>Redemptions</th>
                 <th style={{ padding: "1rem 1.25rem" }}>Min Order</th>
-                <th style={{ padding: "1rem 1.25rem" }}>Expiry</th>
+                <th style={{ padding: "1rem 1.25rem" }}>Validity Schedule</th>
                 <th style={{ padding: "1rem 1.25rem" }}>Status</th>
                 <th style={{ padding: "1rem 1.25rem", textAlign: "right" }}>Actions</th>
               </tr>
@@ -447,27 +517,48 @@ export default function AdminPromoCodesPage() {
                     {pc.minOrderValue ? `${pc.minOrderValue} THB` : "None"}
                   </td>
 
-                  <td style={{ padding: "1.25rem", color: "#64748b", fontSize: "0.9rem" }}>
-                    {pc.expiryDate || "Ongoing"}
+                  <td style={{ padding: "1.25rem", color: "#475569", fontSize: "0.85rem", maxWidth: "230px", lineHeight: "1.4" }}>
+                    {formatSchedule(pc)}
                   </td>
 
                   <td style={{ padding: "1.25rem" }}>
-                    <button 
-                      onClick={() => handleToggleActive(pc.id, pc.isActive)}
-                      style={{
-                        background: pc.isActive ? "#dcfce7" : "#f1f5f9",
-                        color: pc.isActive ? "#166534" : "#64748b",
-                        border: "1px solid",
-                        borderColor: pc.isActive ? "#bbf7d0" : "#cbd5e1",
-                        padding: "0.35rem 0.85rem",
-                        borderRadius: "20px",
-                        fontWeight: "700",
-                        fontSize: "0.8rem",
-                        cursor: "pointer"
-                      }}
-                    >
-                      {pc.isActive ? "● Active" : "○ Inactive"}
-                    </button>
+                    {(() => {
+                      const st = getPromoStatus(pc);
+                      return (
+                        <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem", alignItems: "flex-start" }}>
+                          <span style={{
+                            background: st.bg,
+                            color: st.color,
+                            border: `1px solid ${st.border}`,
+                            padding: "0.25rem 0.65rem",
+                            borderRadius: "12px",
+                            fontWeight: "700",
+                            fontSize: "0.75rem",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "0.35rem"
+                          }}>
+                            <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: st.color }}></span>
+                            {st.label}
+                          </span>
+                          <button 
+                            onClick={() => handleToggleActive(pc.id, pc.isActive)}
+                            title={pc.isActive ? "Click to manually disable" : "Click to manually enable"}
+                            style={{
+                              background: "none",
+                              border: "none",
+                              color: "#64748b",
+                              textDecoration: "underline",
+                              fontSize: "0.75rem",
+                              cursor: "pointer",
+                              padding: 0
+                            }}
+                          >
+                            {pc.isActive ? "Turn Off" : "Turn On"}
+                          </button>
+                        </div>
+                      );
+                    })()}
                   </td>
 
                   <td style={{ padding: "1.25rem", textAlign: "right" }}>
