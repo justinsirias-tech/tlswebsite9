@@ -99,3 +99,95 @@
     font-size: clamp(1.8rem, 5vw, 2.2rem);
   }
 }
+
+.infographicWrapper {
+  padding: 6rem 0;
+  margin-top: 4rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.infographicTitle {
+  text-align: center;
+  font-size: 2.5rem;
+  color: var(--primary);
+  font-weight: 800;
+  margin-bottom: 4rem;
+  position: relative;
+  z-index: 1;
+}
+
+.infographicGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.cloudCard {
+  background: white;
+  border-radius: 40px;
+  padding: 5rem 2rem 2rem 2rem;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  position: relative;
+  transition: transform 0.3s ease;
+}
+
+.cloudCard:hover {
+  transform: translateY(-10px);
+}
+
+.stepRibbon {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #222945;
+  color: white;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 800;
+  font-size: 1.2rem;
+  z-index: 2;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.stepRibbon span {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+}
+
+.infographicImage {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  margin: 0 auto 1.5rem auto;
+  z-index: 2;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 4px solid #f8fafc;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  background: white;
+}
+
+.cloudTitle {
+  font-size: 1.5rem;
+  color: var(--primary);
+  margin-bottom: 1rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.cloudDesc {
+  color: var(--text-light);
+  font-size: 1rem;
+  line-height: 1.6;
+  font-weight: 500;
+}

@@ -19,6 +19,12 @@ export async function generateMetadata({ params }) {
     description: t("metaDesc"),
     alternates: {
       canonical: `https://www.thatlaundryshop.com/${locale}`,
+      languages: {
+        'en': 'https://www.thatlaundryshop.com/en',
+        'th': 'https://www.thatlaundryshop.com/th',
+        'zh-CN': 'https://www.thatlaundryshop.com/cn',
+        'x-default': 'https://www.thatlaundryshop.com/en',
+      },
     }
   };
 }
@@ -78,6 +84,8 @@ export default function Home() {
             alt="Premium laundry shop backdrop"
             fill
             priority
+            fetchPriority="high"
+            unoptimized={true}
             sizes="100vw"
             style={{ objectFit: "cover", objectPosition: "center" }}
           />

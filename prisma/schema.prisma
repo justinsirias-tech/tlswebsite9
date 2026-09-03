@@ -137,3 +137,59 @@ model PopupTemplate {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+model Setting {
+  id    String @id @default(uuid())
+  key   String @unique
+  value String
+
+  @@map("Setting")
+}
+
+model Promotion {
+  id          String   @id @default(uuid())
+  title       String
+  title_th    String?
+  title_cn    String?
+  description String
+  desc_th     String?
+  desc_cn     String?
+  code        String?
+  badge       String?
+  badge_th    String?
+  badge_cn    String?
+  imageUrl    String?
+  category    String   @default("monthly")
+  validUntil  String?
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model PromoCode {
+  id             String    @id @default(uuid())
+  code           String    @unique
+  discountType   String    @default("PERCENTAGE") // "PERCENTAGE" | "FIXED"
+  discountValue  Float     @default(15)
+  minOrderValue  Float?    @default(0)
+  maxDiscount    Float?
+  usageLimit     Int?
+  usedCount      Int       @default(0)
+  expiryDate     String?
+  isActive       Boolean   @default(true)
+  description    String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+model PageView {
+  id        String   @id @default(uuid())
+  path      String
+  locale    String   @default("en")
+  referrer  String?  @default("Direct")
+  device    String?  @default("Mobile")
+  country   String?  @default("Thailand")
+  city      String?  @default("Bangkok")
+  createdAt DateTime @default(now())
+}

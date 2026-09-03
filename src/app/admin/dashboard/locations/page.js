@@ -29,7 +29,7 @@ export default function LocationsAdminPage() {
     fetchLocations();
   }, []);
 
-  const fetchLocations = async () => {
+  async function fetchLocations() {
     try {
       const res = await fetch("/api/hotels");
       const data = await res.json();

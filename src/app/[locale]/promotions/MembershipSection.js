@@ -498,6 +498,7 @@ export default function MembershipSection({ locale, translations, silverPriceVal
                         placeholder={t("formAddressPlaceholder")}
                         value={formData.address} 
                         onChange={handleFormChange}
+                        autoComplete="new-password"
                         style={{ width: "100%", padding: "0.75rem", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "0.95rem", backgroundColor: "#ffffff", color: "#0f172a" }}
                       />
                     </div>
