@@ -56,7 +56,7 @@ export default async function AdminLayout({ children }) {
               <i className="fa-solid fa-tags"></i> Pricing Menu
             </Link>
           )}
-          {hasPerm('pricing') && (
+          {hasPerm('marketing') && (
             <Link href="/admin/dashboard/marketing" className={styles.navLink}>
               <i className="fa-solid fa-bullhorn"></i> Marketing & Analytics
             </Link>

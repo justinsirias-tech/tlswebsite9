@@ -23,6 +23,7 @@ export default function UsersAdminPage() {
     { id: "locations", label: "Building Directory" },
     { id: "pricing", label: "Pricing Menu" },
     { id: "articles", label: "Articles" },
+    { id: "marketing", label: "Marketing" },
   ];
 
   useEffect(() => {
