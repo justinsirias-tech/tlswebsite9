@@ -98,6 +98,7 @@ Authorization: Bearer <YOUR_POS_API_SECRET>
   "code": "EXPRESS20",
   "discountType": "PERCENTAGE",
   "discountValue": 20,
+  "discountTarget": "ALL",
   "maxDiscount": 100,
   "minOrderValue": 0,
   "orderTotal": 600,
@@ -115,6 +116,7 @@ Authorization: Bearer <YOUR_POS_API_SECRET>
   "code": "SUMMER20",
   "discountType": "PERCENTAGE",
   "discountValue": 20,
+  "discountTarget": "ALL",
   "maxDiscount": null,
   "minOrderValue": 0,
   "orderTotal": 400,
@@ -123,6 +125,26 @@ Authorization: Bearer <YOUR_POS_API_SECRET>
   "message": "Promo code is valid and applied."
 }
 ```
+
+ตัวอย่างเพิ่มเติม: โค้ด `FREEDELIVERY` (ฟรีค่ารับส่ง 100% — **Delivery Only**):
+```json
+{
+  "valid": true,
+  "code": "FREEDELIVERY",
+  "discountType": "PERCENTAGE",
+  "discountValue": 100,
+  "discountTarget": "DELIVERY",
+  "maxDiscount": null,
+  "minOrderValue": 1299,
+  "orderTotal": 1500,
+  "discountAmount": 1500,
+  "netPayable": 0,
+  "description": "Free pickup and delivery on orders over 1299 THB",
+  "message": "Promo code is valid and applied."
+}
+```
+
+> ⚠️ **สำคัญ**: เมื่อ `discountTarget` เป็น `"DELIVERY"` — ค่า `discountAmount` และ `netPayable` ที่ API คืนมาจะยังคำนวณจาก `orderTotal` ตามปกติ (เพราะ API ไม่รู้ว่าค่ารับส่งของบิลนี้คือเท่าไหร่) **โปรแกรม POS ต้องจัดการ Logic การคำนวณค่ารับส่งด้วยตัวเอง** — ดูรายละเอียดที่ Section 8
 
 #### Response: ไม่ผ่านเงื่อนไข (400 Bad Request / 404 Not Found)
 * **กรณีโค้ดไม่มีในระบบ (404):**
@@ -416,3 +438,124 @@ public class PosPromoClient
    * Endpoint `/redeem` ฝั่งเซิร์ฟเวอร์ถูกเขียนด้วย Database Atomic Transaction (`prisma.$transaction`) ทำให้มั่นใจได้ว่าแม้จะมีหลายสาขายิงตัดยอดโค้ดจำกัดสิทธิ์พร้อมกัน โควตาจะไม่มีวันติดลบหรือเกินจำนวนที่ตั้งไว้แน่นอน
 3. **การตรวจสอบยอดกระทบยอด (Reconciliation):**
    * ทุกครั้งที่มีการ `/redeem` ระบบจะบันทึก Log เลขที่ใบเสร็จ (`receiptNo`) และ IP ลง Cloud Logging ทำให้ผู้ตรวจสอบบัญชีสามารถดึงข้อมูลเทียบยอดขายกับโปรโมชั่นที่ใช้จริงได้อย่างแม่นยำ
+
+---
+
+## 8. การจัดการโค้ดประเภท Delivery Only (`discountTarget: "DELIVERY"`)
+
+> อัปเดตเพิ่มเติม: **v2 — 3 Sep 2026**
+
+### 8.1 ฟิลด์ใหม่ `discountTarget`
+
+ตั้งแต่ version นี้เป็นต้นไป Response จาก `/api/pos/promo/check` จะมีฟิลด์ใหม่:
+
+| ฟิลด์ | ชนิดข้อมูล | ค่าที่เป็นไปได้ | คำอธิบาย |
+|---|---|---|---|
+| `discountTarget` | string | `"ALL"` หรือ `"DELIVERY"` | ระบุว่าส่วนลดนี้คิดจากอะไร |
+
+| ค่า | ความหมาย | ตัวอย่างโค้ด |
+|---|---|---|
+| `"ALL"` | ส่วนลดคิดจากยอดรวมทั้งบิล (ค่าซักรีด + ค่ารับส่ง) | `TLSWELCOME15`, `EXPRESS20` |
+| `"DELIVERY"` | ส่วนลดคิดเฉพาะค่ารับส่ง/จัดส่งเท่านั้น | `FREEDELIVERY` |
+
+---
+
+### 8.2 Logic ที่โปรแกรม POS ต้องจัดการ
+
+```
+รับ Response จาก /check แล้ว อ่านค่า discountTarget
+
+discountTarget === "ALL"
+  ├─ ใช้ค่า discountAmount และ netPayable จาก Response ได้เลย ✅
+  └─ หักจากยอดรวมของบิล (ตามปกติ)
+
+discountTarget === "DELIVERY"
+  ├─ ห้ามใช้ค่า discountAmount / netPayable จาก Response ❌
+  ├─ ให้อ่านค่า discountType และ discountValue แล้วคำนวณเองจาก deliveryFee ของบิล
+  │    - ถ้า discountType = "PERCENTAGE":
+  │        deliveryDiscount = (deliveryFee × discountValue) / 100
+  │    - ถ้า discountType = "FIXED":
+  │        deliveryDiscount = min(discountValue, deliveryFee)
+  └─ netPayable = (laundryTotal + deliveryFee) - deliveryDiscount
+```
+
+---
+
+### 8.3 ตัวอย่างการคำนวณ (Delivery Only)
+
+**โค้ด `FREEDELIVERY` — ฟรีค่ารับส่ง 100% (ยอดขั้นต่ำ 1,299 THB)**
+
+| รายการ | ยอด (THB) |
+|---|---|
+| ค่าซักรีด | 1,500 |
+| ค่ารับส่ง | 150 |
+| **ยอดรวมก่อนลด** | **1,650** |
+| ส่วนลดค่ารับส่ง (100%) | -150 |
+| **ยอดสุทธิที่ลูกค้าจ่าย** | **1,500** |
+
+```javascript
+// ตัวอย่าง Logic บน POS (JavaScript)
+async function applyPromo(code, laundryTotal, deliveryFee) {
+  const orderTotal = laundryTotal + deliveryFee;
+  const res = await fetch("/api/pos/promo/check", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "x-tls-pos-key": POS_API_KEY },
+    body: JSON.stringify({ code, orderTotal })
+  });
+  const data = await res.json();
+  if (!data.valid) throw new Error(data.error);
+
+  let discountAmount = 0;
+
+  if (data.discountTarget === "DELIVERY") {
+    // คำนวณส่วนลดจากค่ารับส่งเท่านั้น
+    if (data.discountType === "PERCENTAGE") {
+      discountAmount = (deliveryFee * data.discountValue) / 100;
+    } else {
+      discountAmount = Math.min(data.discountValue, deliveryFee);
+    }
+    console.log(`[Delivery Only] ส่วนลดค่ารับส่ง: ${discountAmount} บาท`);
+  } else {
+    // ใช้ค่าจาก API ได้เลย (ALL)
+    discountAmount = data.discountAmount;
+  }
+
+  const netPayable = Math.max(0, orderTotal - discountAmount);
+  return { discountAmount, netPayable };
+}
+```
+
+---
+
+### 8.4 การแสดงผลบนหน้าจอแคชเชียร์และใบเสร็จ
+
+เพื่อความโปร่งใส แนะนำให้แสดงรายการส่วนลดแยกบรรทัดให้ชัดเจน:
+
+```
+บริการซักรีด (Wash & Iron 5kg)    1,500.00 THB
+ค่ารับส่ง                             150.00 THB
+────────────────────────────────────────────────
+ยอดรวม                             1,650.00 THB
+ส่วนลดค่าจัดส่ง (FREEDELIVERY)      -150.00 THB
+────────────────────────────────────────────────
+ยอดสุทธิ                           1,500.00 THB
+```
+
+---
+
+### 8.5 การ Redeem โค้ดประเภท Delivery Only
+
+เมื่อลูกค้าชำระเงินเสร็จสิ้น ให้ยิง `/redeem` โดยส่ง `discountAmount` ที่คำนวณจากค่ารับส่งจริง (ไม่ใช่จากยอดรวม):
+
+```json
+{
+  "code": "FREEDELIVERY",
+  "receiptNo": "INV-20260903-0099",
+  "orderTotal": 1650.00,
+  "discountAmount": 150.00
+}
+```
+
+> **หมายเหตุ**: `discountAmount` ที่ส่งไปใน `/redeem` เป็นแค่ข้อมูลสำหรับ Audit Log เท่านั้น ไม่มีผลต่อการตัดสิทธิ์ — ระบบตัดสิทธิ์โดยการเพิ่ม `usedCount + 1` ทุกครั้งโดยไม่คำนึงถึงยอด
+
+
