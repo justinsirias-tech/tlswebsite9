@@ -76,6 +76,7 @@ export async function GET(request) {
       code: pc.code,
       discountType: pc.discountType,
       discountValue: pc.discountValue,
+      discountTarget: pc.discountTarget || "ALL",
       usedCount: Math.max(pc.usedCount, promoCodeUsageMap[pc.code] || 0),
       isActive: pc.isActive,
       expiryDate: pc.expiryDate

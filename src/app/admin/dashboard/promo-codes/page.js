@@ -59,6 +59,7 @@ export default function AdminPromoCodesPage() {
     code: "",
     discountType: "PERCENTAGE",
     discountValue: 15,
+    discountTarget: "ALL",
     minOrderValue: 0,
     maxDiscount: "",
     usageLimit: "",
@@ -106,6 +107,7 @@ export default function AdminPromoCodesPage() {
       code: pc.code || "",
       discountType: pc.discountType || "PERCENTAGE",
       discountValue: pc.discountValue !== undefined ? pc.discountValue : 15,
+      discountTarget: pc.discountTarget || "ALL",
       minOrderValue: pc.minOrderValue !== undefined ? pc.minOrderValue : 0,
       maxDiscount: pc.maxDiscount !== null ? pc.maxDiscount : "",
       usageLimit: pc.usageLimit !== null ? pc.usageLimit : "",
@@ -352,6 +354,25 @@ export default function AdminPromoCodesPage() {
                 </div>
               </div>
 
+              <div>
+                <label style={{ display: "block", color: "#222945", fontWeight: "600", fontSize: "0.9rem", marginBottom: "0.4rem" }}>
+                  Applies To * (Discount Scope)
+                </label>
+                <select 
+                  value={formData.discountTarget}
+                  onChange={(e) => setFormData(prev => ({ ...prev, discountTarget: e.target.value }))}
+                  style={{ width: "100%", padding: "0.75rem", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#f8fafc", color: "#222945", fontWeight: "600" }}
+                >
+                  <option value="ALL">Entire Order (All Services)</option>
+                  <option value="DELIVERY">Delivery Fee Only (ลดเฉพาะค่ารับส่ง)</option>
+                </select>
+                <span style={{ fontSize: "0.75rem", color: "#64748b", marginTop: "0.25rem", display: "block" }}>
+                  {formData.discountTarget === "DELIVERY" 
+                    ? "ส่วนลดนี้จะคิดเฉพาะค่าบริการรับส่งเท่านั้น (เช่น โค้ดฟรีค่ารับส่ง 100% หรือลด 50 บาท)"
+                    : "ส่วนลดนี้จะคิดจากยอดรวมของบริการทั้งหมด"}
+                </span>
+              </div>
+
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
                 <div>
                   <label style={{ display: "block", color: "#222945", fontWeight: "600", fontSize: "0.9rem", marginBottom: "0.4rem" }}>
@@ -506,7 +527,38 @@ export default function AdminPromoCodesPage() {
                   </td>
 
                   <td style={{ padding: "1.25rem", fontWeight: "800", color: "#222945" }}>
-                    {pc.discountType === "PERCENTAGE" ? `${pc.discountValue}% OFF` : `${pc.discountValue} THB OFF`}
+                    <div>
+                      {pc.discountType === "PERCENTAGE" ? `${pc.discountValue}% OFF` : `${pc.discountValue} THB OFF`}
+                    </div>
+                    {pc.discountTarget === "DELIVERY" ? (
+                      <span style={{
+                        display: "inline-block",
+                        marginTop: "0.35rem",
+                        padding: "0.2rem 0.55rem",
+                        borderRadius: "6px",
+                        fontSize: "0.75rem",
+                        fontWeight: "700",
+                        background: "#eff6ff",
+                        color: "#1d4ed8",
+                        border: "1px solid #bfdbfe"
+                      }}>
+                        🚚 Delivery Only
+                      </span>
+                    ) : (
+                      <span style={{
+                        display: "inline-block",
+                        marginTop: "0.35rem",
+                        padding: "0.2rem 0.55rem",
+                        borderRadius: "6px",
+                        fontSize: "0.75rem",
+                        fontWeight: "600",
+                        background: "#f1f5f9",
+                        color: "#64748b",
+                        border: "1px solid #e2e8f0"
+                      }}>
+                        All Services
+                      </span>
+                    )}
                   </td>
 
                   <td style={{ padding: "1.25rem", fontWeight: "600", color: "#475569" }}>

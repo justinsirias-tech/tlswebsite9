@@ -31,6 +31,7 @@ export async function PUT(request, { params }) {
     if (data.code !== undefined) updateData.code = data.code.trim().toUpperCase();
     if (data.discountType !== undefined) updateData.discountType = data.discountType;
     if (data.discountValue !== undefined) updateData.discountValue = parseFloat(data.discountValue);
+    if (data.discountTarget !== undefined) updateData.discountTarget = data.discountTarget;
     if (data.minOrderValue !== undefined) updateData.minOrderValue = data.minOrderValue ? parseFloat(data.minOrderValue) : 0;
     if (data.maxDiscount !== undefined) updateData.maxDiscount = data.maxDiscount ? parseFloat(data.maxDiscount) : null;
     if (data.usageLimit !== undefined) updateData.usageLimit = data.usageLimit ? parseInt(data.usageLimit) : null;

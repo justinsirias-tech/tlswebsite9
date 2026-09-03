@@ -59,6 +59,7 @@ export async function POST(request) {
       code: promo.code,
       discountType: promo.discountType,
       discountValue: promo.discountValue,
+      discountTarget: promo.discountTarget || "ALL",
       minOrderValue: promo.minOrderValue || 0,
       maxDiscount: promo.maxDiscount,
       description: promo.description

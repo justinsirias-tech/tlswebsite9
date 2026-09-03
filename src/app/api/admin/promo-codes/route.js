@@ -63,6 +63,7 @@ export async function POST(request) {
         code: cleanCode,
         discountType: data.discountType || "PERCENTAGE",
         discountValue: data.discountValue ? parseFloat(data.discountValue) : 15,
+        discountTarget: data.discountTarget || "ALL",
         minOrderValue: data.minOrderValue ? parseFloat(data.minOrderValue) : 0,
         maxDiscount: data.maxDiscount ? parseFloat(data.maxDiscount) : null,
         usageLimit: data.usageLimit ? parseInt(data.usageLimit) : null,

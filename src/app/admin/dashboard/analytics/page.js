@@ -189,6 +189,11 @@ export default function AdminAnalyticsPage() {
                       </td>
                       <td style={{ padding: "1rem", color: "#222945", fontWeight: "800" }}>
                         {pc.discountType === "PERCENTAGE" ? `${pc.discountValue}% OFF` : `${pc.discountValue} THB OFF`}
+                        {pc.discountTarget === "DELIVERY" && (
+                          <span style={{ marginLeft: "0.5rem", background: "#eff6ff", color: "#1d4ed8", padding: "0.2rem 0.5rem", borderRadius: "6px", fontSize: "0.75rem", fontWeight: "700" }}>
+                            🚚 Delivery Only
+                          </span>
+                        )}
                       </td>
                       <td style={{ padding: "1rem" }}>
                         <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>

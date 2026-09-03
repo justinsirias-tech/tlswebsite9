@@ -172,6 +172,7 @@ model PromoCode {
   code           String    @unique
   discountType   String    @default("PERCENTAGE") // "PERCENTAGE" | "FIXED"
   discountValue  Float     @default(15)
+  discountTarget String    @default("ALL") // "ALL" | "DELIVERY"
   minOrderValue  Float?    @default(0)
   maxDiscount    Float?
   usageLimit     Int?
@@ -181,8 +182,42 @@ model PromoCode {
   expiryDate     String?
   isActive       Boolean   @default(true)
   description    String?
+  partnerId      String?
+  partner        Partner?  @relation(fields: [partnerId], references: [id])
+  sales          PartnerSale[]
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
+}
+
+model Partner {
+  id               String        @id @default(uuid())
+  companyName      String
+  contactName      String
+  email            String        @unique
+  password         String
+  phone            String?
+  note             String?
+  isActive         Boolean       @default(true)
+  resetToken       String?
+  resetTokenExpiry DateTime?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  codes            PromoCode[]
+  sales            PartnerSale[]
+}
+
+model PartnerSale {
+  id            String    @id @default(uuid())
+  partnerId     String
+  partner       Partner   @relation(fields: [partnerId], references: [id])
+  promoCodeId   String
+  promoCode     PromoCode @relation(fields: [promoCodeId], references: [id])
+  customerName  String
+  customerPhone String
+  saleAmount    Float
+  note          String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 }
 
 model PageView {

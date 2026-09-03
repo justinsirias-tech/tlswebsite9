@@ -134,6 +134,7 @@ export async function POST(request) {
         code: promo.code,
         discountType: promo.discountType,
         discountValue: promo.discountValue,
+        discountTarget: promo.discountTarget || "ALL",
         maxDiscount: promo.maxDiscount,
         minOrderValue: minOrder,
         orderTotal: currentOrderTotal,
