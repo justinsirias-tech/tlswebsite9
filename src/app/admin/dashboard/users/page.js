@@ -24,6 +24,7 @@ export default function UsersAdminPage() {
     { id: "pricing", label: "Pricing Menu" },
     { id: "articles", label: "Articles" },
     { id: "marketing", label: "Marketing" },
+    { id: "partners", label: "Partners" },
   ];
 
   useEffect(() => {

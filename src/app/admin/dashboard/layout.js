@@ -61,6 +61,11 @@ export default async function AdminLayout({ children }) {
               <i className="fa-solid fa-bullhorn"></i> Marketing & Analytics
             </Link>
           )}
+          {hasPerm('partners') && (
+            <Link href="/admin/dashboard/partners" className={styles.navLink}>
+              <i className="fa-solid fa-handshake"></i> Partners & Sales
+            </Link>
+          )}
           {hasPerm('articles') && (
             <Link href="/admin/dashboard/articles" className={styles.navLink}>
               <i className="fa-solid fa-file-lines"></i> Articles
