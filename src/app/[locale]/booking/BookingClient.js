@@ -18,53 +18,7 @@ export default function BookingClient() {
   const [thaiMobile, setThaiMobile] = useState("");
   const [isWhatsapp, setIsWhatsapp] = useState(false);
   const [phoneError, setPhoneError] = useState("");
-  const [promoCode, setPromoCode] = useState("");
-  const [appliedPromo, setAppliedPromo] = useState(null);
-  const [promoError, setPromoError] = useState("");
-  const [promoInfo, setPromoInfo] = useState(null);
-  const [isValidatingPromo, setIsValidatingPromo] = useState(false);
 
-  const handleApplyPromo = async (codeToApply) => {
-    const code = (codeToApply || promoCode).trim().toUpperCase();
-    if (!code) return;
-    setIsValidatingPromo(true);
-    setPromoError("");
-    try {
-      const res = await fetch("/api/promo-codes/validate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code })
-      });
-      const data = await res.json();
-      if (res.ok && data.valid) {
-        setAppliedPromo(data.code);
-        setPromoInfo(data);
-        setPromoError("");
-      } else {
-        setAppliedPromo(null);
-        setPromoInfo(null);
-        setPromoError(data.error || (locale === "th" ? "โค้ดส่วนลดไม่ถูกต้องหรือหมดอายุแล้ว" : "Invalid or expired promo code."));
-      }
-    } catch (err) {
-      setAppliedPromo(null);
-      setPromoInfo(null);
-      setPromoError(locale === "th" ? "ไม่สามารถตรวจสอบโค้ดส่วนลดได้" : "Unable to validate promo code.");
-    } finally {
-      setIsValidatingPromo(false);
-    }
-  };
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const params = new URLSearchParams(window.location.search);
-      const promoParam = params.get("promo");
-      if (promoParam) {
-        const cleanPromo = promoParam.trim().toUpperCase();
-        setPromoCode(cleanPromo);
-        handleApplyPromo(cleanPromo);
-      }
-    }
-  }, []);
 
   const [isCountryDropdownOpen, setIsCountryDropdownOpen] = useState(false);
   const [countrySearch, setCountrySearch] = useState("");
@@ -212,10 +166,9 @@ export default function BookingClient() {
     
     try {
       const specialInst = e.target.elements.specialInstructions?.value || '';
-      const promoCodeVal = e.target.elements.promoCode?.value || promoCode || '';
       
       const fullServiceDesc = `Services: ${services.join('; ')}
-${promoCodeVal ? `Promo Code: ${promoCodeVal.trim().toUpperCase()}\n` : ''}Address: ${buildingName}, Room ${roomNo}, ${fullAddress}
+Address: ${buildingName}, Room ${roomNo}, ${fullAddress}
 Delivery: ${isDifferentDeliveryAddress ? `${deliveryBuildingName}, Room ${deliveryRoomNo}, ${deliveryFullAddress}` : 'Same as pickup'}
 Pickup Method: ${pickupMethod}
 Time: ${pickupTime}
@@ -962,71 +915,7 @@ Notes: ${specialInst}`.trim();
                   </ul>
                 </div>
 
-                {/* Promo Code Input Field */}
-                <div style={{ marginBottom: "1.5rem", background: "#f8fafc", padding: "1.25rem 1.5rem", borderRadius: "16px", border: "1px dashed #cbd5e1" }}>
-                  <label style={{ fontSize: "1rem", fontWeight: "700", color: "#222945", display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.75rem" }}>
-                    <i className="fa-solid fa-ticket" style={{ color: "#222945" }}></i>
-                    {locale === "th" ? "โค้ดส่วนลด / โปรโมชั่น (ถ้ามี)" : locale === "cn" ? "优惠码 / 折扣券（选填）" : "Promo Code / Discount Coupon (Optional)"}
-                  </label>
-                  <div style={{ display: "flex", gap: "0.5rem" }}>
-                    <input 
-                      type="text" 
-                      name="promoCode"
-                      placeholder={locale === "th" ? "ใส่โค้ดส่วนลด (เช่น TLSWELCOME15)" : locale === "cn" ? "请输入优惠码 (例如 TLSWELCOME15)" : "Enter promo code (e.g. TLSWELCOME15)"}
-                      value={promoCode}
-                      onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
-                      style={{
-                        flex: "1",
-                        padding: "0.85rem 1rem",
-                        borderRadius: "10px",
-                        border: "1px solid #cbd5e1",
-                        fontSize: "1rem",
-                        fontWeight: "700",
-                        fontFamily: "monospace",
-                        color: "#222945",
-                        textTransform: "uppercase",
-                        background: "#ffffff"
-                      }}
-                    />
-                    <button 
-                      type="button"
-                      disabled={isValidatingPromo}
-                      onClick={() => handleApplyPromo()}
-                      style={{
-                        padding: "0.85rem 1.5rem",
-                        borderRadius: "10px",
-                        background: "#222945",
-                        color: "#ffffff",
-                        border: "none",
-                        fontWeight: "700",
-                        cursor: "pointer",
-                        whiteSpace: "nowrap"
-                      }}
-                    >
-                      {isValidatingPromo ? "..." : (locale === "th" ? "ใช้โค้ด" : locale === "cn" ? "使用" : "Apply")}
-                    </button>
-                  </div>
 
-                  {promoError && (
-                    <div style={{ marginTop: "0.75rem", color: "#991b1b", background: "#fef2f2", border: "1px solid #fecaca", padding: "0.6rem 1rem", borderRadius: "8px", fontSize: "0.9rem", fontWeight: "600", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                      <i className="fa-solid fa-circle-exclamation"></i>
-                      <span>{promoError}</span>
-                    </div>
-                  )}
-
-                  {appliedPromo && (
-                    <div style={{ marginTop: "0.75rem", color: "#166534", background: "#f0fdf4", border: "1px solid #bbf7d0", padding: "0.6rem 1rem", borderRadius: "8px", fontSize: "0.9rem", fontWeight: "600", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                      <i className="fa-solid fa-circle-check"></i>
-                      <span>
-                        {locale === "th" 
-                          ? `ใช้โค้ดส่วนลด ${appliedPromo} เรียบร้อยแล้ว ${promoInfo?.discountType === "PERCENTAGE" ? `(ลด ${promoInfo.discountValue}%)` : `(ลด ${promoInfo?.discountValue} บาท)`}`
-                          : locale === "cn" 
-                          ? `已成功应用优惠码 ${appliedPromo}` 
-                          : `Promo code ${appliedPromo} applied! (${promoInfo?.discountType === "PERCENTAGE" ? `${promoInfo.discountValue}% OFF` : `${promoInfo?.discountValue} THB OFF`})`}
-                      </span>
-                    </div>
-                  )}
-                </div>
 
                 <button type="submit" className={styles.submitBtn} disabled={isSubmitting}>
                   {isSubmitting ? t("processing") : t("confirmBooking")}
