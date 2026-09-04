@@ -15,7 +15,6 @@ export default function PartnerCodesPage() {
     code: "",
     discountType: "PERCENTAGE",
     discountValue: "15",
-    discountTarget: "ALL",
     minOrderValue: "0",
     maxDiscount: "",
     usageLimit: "",
@@ -78,7 +77,6 @@ export default function PartnerCodesPage() {
       code: pc.code,
       discountType: pc.discountType || "PERCENTAGE",
       discountValue: String(pc.discountValue ?? "15"),
-      discountTarget: pc.discountTarget || "ALL",
       minOrderValue: String(pc.minOrderValue ?? "0"),
       maxDiscount: pc.maxDiscount !== null && pc.maxDiscount !== undefined ? String(pc.maxDiscount) : "",
       usageLimit: pc.usageLimit !== null && pc.usageLimit !== undefined ? String(pc.usageLimit) : "",
@@ -264,11 +262,6 @@ export default function PartnerCodesPage() {
 
                       <td style={{ padding: "1rem 1.25rem", fontWeight: "800", color: "#0f172a" }}>
                         {pc.discountType === "PERCENTAGE" ? `${pc.discountValue}% OFF` : `${pc.discountValue} THB OFF`}
-                        {pc.discountTarget === "DELIVERY" && (
-                          <span style={{ display: "block", fontSize: "0.75rem", color: "#0284c7", fontWeight: "600" }}>
-                            (Delivery fee only)
-                          </span>
-                        )}
                       </td>
 
                       <td style={{ padding: "1rem 1.25rem", color: "#475569", fontSize: "0.85rem", maxWidth: "240px", lineHeight: "1.4" }}>

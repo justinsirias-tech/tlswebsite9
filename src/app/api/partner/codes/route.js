@@ -11,7 +11,7 @@ export async function GET(request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const codes = await prisma.promoCode.findMany({
+    const codes = await prisma.partnerCode.findMany({
       where: { partnerId: partner.id },
       orderBy: { createdAt: "desc" },
       include: {
@@ -30,7 +30,7 @@ export async function GET(request) {
 
 export async function POST() {
   return NextResponse.json(
-    { error: "Partners are not permitted to create promo codes directly. Please contact TLS Administrator to create promo codes." },
+    { error: "Partners are not permitted to create partner codes directly. Please contact TLS Administrator to create partner codes." },
     { status: 403 }
   );
 }

@@ -19,6 +19,7 @@ export default function PartnerSalesPage() {
 
   // Form State
   const initialForm = {
+    partnerCodeId: "",
     promoCodeId: "",
     customerName: "",
     customerPhone: "",
@@ -36,8 +37,8 @@ export default function PartnerSalesPage() {
       const data = await res.json();
       if (res.ok && data.success) {
         setCodes(data.codes || []);
-        if (data.codes.length > 0 && !formData.promoCodeId) {
-          setFormData(prev => ({ ...prev, promoCodeId: data.codes[0].id }));
+        if (data.codes.length > 0 && !formData.partnerCodeId && !formData.promoCodeId) {
+          setFormData(prev => ({ ...prev, partnerCodeId: data.codes[0].id, promoCodeId: data.codes[0].id }));
         }
       }
     } catch (err) {
@@ -51,7 +52,10 @@ export default function PartnerSalesPage() {
       setLoading(true);
       const params = new URLSearchParams();
       if (period && period !== "all") params.append("period", period);
-      if (selectedCodeId) params.append("promoCodeId", selectedCodeId);
+      if (selectedCodeId) {
+        params.append("partnerCodeId", selectedCodeId);
+        params.append("promoCodeId", selectedCodeId);
+      }
 
       const res = await fetch(`/api/partner/sales?${params.toString()}`);
       const data = await res.json();
@@ -78,6 +82,7 @@ export default function PartnerSalesPage() {
     setFormError("");
     setFormData({
       ...initialForm,
+      partnerCodeId: codes.length > 0 ? codes[0].id : "",
       promoCodeId: codes.length > 0 ? codes[0].id : ""
     });
     setIsAddModalOpen(true);
@@ -87,7 +92,8 @@ export default function PartnerSalesPage() {
     setFormError("");
     setEditingSale(sale);
     setFormData({
-      promoCodeId: sale.promoCodeId,
+      partnerCodeId: sale.partnerCodeId || sale.promoCodeId || "",
+      promoCodeId: sale.partnerCodeId || sale.promoCodeId || "",
       customerName: sale.customerName,
       customerPhone: sale.customerPhone,
       saleAmount: sale.saleAmount,
@@ -342,7 +348,7 @@ export default function PartnerSalesPage() {
                           borderRadius: "6px",
                           letterSpacing: "0.5px"
                         }}>
-                          {s.promoCode?.code}
+                          {s.partnerCode?.code || s.promoCode?.code}
                         </span>
                       </td>
                       <td style={{ padding: "1rem 1.25rem", fontWeight: "700", color: "#0f172a" }}>
@@ -429,11 +435,11 @@ export default function PartnerSalesPage() {
             <form onSubmit={handleSubmitAdd} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
               <div>
                 <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
-                  Select Promo Code *
+                  Select Partner Code *
                 </label>
                 <select
-                  value={formData.promoCodeId}
-                  onChange={(e) => setFormData(prev => ({ ...prev, promoCodeId: e.target.value }))}
+                  value={formData.partnerCodeId || formData.promoCodeId}
+                  onChange={(e) => setFormData(prev => ({ ...prev, partnerCodeId: e.target.value, promoCodeId: e.target.value }))}
                   required
                   style={{ width: "100%", padding: "0.75rem", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#f8fafc", boxSizing: "border-box" }}
                 >
@@ -565,11 +571,11 @@ export default function PartnerSalesPage() {
             <form onSubmit={handleSubmitEdit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
               <div>
                 <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
-                  Promo Code
+                  Partner Code
                 </label>
                 <select
-                  value={formData.promoCodeId}
-                  onChange={(e) => setFormData(prev => ({ ...prev, promoCodeId: e.target.value }))}
+                  value={formData.partnerCodeId || formData.promoCodeId}
+                  onChange={(e) => setFormData(prev => ({ ...prev, partnerCodeId: e.target.value, promoCodeId: e.target.value }))}
                   required
                   style={{ width: "100%", padding: "0.75rem", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#f8fafc", boxSizing: "border-box" }}
                 >

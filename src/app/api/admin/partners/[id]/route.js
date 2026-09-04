@@ -45,7 +45,7 @@ export async function PUT(request, { params }) {
       if (cleanEmail !== existing.email) {
         const emailTaken = await prisma.partner.findUnique({ where: { email: cleanEmail } });
         if (emailTaken) {
-          return NextResponse.json({ error: `อีเมล '${cleanEmail}' มีอยู่ในระบบแล้ว` }, { status: 400 });
+          return NextResponse.json({ error: `Email '${cleanEmail}' is already registered.` }, { status: 400 });
         }
         updateData.email = cleanEmail;
       }
@@ -96,19 +96,18 @@ export async function DELETE(request, { params }) {
       });
       return NextResponse.json({
         success: true,
-        message: "พาร์ทเนอร์นี้มีประวัติรายการขายในระบบ จึงได้ทำการปิดการใช้งาน (Deactivate) แทนการลบข้อมูล"
+        message: "This partner has sales records and has been deactivated instead of deleted to preserve history."
       });
     }
 
-    // Unlink codes
-    await prisma.promoCode.updateMany({
-      where: { partnerId: id },
-      data: { partnerId: null }
+    // Delete associated partner codes
+    await prisma.partnerCode.deleteMany({
+      where: { partnerId: id }
     });
 
     await prisma.partner.delete({ where: { id } });
 
-    return NextResponse.json({ success: true, message: "ลบพาร์ทเนอร์เรียบร้อยแล้ว" });
+    return NextResponse.json({ success: true, message: "Partner deleted successfully." });
   } catch (error) {
     console.error("[ADMIN_PARTNER_DELETE_ERROR]", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

@@ -16,7 +16,7 @@ export async function PUT(request, { params }) {
     const data = await request.json().catch(() => ({}));
 
     // Verify ownership
-    const existing = await prisma.promoCode.findFirst({
+    const existing = await prisma.partnerCode.findFirst({
       where: {
         id,
         partnerId: partner.id
@@ -25,7 +25,7 @@ export async function PUT(request, { params }) {
 
     if (!existing) {
       return NextResponse.json(
-        { error: "Promo code not found or you do not have permission to edit this code." },
+        { error: "Partner code not found or you do not have permission to edit this code." },
         { status: 404 }
       );
     }
@@ -40,12 +40,12 @@ export async function PUT(request, { params }) {
     if (data.maxDiscount !== undefined) updateData.maxDiscount = data.maxDiscount ? parseFloat(data.maxDiscount) : null;
     if (data.usageLimit !== undefined) updateData.usageLimit = data.usageLimit ? parseInt(data.usageLimit) : null;
 
-    const updated = await prisma.promoCode.update({
+    const updated = await prisma.partnerCode.update({
       where: { id },
       data: updateData
     });
 
-    return NextResponse.json({ success: true, promoCode: updated });
+    return NextResponse.json({ success: true, partnerCode: updated, promoCode: updated });
   } catch (error) {
     console.error("[PARTNER_CODE_PUT_ERROR]", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

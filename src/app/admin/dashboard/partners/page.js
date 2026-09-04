@@ -34,7 +34,6 @@ export default function AdminPartnersPage() {
     code: "",
     discountType: "PERCENTAGE",
     discountValue: "15",
-    discountTarget: "ALL",
     minOrderValue: "0",
     maxDiscount: "",
     usageLimit: "",
@@ -104,7 +103,6 @@ export default function AdminPartnersPage() {
       code: pc.code,
       discountType: pc.discountType || "PERCENTAGE",
       discountValue: String(pc.discountValue ?? "15"),
-      discountTarget: pc.discountTarget || "ALL",
       minOrderValue: String(pc.minOrderValue ?? "0"),
       maxDiscount: pc.maxDiscount !== null && pc.maxDiscount !== undefined ? String(pc.maxDiscount) : "",
       usageLimit: pc.usageLimit !== null && pc.usageLimit !== undefined ? String(pc.usageLimit) : "",
@@ -117,14 +115,15 @@ export default function AdminPartnersPage() {
   };
 
   const handleToggleCodeActive = async (codeId, currentStatus) => {
+    if (!selectedPartnerForCodes) return;
     try {
-      const res = await fetch(`/api/admin/promo-codes/${codeId}`, {
+      const res = await fetch(`/api/admin/partners/${selectedPartnerForCodes.id}/codes/${codeId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ isActive: !currentStatus })
       });
       if (res.ok) {
-        if (selectedPartnerForCodes) fetchPartnerCodes(selectedPartnerForCodes.id);
+        fetchPartnerCodes(selectedPartnerForCodes.id);
         fetchPartners();
       }
     } catch (err) {
@@ -180,7 +179,7 @@ export default function AdminPartnersPage() {
         endDate: toISOStringOrNull(codeFormData.endDate)
       };
 
-      const res = await fetch(`/api/admin/promo-codes/${editingCode.id}`, {
+      const res = await fetch(`/api/admin/partners/${selectedPartnerForCodes.id}/codes/${editingCode.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
@@ -188,7 +187,7 @@ export default function AdminPartnersPage() {
 
       const data = await res.json();
       if (!res.ok) {
-        setCodeFormError(data.error || "An error occurred while updating the promo code.");
+        setCodeFormError(data.error || "An error occurred while updating the partner code.");
         return;
       }
 
@@ -700,7 +699,7 @@ export default function AdminPartnersPage() {
                         </td>
                         <td style={{ padding: "1rem 1.25rem" }}>
                           <span style={{ fontFamily: "monospace", fontWeight: "800", color: "#222945", background: "#f1f5f9", padding: "0.25rem 0.5rem", borderRadius: "4px" }}>
-                            {s.promoCode?.code}
+                            {s.partnerCode?.code || s.promoCode?.code}
                           </span>
                         </td>
                         <td style={{ padding: "1rem 1.25rem", fontWeight: "600", color: "#334155" }}>
@@ -1093,11 +1092,6 @@ export default function AdminPartnersPage() {
 
                           <td style={{ padding: "0.85rem 1rem", fontWeight: "700", color: "#0f172a" }}>
                             {pc.discountType === "PERCENTAGE" ? `${pc.discountValue}% OFF` : `${pc.discountValue} THB`}
-                            {pc.discountTarget === "DELIVERY" && (
-                              <span style={{ display: "block", fontSize: "0.7rem", color: "#0284c7" }}>
-                                (Delivery fee only)
-                              </span>
-                            )}
                           </td>
 
                           <td style={{ padding: "0.85rem 1rem", color: "#475569", fontSize: "0.8rem", maxWidth: "200px" }}>
@@ -1191,7 +1185,7 @@ export default function AdminPartnersPage() {
                   Create Code for {selectedPartnerForCodes.companyName}
                 </h3>
                 <p style={{ margin: "0.2rem 0 0 0", fontSize: "0.85rem", color: "#64748b" }}>
-                  This promo code will be assigned to this partner account automatically
+                  This partner code will be assigned to this partner account automatically
                 </p>
               </div>
               <button onClick={() => setIsCreateCodeModalOpen(false)} style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer", fontSize: "1.2rem" }}>
@@ -1208,7 +1202,7 @@ export default function AdminPartnersPage() {
             <form onSubmit={handleSubmitCreateCode} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
               <div>
                 <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
-                  Promo Code *
+                  Partner Code *
                 </label>
                 <input
                   type="text"
@@ -1250,20 +1244,6 @@ export default function AdminPartnersPage() {
                     style={{ width: "100%", padding: "0.75rem", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#f8fafc", boxSizing: "border-box", fontWeight: "700" }}
                   />
                 </div>
-              </div>
-
-              <div>
-                <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
-                  Discount Target
-                </label>
-                <select
-                  value={codeFormData.discountTarget}
-                  onChange={(e) => setCodeFormData(prev => ({ ...prev, discountTarget: e.target.value }))}
-                  style={{ width: "100%", padding: "0.75rem", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#f8fafc", boxSizing: "border-box" }}
-                >
-                  <option value="ALL">Entire Order (All Items)</option>
-                  <option value="DELIVERY">Delivery Fee Only</option>
-                </select>
               </div>
 
               {/* Start & End Date */}
@@ -1349,7 +1329,7 @@ export default function AdminPartnersPage() {
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
               <div>
                 <h3 style={{ fontSize: "1.25rem", fontWeight: "800", color: "#0f172a", margin: 0 }}>
-                  Edit Promo Code: {editingCode.code}
+                  Edit Partner Code: {editingCode.code}
                 </h3>
                 <p style={{ margin: "0.2rem 0 0 0", fontSize: "0.85rem", color: "#64748b" }}>
                   Modify conditions, schedule, and active status

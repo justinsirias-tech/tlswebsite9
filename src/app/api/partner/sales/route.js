@@ -13,12 +13,12 @@ export async function GET(request) {
 
     const { searchParams } = new URL(request.url);
     const period = searchParams.get("period"); // "today", "month", "year", "all"
-    const promoCodeId = searchParams.get("promoCodeId");
+    const partnerCodeId = searchParams.get("partnerCodeId") || searchParams.get("promoCodeId");
 
     const where = { partnerId: partner.id };
 
-    if (promoCodeId) {
-      where.promoCodeId = promoCodeId;
+    if (partnerCodeId) {
+      where.partnerCodeId = partnerCodeId;
     }
 
     if (period) {
@@ -41,7 +41,7 @@ export async function GET(request) {
     const sales = await prisma.partnerSale.findMany({
       where,
       include: {
-        promoCode: {
+        partnerCode: {
           select: {
             id: true,
             code: true,
@@ -53,11 +53,16 @@ export async function GET(request) {
       orderBy: { createdAt: "desc" }
     });
 
+    const formattedSales = sales.map(s => ({
+      ...s,
+      promoCode: s.partnerCode
+    }));
+
     const totalAmount = sales.reduce((acc, curr) => acc + (curr.saleAmount || 0), 0);
 
     return NextResponse.json({
       success: true,
-      sales,
+      sales: formattedSales,
       summary: {
         totalCount: sales.length,
         totalAmount: Math.round(totalAmount * 100) / 100
@@ -77,11 +82,12 @@ export async function POST(request) {
     }
 
     const data = await request.json().catch(() => ({}));
-    const { promoCodeId, customerName, customerPhone, saleAmount, note } = data;
+    const partnerCodeId = data.partnerCodeId || data.promoCodeId;
+    const { customerName, customerPhone, saleAmount, note } = data;
 
-    if (!promoCodeId || !customerName || !customerPhone || saleAmount === undefined || saleAmount === null) {
+    if (!partnerCodeId || !customerName || !customerPhone || saleAmount === undefined || saleAmount === null) {
       return NextResponse.json(
-        { error: "Please fill in all required fields: Promo Code, Customer Name, Phone Number, and Sale Price." },
+        { error: "Please fill in all required fields: Partner Code, Customer Name, Phone Number, and Sale Price." },
         { status: 400 }
       );
     }
@@ -94,17 +100,17 @@ export async function POST(request) {
       );
     }
 
-    // Verify promoCode belongs to this partner
-    const code = await prisma.promoCode.findFirst({
+    // Verify partnerCode belongs to this partner
+    const code = await prisma.partnerCode.findFirst({
       where: {
-        id: promoCodeId,
+        id: partnerCodeId,
         partnerId: partner.id
       }
     });
 
     if (!code) {
       return NextResponse.json(
-        { error: "Promo code not found or you do not have permission to use it." },
+        { error: "Partner code not found or you do not have permission to use it." },
         { status: 404 }
       );
     }
@@ -112,14 +118,14 @@ export async function POST(request) {
     const newSale = await prisma.partnerSale.create({
       data: {
         partnerId: partner.id,
-        promoCodeId: code.id,
+        partnerCodeId: code.id,
         customerName: customerName.trim(),
         customerPhone: customerPhone.trim(),
         saleAmount: amount,
         note: note ? note.trim() : null
       },
       include: {
-        promoCode: {
+        partnerCode: {
           select: {
             id: true,
             code: true,
@@ -130,7 +136,13 @@ export async function POST(request) {
       }
     });
 
-    return NextResponse.json({ success: true, sale: newSale }, { status: 201 });
+    return NextResponse.json({
+      success: true,
+      sale: {
+        ...newSale,
+        promoCode: newSale.partnerCode
+      }
+    }, { status: 201 });
   } catch (error) {
     console.error("[PARTNER_SALES_POST_ERROR]", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

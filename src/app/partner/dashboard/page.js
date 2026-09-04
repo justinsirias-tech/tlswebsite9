@@ -308,7 +308,7 @@ export default function PartnerDashboardOverview() {
                     </td>
                     <td style={{ padding: "0.85rem 0.5rem" }}>
                       <span style={{ fontFamily: "monospace", fontSize: "0.8rem", fontWeight: "700", color: "#222945", background: "#f8fafc", padding: "0.2rem 0.4rem", borderRadius: "4px", border: "1px solid #e2e8f0" }}>
-                        {s.promoCode?.code}
+                        {s.partnerCode?.code || s.promoCode?.code}
                       </span>
                     </td>
                     <td style={{ padding: "0.85rem 0.5rem", textAlign: "right", fontWeight: "800", color: "#166534" }}>

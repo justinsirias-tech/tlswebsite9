@@ -22,11 +22,11 @@ export async function GET(request) {
     // Start of Year
     const startOfYear = new Date(now.getFullYear(), 0, 1);
 
-    // Query all sales for this partner with their related promo codes
+    // Query all sales for this partner with their related partner codes
     const allSales = await prisma.partnerSale.findMany({
       where: { partnerId: partner.id },
       include: {
-        promoCode: {
+        partnerCode: {
           select: {
             code: true,
             discountType: true,
@@ -66,12 +66,12 @@ export async function GET(request) {
       }
 
       // Breakdown by code
-      const codeName = s.promoCode?.code || "DELETED_CODE";
+      const codeName = s.partnerCode?.code || "DELETED_CODE";
       if (!codeStatsMap[codeName]) {
         codeStatsMap[codeName] = {
           code: codeName,
-          discountType: s.promoCode?.discountType || "PERCENTAGE",
-          discountValue: s.promoCode?.discountValue || 0,
+          discountType: s.partnerCode?.discountType || "PERCENTAGE",
+          discountValue: s.partnerCode?.discountValue || 0,
           totalAmount: 0,
           count: 0
         };
@@ -97,7 +97,10 @@ export async function GET(request) {
         allTime: { amount: Math.round(allAmount * 100) / 100, count: allCount }
       },
       codesBreakdown,
-      recentSales: allSales.slice(0, 5)
+      recentSales: allSales.slice(0, 5).map(s => ({
+        ...s,
+        promoCode: s.partnerCode
+      }))
     });
   } catch (error) {
     console.error("[PARTNER_DASHBOARD_STATS_ERROR]", error);

@@ -26,12 +26,12 @@ export async function GET(request) {
 
     const { searchParams } = new URL(request.url);
     const partnerId = searchParams.get("partnerId");
-    const promoCodeId = searchParams.get("promoCodeId");
+    const partnerCodeId = searchParams.get("partnerCodeId") || searchParams.get("promoCodeId");
     const period = searchParams.get("period");
 
     const where = {};
     if (partnerId) where.partnerId = partnerId;
-    if (promoCodeId) where.promoCodeId = promoCodeId;
+    if (partnerCodeId) where.partnerCodeId = partnerCodeId;
 
     if (period) {
       const now = new Date();
@@ -61,7 +61,7 @@ export async function GET(request) {
             email: true
           }
         },
-        promoCode: {
+        partnerCode: {
           select: {
             id: true,
             code: true,
@@ -73,11 +73,16 @@ export async function GET(request) {
       orderBy: { createdAt: "desc" }
     });
 
+    const formattedSales = sales.map(s => ({
+      ...s,
+      promoCode: s.partnerCode
+    }));
+
     const totalRevenue = sales.reduce((acc, s) => acc + (s.saleAmount || 0), 0);
 
     return NextResponse.json({
       success: true,
-      sales,
+      sales: formattedSales,
       summary: {
         count: sales.length,
         totalRevenue: Math.round(totalRevenue * 100) / 100

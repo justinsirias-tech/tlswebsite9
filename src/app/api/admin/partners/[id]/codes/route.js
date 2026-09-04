@@ -36,7 +36,7 @@ export async function GET(request, { params }) {
       return NextResponse.json({ error: "Partner not found" }, { status: 404 });
     }
 
-    const codes = await prisma.promoCode.findMany({
+    const codes = await prisma.partnerCode.findMany({
       where: { partnerId: id },
       orderBy: { createdAt: "desc" },
       include: {
@@ -72,30 +72,29 @@ export async function POST(request, { params }) {
 
     const data = await request.json().catch(() => ({}));
     if (!data.code || typeof data.code !== "string" || !data.code.trim()) {
-      return NextResponse.json({ error: "Promo Code is required." }, { status: 400 });
+      return NextResponse.json({ error: "Partner Code is required." }, { status: 400 });
     }
 
     const cleanCode = data.code.trim().toUpperCase();
 
     // Check uniqueness
-    const existing = await prisma.promoCode.findUnique({
+    const existing = await prisma.partnerCode.findUnique({
       where: { code: cleanCode }
     });
 
     if (existing) {
       return NextResponse.json(
-        { error: `Promo Code '${cleanCode}' already exists.` },
+        { error: `Partner Code '${cleanCode}' already exists.` },
         { status: 400 }
       );
     }
 
-    const promoCode = await prisma.promoCode.create({
+    const partnerCode = await prisma.partnerCode.create({
       data: {
         code: cleanCode,
         partnerId: id,
         discountType: data.discountType || "PERCENTAGE",
-        discountValue: data.discountValue ? parseFloat(data.discountValue) : 15,
-        discountTarget: data.discountTarget || "ALL",
+        discountValue: data.discountValue ? parseFloat(data.discountValue) : 10,
         minOrderValue: data.minOrderValue ? parseFloat(data.minOrderValue) : 0,
         maxDiscount: data.maxDiscount ? parseFloat(data.maxDiscount) : null,
         usageLimit: data.usageLimit ? parseInt(data.usageLimit) : null,
@@ -106,7 +105,7 @@ export async function POST(request, { params }) {
       }
     });
 
-    return NextResponse.json({ success: true, promoCode }, { status: 201 });
+    return NextResponse.json({ success: true, partnerCode, promoCode: partnerCode }, { status: 201 });
   } catch (error) {
     console.error("[ADMIN_PARTNER_CODES_POST_ERROR]", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

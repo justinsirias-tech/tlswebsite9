@@ -43,24 +43,25 @@ export async function PUT(request, { params }) {
       updateData.saleAmount = amount;
     }
 
-    if (data.promoCodeId !== undefined) {
-      const code = await prisma.promoCode.findFirst({
+    const incomingCodeId = data.partnerCodeId !== undefined ? data.partnerCodeId : data.promoCodeId;
+    if (incomingCodeId !== undefined) {
+      const code = await prisma.partnerCode.findFirst({
         where: {
-          id: data.promoCodeId,
+          id: incomingCodeId,
           partnerId: partner.id
         }
       });
       if (!code) {
-        return NextResponse.json({ error: "Invalid promo code." }, { status: 400 });
+        return NextResponse.json({ error: "Invalid partner code." }, { status: 400 });
       }
-      updateData.promoCodeId = code.id;
+      updateData.partnerCodeId = code.id;
     }
 
     const updatedSale = await prisma.partnerSale.update({
       where: { id },
       data: updateData,
       include: {
-        promoCode: {
+        partnerCode: {
           select: {
             id: true,
             code: true,
@@ -71,7 +72,13 @@ export async function PUT(request, { params }) {
       }
     });
 
-    return NextResponse.json({ success: true, sale: updatedSale });
+    return NextResponse.json({
+      success: true,
+      sale: {
+        ...updatedSale,
+        promoCode: updatedSale.partnerCode
+      }
+    });
   } catch (error) {
     console.error("[PARTNER_SALE_PUT_ERROR]", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
