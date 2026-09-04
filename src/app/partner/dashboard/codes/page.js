@@ -7,7 +7,6 @@ export default function PartnerCodesPage() {
   const [loading, setLoading] = useState(true);
 
   // Modals
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingCode, setEditingCode] = useState(null);
 
@@ -78,12 +77,6 @@ export default function PartnerCodesPage() {
   useEffect(() => {
     fetchCodes();
   }, []);
-
-  const handleOpenCreate = () => {
-    setFormError("");
-    setFormData(initialForm);
-    setIsCreateModalOpen(true);
-  };
 
   const handleOpenEdit = (pc) => {
     setFormError("");
@@ -193,26 +186,21 @@ export default function PartnerCodesPage() {
           </p>
         </div>
 
-        <button
-          onClick={handleOpenCreate}
-          style={{
-            padding: "0.85rem 1.4rem",
-            borderRadius: "10px",
-            background: "#222945",
-            color: "#ffffff",
-            border: "none",
-            fontWeight: "700",
-            fontSize: "0.95rem",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            gap: "0.5rem",
-            boxShadow: "0 4px 10px rgba(34, 41, 69, 0.2)"
-          }}
-        >
-          <i className="fa-solid fa-plus"></i>
-          <span>สร้างโค้ดใหม่</span>
-        </button>
+        <div style={{
+          background: "#f0f9ff",
+          border: "1px solid #bae6fd",
+          color: "#0369a1",
+          padding: "0.6rem 1rem",
+          borderRadius: "10px",
+          fontSize: "0.85rem",
+          fontWeight: "600",
+          display: "flex",
+          alignItems: "center",
+          gap: "0.5rem"
+        }}>
+          <i className="fa-solid fa-shield-halved"></i>
+          <span>โค้ดโปรโมชั่นออกโดย Admin TLS (ติดต่อแอดมินเพื่อขอโค้ดเพิ่ม)</span>
+        </div>
       </div>
 
       {/* Codes Table */}
@@ -231,21 +219,7 @@ export default function PartnerCodesPage() {
           <div style={{ textAlign: "center", padding: "4rem 2rem", color: "#94a3b8" }}>
             <i className="fa-solid fa-ticket" style={{ fontSize: "2.5rem", marginBottom: "1rem", opacity: 0.5 }}></i>
             <h3 style={{ fontSize: "1.1rem", color: "#475569", margin: "0 0 0.5rem 0" }}>ยังไม่มีโค้ดโปรโมชั่นสำหรับพาร์ทเนอร์ของคุณ</h3>
-            <p style={{ fontSize: "0.85rem", margin: "0 0 1.5rem 0" }}>คุณสามารถสร้างโค้ดเพื่อนำไปแจกจ่ายให้ลูกค้าของคุณได้ทันที</p>
-            <button
-              onClick={handleOpenCreate}
-              style={{
-                padding: "0.6rem 1.2rem",
-                borderRadius: "8px",
-                background: "#222945",
-                color: "#ffffff",
-                border: "none",
-                fontWeight: "700",
-                cursor: "pointer"
-              }}
-            >
-              + สร้างโค้ดแรกของคุณ
-            </button>
+            <p style={{ fontSize: "0.85rem", margin: 0 }}>กรุณาติดต่อทีมงานผู้ดูแลระบบ TLS เพื่อสร้างโค้ดโปรโมชั่นสำหรับพาร์ทเนอร์ของคุณ</p>
           </div>
         ) : (
           <div style={{ overflowX: "auto" }}>
@@ -367,170 +341,6 @@ export default function PartnerCodesPage() {
           </div>
         )}
       </div>
-
-      {/* Modal: Create Code */}
-      {isCreateModalOpen && (
-        <div style={{
-          position: "fixed",
-          inset: 0,
-          background: "rgba(15, 23, 42, 0.6)",
-          backdropFilter: "blur(4px)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          zIndex: 100,
-          padding: "1rem"
-        }}>
-          <div style={{
-            background: "#ffffff",
-            borderRadius: "20px",
-            width: "100%",
-            maxWidth: "540px",
-            padding: "2rem",
-            maxHeight: "90vh",
-            overflowY: "auto",
-            boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)"
-          }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
-              <h2 style={{ fontSize: "1.3rem", fontWeight: "800", color: "#0f172a", margin: 0 }}>
-                สร้างโค้ดโปรโมชั่นใหม่
-              </h2>
-              <button
-                onClick={() => setIsCreateModalOpen(false)}
-                style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer", fontSize: "1.2rem" }}
-              >
-                ✕
-              </button>
-            </div>
-
-            {formError && (
-              <div style={{ background: "#fef2f2", border: "1px solid #fecaca", color: "#991b1b", padding: "0.75rem", borderRadius: "8px", fontSize: "0.85rem", marginBottom: "1rem" }}>
-                {formError}
-              </div>
-            )}
-
-            <form onSubmit={handleSubmitCreate} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-              <div>
-                <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
-                  รหัสโค้ด (Promo Code) *
-                </label>
-                <input
-                  type="text"
-                  placeholder="เช่น PARTNER15"
-                  value={formData.code}
-                  onChange={(e) => setFormData(prev => ({ ...prev, code: e.target.value.toUpperCase() }))}
-                  required
-                  style={{ width: "100%", padding: "0.75rem", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#f8fafc", boxSizing: "border-box", fontFamily: "monospace", fontWeight: "800", letterSpacing: "1px" }}
-                />
-              </div>
-
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-                <div>
-                  <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
-                    ประเภทส่วนลด
-                  </label>
-                  <select
-                    value={formData.discountType}
-                    onChange={(e) => setFormData(prev => ({ ...prev, discountType: e.target.value }))}
-                    style={{ width: "100%", padding: "0.75rem", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#f8fafc", boxSizing: "border-box" }}
-                  >
-                    <option value="PERCENTAGE">เปอร์เซ็นต์ (%)</option>
-                    <option value="FIXED">จำนวนเงินคงที่ (THB)</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
-                    มูลค่าส่วนลด *
-                  </label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    placeholder="15"
-                    value={formData.discountValue}
-                    onChange={(e) => setFormData(prev => ({ ...prev, discountValue: e.target.value }))}
-                    required
-                    style={{ width: "100%", padding: "0.75rem", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#f8fafc", boxSizing: "border-box", fontWeight: "700" }}
-                  />
-                </div>
-              </div>
-
-              {/* Start & End Date */}
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-                <div>
-                  <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
-                    วัน-เวลาเริ่มต้น (Start Date)
-                  </label>
-                  <input
-                    type="datetime-local"
-                    value={formData.startDate}
-                    onChange={(e) => setFormData(prev => ({ ...prev, startDate: e.target.value }))}
-                    style={{ width: "100%", padding: "0.75rem", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#f8fafc", boxSizing: "border-box", fontSize: "0.85rem" }}
-                  />
-                  <span style={{ fontSize: "0.75rem", color: "#64748b" }}>เว้นว่างหากเริ่มทันที</span>
-                </div>
-
-                <div>
-                  <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
-                    วัน-เวลาสิ้นสุด (End Date)
-                  </label>
-                  <input
-                    type="datetime-local"
-                    value={formData.endDate}
-                    onChange={(e) => setFormData(prev => ({ ...prev, endDate: e.target.value }))}
-                    style={{ width: "100%", padding: "0.75rem", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#f8fafc", boxSizing: "border-box", fontSize: "0.85rem" }}
-                  />
-                  <span style={{ fontSize: "0.75rem", color: "#64748b" }}>เว้นว่างหากไม่มีวันหมดอายุ</span>
-                </div>
-              </div>
-
-              <div>
-                <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
-                  จำกัดจำนวนครั้งที่ใช้ได้ (Usage Limit)
-                </label>
-                <input
-                  type="number"
-                  placeholder="เว้นว่างหากไม่จำกัดจำนวนครั้ง"
-                  value={formData.usageLimit}
-                  onChange={(e) => setFormData(prev => ({ ...prev, usageLimit: e.target.value }))}
-                  style={{ width: "100%", padding: "0.75rem", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#f8fafc", boxSizing: "border-box" }}
-                />
-              </div>
-
-              <div>
-                <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
-                  คำอธิบาย / รายละเอียดโค้ด
-                </label>
-                <input
-                  type="text"
-                  placeholder="เช่น ส่วนลดพิเศษสำหรับลูกค้าคอนโด A"
-                  value={formData.description}
-                  onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                  style={{ width: "100%", padding: "0.75rem", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#f8fafc", boxSizing: "border-box" }}
-                />
-              </div>
-
-              <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.75rem", marginTop: "1rem" }}>
-                <button
-                  type="button"
-                  onClick={() => setIsCreateModalOpen(false)}
-                  style={{ padding: "0.75rem 1.25rem", borderRadius: "8px", background: "#f1f5f9", border: "1px solid #cbd5e1", color: "#475569", fontWeight: "700", cursor: "pointer" }}
-                >
-                  ยกเลิก
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  style={{ padding: "0.75rem 1.5rem", borderRadius: "8px", background: "#222945", border: "none", color: "#ffffff", fontWeight: "700", cursor: "pointer", opacity: isSubmitting ? 0.7 : 1 }}
-                >
-                  {isSubmitting ? "กำลังสร้าง..." : "สร้างโค้ดโปรโมชั่น"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
 
       {/* Modal: Edit Code */}
       {isEditModalOpen && (

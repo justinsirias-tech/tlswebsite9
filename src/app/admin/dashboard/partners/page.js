@@ -21,6 +21,183 @@ export default function AdminPartnersPage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingPartner, setEditingPartner] = useState(null);
 
+  // Codes Management for a selected Partner
+  const [selectedPartnerForCodes, setSelectedPartnerForCodes] = useState(null);
+  const [partnerCodes, setPartnerCodes] = useState([]);
+  const [loadingPartnerCodes, setLoadingPartnerCodes] = useState(false);
+  const [isCreateCodeModalOpen, setIsCreateCodeModalOpen] = useState(false);
+  const [isEditCodeModalOpen, setIsEditCodeModalOpen] = useState(false);
+  const [editingCode, setEditingCode] = useState(null);
+
+  const initialCodeForm = {
+    code: "",
+    discountType: "PERCENTAGE",
+    discountValue: "15",
+    discountTarget: "ALL",
+    minOrderValue: "0",
+    maxDiscount: "",
+    usageLimit: "",
+    startDate: "",
+    endDate: "",
+    description: "",
+    isActive: true
+  };
+  const [codeFormData, setCodeFormData] = useState(initialCodeForm);
+  const [codeFormError, setCodeFormError] = useState("");
+  const [isCodeSubmitting, setIsCodeSubmitting] = useState(false);
+
+  const toInputDateTime = (dateVal) => {
+    if (!dateVal) return "";
+    const d = new Date(dateVal);
+    if (isNaN(d.getTime())) return "";
+    const pad = (n) => String(n).padStart(2, "0");
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  };
+
+  const getCodeStatus = (pc) => {
+    if (!pc.isActive) {
+      return { label: "Disabled", color: "#64748b", bg: "#f1f5f9", border: "#cbd5e1" };
+    }
+    const now = new Date();
+    if (pc.startDate && new Date(pc.startDate) > now) {
+      return { label: "Upcoming (Auto)", color: "#0284c7", bg: "#f0f9ff", border: "#bae6fd" };
+    }
+    if (pc.endDate && new Date(pc.endDate) < now) {
+      return { label: "Expired (Auto)", color: "#dc2626", bg: "#fef2f2", border: "#fecaca" };
+    }
+    return { label: "Active", color: "#166534", bg: "#dcfce7", border: "#bbf7d0" };
+  };
+
+  const formatSchedule = (pc) => {
+    if (!pc.startDate && !pc.endDate) {
+      return "Always Active (No limits)";
+    }
+    const formatOpt = { dateStyle: "medium", timeStyle: "short" };
+    const startStr = pc.startDate ? new Date(pc.startDate).toLocaleString("th-TH", formatOpt) : "Now";
+    const endStr = pc.endDate ? new Date(pc.endDate).toLocaleString("th-TH", formatOpt) : "Ongoing";
+    return `${startStr} → ${endStr}`;
+  };
+
+  const fetchPartnerCodes = async (partnerId) => {
+    try {
+      setLoadingPartnerCodes(true);
+      const res = await fetch(`/api/admin/partners/${partnerId}/codes`);
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setPartnerCodes(data.codes || []);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingPartnerCodes(false);
+    }
+  };
+
+  const handleOpenCodesModal = (partner) => {
+    setSelectedPartnerForCodes(partner);
+    fetchPartnerCodes(partner.id);
+  };
+
+  const handleOpenCreateCode = () => {
+    setCodeFormError("");
+    setCodeFormData(initialCodeForm);
+    setIsCreateCodeModalOpen(true);
+  };
+
+  const handleOpenEditCode = (pc) => {
+    setCodeFormError("");
+    setEditingCode(pc);
+    setCodeFormData({
+      code: pc.code,
+      discountType: pc.discountType || "PERCENTAGE",
+      discountValue: String(pc.discountValue ?? "15"),
+      discountTarget: pc.discountTarget || "ALL",
+      minOrderValue: String(pc.minOrderValue ?? "0"),
+      maxDiscount: pc.maxDiscount !== null && pc.maxDiscount !== undefined ? String(pc.maxDiscount) : "",
+      usageLimit: pc.usageLimit !== null && pc.usageLimit !== undefined ? String(pc.usageLimit) : "",
+      startDate: toInputDateTime(pc.startDate),
+      endDate: toInputDateTime(pc.endDate),
+      description: pc.description || "",
+      isActive: pc.isActive
+    });
+    setIsEditCodeModalOpen(true);
+  };
+
+  const handleToggleCodeActive = async (codeId, currentStatus) => {
+    try {
+      const res = await fetch(`/api/admin/promo-codes/${codeId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isActive: !currentStatus })
+      });
+      if (res.ok) {
+        if (selectedPartnerForCodes) fetchPartnerCodes(selectedPartnerForCodes.id);
+        fetchPartners();
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleSubmitCreateCode = async (e) => {
+    e.preventDefault();
+    if (!selectedPartnerForCodes) return;
+    setCodeFormError("");
+    setIsCodeSubmitting(true);
+
+    try {
+      const res = await fetch(`/api/admin/partners/${selectedPartnerForCodes.id}/codes`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(codeFormData)
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        setCodeFormError(data.error || "เกิดข้อผิดพลาดในการสร้างโค้ด");
+        return;
+      }
+
+      setIsCreateCodeModalOpen(false);
+      fetchPartnerCodes(selectedPartnerForCodes.id);
+      fetchPartners();
+    } catch (err) {
+      setCodeFormError("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้");
+    } finally {
+      setIsCodeSubmitting(false);
+    }
+  };
+
+  const handleSubmitEditCode = async (e) => {
+    e.preventDefault();
+    if (!editingCode) return;
+    setCodeFormError("");
+    setIsCodeSubmitting(true);
+
+    try {
+      const res = await fetch(`/api/admin/promo-codes/${editingCode.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(codeFormData)
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        setCodeFormError(data.error || "เกิดข้อผิดพลาดในการแก้ไขโค้ด");
+        return;
+      }
+
+      setIsEditCodeModalOpen(false);
+      setEditingCode(null);
+      if (selectedPartnerForCodes) fetchPartnerCodes(selectedPartnerForCodes.id);
+      fetchPartners();
+    } catch (err) {
+      setCodeFormError("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้");
+    } finally {
+      setIsCodeSubmitting(false);
+    }
+  };
+
   const initialForm = {
     companyName: "",
     contactName: "",
@@ -312,8 +489,27 @@ export default function AdminPartnersPage() {
                         )}
                       </td>
 
-                      <td style={{ padding: "1.1rem 1.25rem", textAlign: "center", fontWeight: "700", color: "#0284c7" }}>
-                        {p._count?.codes ?? 0} โค้ด
+                      <td style={{ padding: "1.1rem 1.25rem", textAlign: "center" }}>
+                        <button
+                          onClick={() => handleOpenCodesModal(p)}
+                          title="คลิกเพื่อดูและจัดการโค้ดของพาร์ทเนอร์เจ้านี้"
+                          style={{
+                            background: "#f0f9ff",
+                            color: "#0284c7",
+                            border: "1px solid #bae6fd",
+                            padding: "0.35rem 0.75rem",
+                            borderRadius: "8px",
+                            fontWeight: "700",
+                            fontSize: "0.85rem",
+                            cursor: "pointer",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "0.4rem"
+                          }}
+                        >
+                          <i className="fa-solid fa-ticket"></i>
+                          <span>{p._count?.codes ?? 0} โค้ด (จัดการ)</span>
+                        </button>
                       </td>
 
                       <td style={{ padding: "1.1rem 1.25rem", textAlign: "center", fontWeight: "700", color: "#475569" }}>
@@ -343,21 +539,42 @@ export default function AdminPartnersPage() {
                       </td>
 
                       <td style={{ padding: "1.1rem 1.25rem", textAlign: "right" }}>
-                        <button
-                          onClick={() => handleOpenEdit(p)}
-                          style={{
-                            padding: "0.4rem 0.8rem",
-                            borderRadius: "6px",
-                            background: "#f1f5f9",
-                            color: "#334155",
-                            border: "1px solid #cbd5e1",
-                            fontWeight: "700",
-                            fontSize: "0.8rem",
-                            cursor: "pointer"
-                          }}
-                        >
-                          แก้ไข / รหัสผ่าน
-                        </button>
+                        <div style={{ display: "inline-flex", gap: "0.5rem" }}>
+                          <button
+                            onClick={() => handleOpenCodesModal(p)}
+                            style={{
+                              padding: "0.4rem 0.8rem",
+                              borderRadius: "6px",
+                              background: "#222945",
+                              color: "#ffffff",
+                              border: "none",
+                              fontWeight: "700",
+                              fontSize: "0.8rem",
+                              cursor: "pointer",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "0.35rem"
+                            }}
+                          >
+                            <i className="fa-solid fa-ticket"></i>
+                            <span>จัดการโค้ด</span>
+                          </button>
+                          <button
+                            onClick={() => handleOpenEdit(p)}
+                            style={{
+                              padding: "0.4rem 0.8rem",
+                              borderRadius: "6px",
+                              background: "#f1f5f9",
+                              color: "#334155",
+                              border: "1px solid #cbd5e1",
+                              fontWeight: "700",
+                              fontSize: "0.8rem",
+                              cursor: "pointer"
+                            }}
+                          >
+                            แก้ไข
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -748,6 +965,499 @@ export default function AdminPartnersPage() {
                   style={{ padding: "0.75rem 1.5rem", borderRadius: "8px", background: "#222945", border: "none", color: "#ffffff", fontWeight: "700", cursor: "pointer", opacity: isSubmitting ? 0.7 : 1 }}
                 >
                   {isSubmitting ? "กำลังบันทึก..." : "บันทึกข้อมูล"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+      {/* Modal: Partner Codes Management */}
+      {selectedPartnerForCodes && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.6)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100, padding: "1rem" }}>
+          <div style={{ background: "#ffffff", borderRadius: "20px", width: "100%", maxWidth: "900px", maxHeight: "90vh", display: "flex", flexDirection: "column", boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)" }}>
+            {/* Header */}
+            <div style={{ padding: "1.5rem 2rem", borderBottom: "1px solid #e2e8f0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                  <span style={{ background: "#f0f9ff", color: "#0284c7", border: "1px solid #bae6fd", padding: "0.2rem 0.55rem", borderRadius: "6px", fontSize: "0.75rem", fontWeight: "700" }}>
+                    PARTNER CODES
+                  </span>
+                  <h2 style={{ fontSize: "1.35rem", fontWeight: "800", color: "#0f172a", margin: 0 }}>
+                    {selectedPartnerForCodes.companyName}
+                  </h2>
+                </div>
+                <p style={{ margin: "0.25rem 0 0 0", fontSize: "0.85rem", color: "#64748b" }}>
+                  ผู้ติดต่อ: {selectedPartnerForCodes.contactName} ({selectedPartnerForCodes.email})
+                </p>
+              </div>
+
+              <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+                <button
+                  onClick={handleOpenCreateCode}
+                  style={{
+                    background: "#222945",
+                    color: "#ffffff",
+                    border: "none",
+                    padding: "0.6rem 1.1rem",
+                    borderRadius: "8px",
+                    fontWeight: "700",
+                    fontSize: "0.85rem",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.4rem",
+                    boxShadow: "0 4px 10px rgba(34, 41, 69, 0.15)"
+                  }}
+                >
+                  <i className="fa-solid fa-plus"></i>
+                  <span>สร้าง Code ให้ Partner เจ้านี้</span>
+                </button>
+
+                <button
+                  onClick={() => setSelectedPartnerForCodes(null)}
+                  style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer", fontSize: "1.3rem" }}
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+
+            {/* Body */}
+            <div style={{ padding: "1.5rem 2rem", overflowY: "auto", flex: 1 }}>
+              {loadingPartnerCodes ? (
+                <div style={{ textAlign: "center", padding: "3rem 0", color: "#64748b" }}>
+                  <i className="fa-solid fa-spinner fa-spin" style={{ fontSize: "1.8rem", marginBottom: "0.8rem" }}></i>
+                  <div>กำลังโหลดโค้ดของพาร์ทเนอร์...</div>
+                </div>
+              ) : partnerCodes.length === 0 ? (
+                <div style={{ textAlign: "center", padding: "3rem 1rem", color: "#94a3b8" }}>
+                  <i className="fa-solid fa-ticket" style={{ fontSize: "2.5rem", marginBottom: "0.8rem", opacity: 0.5 }}></i>
+                  <h3 style={{ fontSize: "1.1rem", color: "#475569", margin: "0 0 0.4rem 0" }}>ยังไม่มีโค้ดโปรโมชั่นสำหรับ Partner เจ้านี้</h3>
+                  <p style={{ fontSize: "0.85rem", margin: "0 0 1.25rem 0" }}>คลิกปุ่มด้านล่างเพื่อสร้างโค้ดส่วนลดให้พาร์ทเนอร์นำไปใช้งาน</p>
+                  <button
+                    onClick={handleOpenCreateCode}
+                    style={{
+                      background: "#222945",
+                      color: "#ffffff",
+                      border: "none",
+                      padding: "0.6rem 1.25rem",
+                      borderRadius: "8px",
+                      fontWeight: "700",
+                      cursor: "pointer"
+                    }}
+                  >
+                    + สร้าง Code ให้ Partner เจ้านี้
+                  </button>
+                </div>
+              ) : (
+                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.9rem" }}>
+                  <thead>
+                    <tr style={{ background: "#f8fafc", borderBottom: "1px solid #e2e8f0", color: "#475569", fontSize: "0.75rem", textTransform: "uppercase" }}>
+                      <th style={{ padding: "0.75rem 1rem", textAlign: "left" }}>โค้ด (Code)</th>
+                      <th style={{ padding: "0.75rem 1rem", textAlign: "left" }}>ส่วนลด</th>
+                      <th style={{ padding: "0.75rem 1rem", textAlign: "left" }}>กำหนดการ (Schedule)</th>
+                      <th style={{ padding: "0.75rem 1rem", textAlign: "center" }}>จำนวนใช้ / จำกัด</th>
+                      <th style={{ padding: "0.75rem 1rem", textAlign: "center" }}>สถานะ</th>
+                      <th style={{ padding: "0.75rem 1rem", textAlign: "right" }}>จัดการ</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {partnerCodes.map((pc) => {
+                      const st = getCodeStatus(pc);
+                      return (
+                        <tr key={pc.id} style={{ borderBottom: "1px solid #f1f5f9" }}>
+                          <td style={{ padding: "0.85rem 1rem" }}>
+                            <span style={{
+                              fontFamily: "monospace",
+                              fontWeight: "800",
+                              color: "#222945",
+                              background: "#f1f5f9",
+                              border: "1px solid #cbd5e1",
+                              padding: "0.25rem 0.5rem",
+                              borderRadius: "6px",
+                              fontSize: "0.95rem"
+                            }}>
+                              {pc.code}
+                            </span>
+                            {pc.description && (
+                              <div style={{ fontSize: "0.75rem", color: "#64748b", marginTop: "0.2rem" }}>
+                                {pc.description}
+                              </div>
+                            )}
+                          </td>
+
+                          <td style={{ padding: "0.85rem 1rem", fontWeight: "700", color: "#0f172a" }}>
+                            {pc.discountType === "PERCENTAGE" ? `${pc.discountValue}% OFF` : `${pc.discountValue} THB`}
+                            {pc.discountTarget === "DELIVERY" && (
+                              <span style={{ display: "block", fontSize: "0.7rem", color: "#0284c7" }}>
+                                (ค่าจัดส่ง)
+                              </span>
+                            )}
+                          </td>
+
+                          <td style={{ padding: "0.85rem 1rem", color: "#475569", fontSize: "0.8rem", maxWidth: "200px" }}>
+                            {formatSchedule(pc)}
+                          </td>
+
+                          <td style={{ padding: "0.85rem 1rem", textAlign: "center", fontWeight: "700", color: "#334155" }}>
+                            {pc._count?.sales ?? pc.usedCount} {pc.usageLimit ? `/ ${pc.usageLimit}` : "(ไม่จำกัด)"}
+                          </td>
+
+                          <td style={{ padding: "0.85rem 1rem", textAlign: "center" }}>
+                            <span style={{
+                              background: st.bg,
+                              color: st.color,
+                              border: `1px solid ${st.border}`,
+                              padding: "0.2rem 0.55rem",
+                              borderRadius: "10px",
+                              fontWeight: "700",
+                              fontSize: "0.75rem",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "0.3rem"
+                            }}>
+                              <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: st.color }}></span>
+                              {st.label}
+                            </span>
+                          </td>
+
+                          <td style={{ padding: "0.85rem 1rem", textAlign: "right" }}>
+                            <div style={{ display: "inline-flex", gap: "0.4rem" }}>
+                              <button
+                                onClick={() => handleToggleCodeActive(pc.id, pc.isActive)}
+                                style={{
+                                  background: "none",
+                                  border: "1px solid #cbd5e1",
+                                  color: pc.isActive ? "#991b1b" : "#166534",
+                                  padding: "0.3rem 0.6rem",
+                                  borderRadius: "6px",
+                                  fontSize: "0.75rem",
+                                  fontWeight: "700",
+                                  cursor: "pointer"
+                                }}
+                              >
+                                {pc.isActive ? "Turn Off" : "Turn On"}
+                              </button>
+                              <button
+                                onClick={() => handleOpenEditCode(pc)}
+                                style={{
+                                  background: "#f1f5f9",
+                                  border: "1px solid #cbd5e1",
+                                  color: "#334155",
+                                  padding: "0.3rem 0.6rem",
+                                  borderRadius: "6px",
+                                  fontSize: "0.75rem",
+                                  fontWeight: "700",
+                                  cursor: "pointer"
+                                }}
+                              >
+                                แก้ไข
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div style={{ padding: "1rem 2rem", borderTop: "1px solid #e2e8f0", display: "flex", justifyContent: "flex-end" }}>
+              <button
+                onClick={() => setSelectedPartnerForCodes(null)}
+                style={{ padding: "0.6rem 1.25rem", borderRadius: "8px", background: "#f1f5f9", border: "1px solid #cbd5e1", color: "#475569", fontWeight: "700", cursor: "pointer" }}
+              >
+                ปิดหน้าต่าง
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Sub-Modal: Create Code for Selected Partner */}
+      {isCreateCodeModalOpen && selectedPartnerForCodes && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.7)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 110, padding: "1rem" }}>
+          <div style={{ background: "#ffffff", borderRadius: "20px", width: "100%", maxWidth: "540px", padding: "2rem", maxHeight: "90vh", overflowY: "auto", boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.2)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
+              <div>
+                <h3 style={{ fontSize: "1.25rem", fontWeight: "800", color: "#0f172a", margin: 0 }}>
+                  สร้างโค้ดให้ {selectedPartnerForCodes.companyName}
+                </h3>
+                <p style={{ margin: "0.2rem 0 0 0", fontSize: "0.85rem", color: "#64748b" }}>
+                  โค้ดนี้จะผูกกับพาร์ทเนอร์เจ้านี้โดยอัตโนมัติ
+                </p>
+              </div>
+              <button onClick={() => setIsCreateCodeModalOpen(false)} style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer", fontSize: "1.2rem" }}>
+                ✕
+              </button>
+            </div>
+
+            {codeFormError && (
+              <div style={{ background: "#fef2f2", border: "1px solid #fecaca", color: "#991b1b", padding: "0.75rem", borderRadius: "8px", fontSize: "0.85rem", marginBottom: "1rem" }}>
+                {codeFormError}
+              </div>
+            )}
+
+            <form onSubmit={handleSubmitCreateCode} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+              <div>
+                <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
+                  รหัสโค้ด (Promo Code) *
+                </label>
+                <input
+                  type="text"
+                  placeholder="เช่น GRAND20 หรือ LUXURY15"
+                  value={codeFormData.code}
+                  onChange={(e) => setCodeFormData(prev => ({ ...prev, code: e.target.value.toUpperCase() }))}
+                  required
+                  style={{ width: "100%", padding: "0.75rem", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#f8fafc", boxSizing: "border-box", fontFamily: "monospace", fontWeight: "800", letterSpacing: "1px" }}
+                />
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+                <div>
+                  <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
+                    ประเภทส่วนลด
+                  </label>
+                  <select
+                    value={codeFormData.discountType}
+                    onChange={(e) => setCodeFormData(prev => ({ ...prev, discountType: e.target.value }))}
+                    style={{ width: "100%", padding: "0.75rem", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#f8fafc", boxSizing: "border-box" }}
+                  >
+                    <option value="PERCENTAGE">เปอร์เซ็นต์ (%)</option>
+                    <option value="FIXED">จำนวนเงินคงที่ (THB)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
+                    มูลค่าส่วนลด *
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    placeholder="15"
+                    value={codeFormData.discountValue}
+                    onChange={(e) => setCodeFormData(prev => ({ ...prev, discountValue: e.target.value }))}
+                    required
+                    style={{ width: "100%", padding: "0.75rem", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#f8fafc", boxSizing: "border-box", fontWeight: "700" }}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
+                  เป้าหมายส่วนลด (Discount Target)
+                </label>
+                <select
+                  value={codeFormData.discountTarget}
+                  onChange={(e) => setCodeFormData(prev => ({ ...prev, discountTarget: e.target.value }))}
+                  style={{ width: "100%", padding: "0.75rem", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#f8fafc", boxSizing: "border-box" }}
+                >
+                  <option value="ALL">ลดทั้งบิล (All Items)</option>
+                  <option value="DELIVERY">ลดเฉพาะค่าจัดส่ง (Delivery Only)</option>
+                </select>
+              </div>
+
+              {/* Start & End Date */}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+                <div>
+                  <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
+                    วัน-เวลาเริ่มต้น
+                  </label>
+                  <input
+                    type="datetime-local"
+                    value={codeFormData.startDate}
+                    onChange={(e) => setCodeFormData(prev => ({ ...prev, startDate: e.target.value }))}
+                    style={{ width: "100%", padding: "0.75rem", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#f8fafc", boxSizing: "border-box", fontSize: "0.85rem" }}
+                  />
+                  <span style={{ fontSize: "0.75rem", color: "#64748b" }}>เว้นว่างหากเริ่มทันที</span>
+                </div>
+
+                <div>
+                  <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
+                    วัน-เวลาสิ้นสุด
+                  </label>
+                  <input
+                    type="datetime-local"
+                    value={codeFormData.endDate}
+                    onChange={(e) => setCodeFormData(prev => ({ ...prev, endDate: e.target.value }))}
+                    style={{ width: "100%", padding: "0.75rem", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#f8fafc", boxSizing: "border-box", fontSize: "0.85rem" }}
+                  />
+                  <span style={{ fontSize: "0.75rem", color: "#64748b" }}>เว้นว่างหากไม่มีวันหมดอายุ</span>
+                </div>
+              </div>
+
+              <div>
+                <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
+                  จำกัดจำนวนครั้งที่ใช้ได้ (Usage Limit)
+                </label>
+                <input
+                  type="number"
+                  placeholder="เว้นว่างหากไม่จำกัด"
+                  value={codeFormData.usageLimit}
+                  onChange={(e) => setCodeFormData(prev => ({ ...prev, usageLimit: e.target.value }))}
+                  style={{ width: "100%", padding: "0.75rem", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#f8fafc", boxSizing: "border-box" }}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
+                  คำอธิบาย / หมายเหตุ
+                </label>
+                <input
+                  type="text"
+                  placeholder="เช่น ส่วนลดพิเศษสำหรับลูกค้าเครือ Partner"
+                  value={codeFormData.description}
+                  onChange={(e) => setCodeFormData(prev => ({ ...prev, description: e.target.value }))}
+                  style={{ width: "100%", padding: "0.75rem", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#f8fafc", boxSizing: "border-box" }}
+                />
+              </div>
+
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.75rem", marginTop: "1rem" }}>
+                <button
+                  type="button"
+                  onClick={() => setIsCreateCodeModalOpen(false)}
+                  style={{ padding: "0.75rem 1.25rem", borderRadius: "8px", background: "#f1f5f9", border: "1px solid #cbd5e1", color: "#475569", fontWeight: "700", cursor: "pointer" }}
+                >
+                  ยกเลิก
+                </button>
+                <button
+                  type="submit"
+                  disabled={isCodeSubmitting}
+                  style={{ padding: "0.75rem 1.5rem", borderRadius: "8px", background: "#222945", border: "none", color: "#ffffff", fontWeight: "700", cursor: "pointer", opacity: isCodeSubmitting ? 0.7 : 1 }}
+                >
+                  {isCodeSubmitting ? "กำลังสร้าง..." : "สร้างโค้ด"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Sub-Modal: Edit Code */}
+      {isEditCodeModalOpen && editingCode && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.7)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 110, padding: "1rem" }}>
+          <div style={{ background: "#ffffff", borderRadius: "20px", width: "100%", maxWidth: "540px", padding: "2rem", maxHeight: "90vh", overflowY: "auto", boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.2)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
+              <div>
+                <h3 style={{ fontSize: "1.25rem", fontWeight: "800", color: "#0f172a", margin: 0 }}>
+                  แก้ไขโค้ด: {editingCode.code}
+                </h3>
+                <p style={{ margin: "0.2rem 0 0 0", fontSize: "0.85rem", color: "#64748b" }}>
+                  แก้ไขเงื่อนไข วันเวลา และสถานะการใช้งาน
+                </p>
+              </div>
+              <button onClick={() => setIsEditCodeModalOpen(false)} style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer", fontSize: "1.2rem" }}>
+                ✕
+              </button>
+            </div>
+
+            {codeFormError && (
+              <div style={{ background: "#fef2f2", border: "1px solid #fecaca", color: "#991b1b", padding: "0.75rem", borderRadius: "8px", fontSize: "0.85rem", marginBottom: "1rem" }}>
+                {codeFormError}
+              </div>
+            )}
+
+            <form onSubmit={handleSubmitEditCode} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+                <div>
+                  <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
+                    ประเภทส่วนลด
+                  </label>
+                  <select
+                    value={codeFormData.discountType}
+                    onChange={(e) => setCodeFormData(prev => ({ ...prev, discountType: e.target.value }))}
+                    style={{ width: "100%", padding: "0.75rem", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#f8fafc", boxSizing: "border-box" }}
+                  >
+                    <option value="PERCENTAGE">เปอร์เซ็นต์ (%)</option>
+                    <option value="FIXED">จำนวนเงินคงที่ (THB)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
+                    มูลค่าส่วนลด *
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={codeFormData.discountValue}
+                    onChange={(e) => setCodeFormData(prev => ({ ...prev, discountValue: e.target.value }))}
+                    required
+                    style={{ width: "100%", padding: "0.75rem", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#f8fafc", boxSizing: "border-box", fontWeight: "700" }}
+                  />
+                </div>
+              </div>
+
+              {/* Start & End Date */}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+                <div>
+                  <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
+                    วัน-เวลาเริ่มต้น
+                  </label>
+                  <input
+                    type="datetime-local"
+                    value={codeFormData.startDate}
+                    onChange={(e) => setCodeFormData(prev => ({ ...prev, startDate: e.target.value }))}
+                    style={{ width: "100%", padding: "0.75rem", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#f8fafc", boxSizing: "border-box", fontSize: "0.85rem" }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
+                    วัน-เวลาสิ้นสุด
+                  </label>
+                  <input
+                    type="datetime-local"
+                    value={codeFormData.endDate}
+                    onChange={(e) => setCodeFormData(prev => ({ ...prev, endDate: e.target.value }))}
+                    style={{ width: "100%", padding: "0.75rem", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#f8fafc", boxSizing: "border-box", fontSize: "0.85rem" }}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
+                  คำอธิบาย
+                </label>
+                <input
+                  type="text"
+                  value={codeFormData.description}
+                  onChange={(e) => setCodeFormData(prev => ({ ...prev, description: e.target.value }))}
+                  style={{ width: "100%", padding: "0.75rem", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#f8fafc", boxSizing: "border-box" }}
+                />
+              </div>
+
+              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <input
+                  type="checkbox"
+                  id="adminEditCodeActive"
+                  checked={codeFormData.isActive}
+                  onChange={(e) => setCodeFormData(prev => ({ ...prev, isActive: e.target.checked }))}
+                />
+                <label htmlFor="adminEditCodeActive" style={{ fontSize: "0.9rem", fontWeight: "700", color: "#334155", cursor: "pointer" }}>
+                  เปิดใช้งานโค้ดนี้ (Active)
+                </label>
+              </div>
+
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.75rem", marginTop: "1rem" }}>
+                <button
+                  type="button"
+                  onClick={() => setIsEditCodeModalOpen(false)}
+                  style={{ padding: "0.75rem 1.25rem", borderRadius: "8px", background: "#f1f5f9", border: "1px solid #cbd5e1", color: "#475569", fontWeight: "700", cursor: "pointer" }}
+                >
+                  ยกเลิก
+                </button>
+                <button
+                  type="submit"
+                  disabled={isCodeSubmitting}
+                  style={{ padding: "0.75rem 1.5rem", borderRadius: "8px", background: "#222945", border: "none", color: "#ffffff", fontWeight: "700", cursor: "pointer", opacity: isCodeSubmitting ? 0.7 : 1 }}
+                >
+                  {isCodeSubmitting ? "กำลังบันทึก..." : "อัปเดตโค้ด"}
                 </button>
               </div>
             </form>
