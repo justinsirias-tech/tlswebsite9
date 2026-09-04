@@ -1,12 +1,31 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import styles from "./page.module.css";
 
 export default function PromotionsClient({ locale, initialPromotions = [] }) {
   const [activeCategory, setActiveCategory] = useState("all");
   const [copiedCode, setCopiedCode] = useState(null);
+  const [selectedPromo, setSelectedPromo] = useState(null);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        setSelectedPromo(null);
+      }
+    };
+    if (selectedPromo) {
+      document.body.style.overflow = "hidden";
+      window.addEventListener("keydown", handleKeyDown);
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [selectedPromo]);
 
   const displayPromotions = Array.isArray(initialPromotions) ? initialPromotions : [];
 
@@ -112,8 +131,31 @@ export default function PromotionsClient({ locale, initialPromotions = [] }) {
             const badge = getLocalizedField(promo, "badge") || promo.badge;
 
             return (
-              <div key={promo.id} className={styles.dealCard}>
-                <div className={styles.cardHeader}>
+              <div 
+                key={promo.id} 
+                className={styles.dealCard}
+                onClick={() => setSelectedPromo(promo)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setSelectedPromo(promo);
+                  }
+                }}
+              >
+                {promo.imageUrl && (
+                  <div className={styles.cardImageWrapper}>
+                    <img 
+                      src={promo.imageUrl} 
+                      alt={title} 
+                      className={styles.cardImage}
+                      loading="lazy"
+                    />
+                  </div>
+                )}
+
+                <div className={`${styles.cardHeader} ${promo.imageUrl ? styles.cardHeaderWithImage : ""}`}>
                   <span className={styles.cardCategory}>{promo.category || "Monthly Deal"}</span>
                   {badge && <span className={styles.badge}>{badge}</span>}
                 </div>
@@ -130,61 +172,21 @@ export default function PromotionsClient({ locale, initialPromotions = [] }) {
                   )}
 
                   {promo.code && (
-                    <div className={styles.codeBox}>
-                      <span className={styles.codeText}>{promo.code}</span>
-                      <button 
-                        onClick={() => handleCopyCode(promo.code)}
-                        className={`${styles.copyBtn} ${copiedCode === promo.code ? styles.copiedBtn : ""}`}
-                      >
-                        {copiedCode === promo.code ? (
-                          <>
-                            <i className="fa-solid fa-check" style={{ marginRight: "0.3rem" }}></i>
-                            {locale === "th" ? "คัดลอกแล้ว" : locale === "cn" ? "已复制" : "Copied!"}
-                          </>
-                        ) : (
-                          <>
-                            <i className="fa-regular fa-copy" style={{ marginRight: "0.3rem" }}></i>
-                            {locale === "th" ? "คัดลอกโค้ด" : locale === "cn" ? "复制优惠码" : "Copy Code"}
-                          </>
-                        )}
-                      </button>
+                    <div className={styles.codeSnippet}>
+                      <span className={styles.codeSnippetLabel}>
+                        <i className="fa-solid fa-ticket" style={{ marginRight: "0.35rem", color: "#2563eb" }}></i>
+                        {locale === "th" ? "โค้ด:" : locale === "cn" ? "优惠码:" : "Code:"}
+                      </span>
+                      <span className={styles.codeSnippetValue}>{promo.code}</span>
                     </div>
                   )}
 
-                  {/* Primary Booking Link */}
-                  <Link 
-                    href={`/${locale}/booking${promo.code ? `?promo=${promo.code}` : ""}`}
-                    className={styles.bookBtn}
-                    style={{ marginBottom: "0.75rem" }}
-                  >
-                    <span>{locale === "th" ? "จองทางเว็บพร้อมโค้ดนี้" : locale === "cn" ? "官网使用优惠码预订" : "Book Online With Code"}</span>
+                  <div className={styles.cardActionHint}>
+                    <span>
+                      {locale === "th" ? "ดูรายละเอียดและรับสิทธิ์" : locale === "cn" ? "查看详情并领取" : "View Details & Claim"}
+                    </span>
                     <i className="fa-solid fa-arrow-right"></i>
-                  </Link>
-
-                  {/* Social Media Quick Claim Row */}
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem" }}>
-                    <a 
-                      href={getSocialLineUrl(promo.code)}
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className={styles.socialClaimBtn}
-                      style={{ background: "rgba(0, 185, 0, 0.08)", color: "#00B900", border: "1px solid rgba(0, 185, 0, 0.2)" }}
-                    >
-                      <i className="fa-brands fa-line" style={{ fontSize: "1.05rem" }}></i>
-                      <span>LINE OA</span>
-                    </a>
-                    <a 
-                      href={getSocialWhatsappUrl(promo.code)}
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className={styles.socialClaimBtn}
-                      style={{ background: "rgba(37, 211, 102, 0.08)", color: "#25D366", border: "1px solid rgba(37, 211, 102, 0.2)" }}
-                    >
-                      <i className="fa-brands fa-whatsapp" style={{ fontSize: "1.05rem" }}></i>
-                      <span>WhatsApp</span>
-                    </a>
                   </div>
-
                 </div>
               </div>
             );
@@ -226,6 +228,138 @@ export default function PromotionsClient({ locale, initialPromotions = [] }) {
           </Link>
         </div>
       )}
+
+      {/* Promotion Detail Pop Up Modal */}
+      {selectedPromo && (() => {
+        const modalTitle = getLocalizedField(selectedPromo, "title");
+        const modalDescription = getLocalizedField(selectedPromo, "description");
+        const modalBadge = getLocalizedField(selectedPromo, "badge") || selectedPromo.badge;
+
+        return (
+          <div 
+            className={styles.modalOverlay} 
+            onClick={() => setSelectedPromo(null)}
+            role="dialog"
+            aria-modal="true"
+          >
+            <div 
+              className={`${styles.modalContent} ${selectedPromo.imageUrl ? styles.modalContentWithImage : styles.modalContentNoImage}`} 
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Close Button */}
+              <button 
+                type="button"
+                className={styles.modalCloseBtn}
+                onClick={() => setSelectedPromo(null)}
+                aria-label="Close modal"
+              >
+                <i className="fa-solid fa-xmark"></i>
+              </button>
+
+              {/* Banner Image */}
+              {selectedPromo.imageUrl && (
+                <div className={styles.modalImageWrapper}>
+                  <img 
+                    src={selectedPromo.imageUrl} 
+                    alt={modalTitle} 
+                    className={styles.modalImage}
+                  />
+                </div>
+              )}
+
+              <div className={styles.modalBody}>
+                {/* Meta Row: Category, Badge & Validity */}
+                <div className={styles.modalMetaRow}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                    <span className={styles.cardCategory}>{selectedPromo.category || "Special Deal"}</span>
+                    {modalBadge && <span className={styles.badge}>{modalBadge}</span>}
+                  </div>
+                  {selectedPromo.validUntil && (
+                    <div className={styles.validityTag} style={{ marginBottom: 0, padding: "0.25rem 0.55rem", fontSize: "0.76rem" }}>
+                      <i className="fa-solid fa-clock" style={{ marginRight: "0.25rem" }}></i>
+                      <span>{selectedPromo.validUntil}</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Title */}
+                <h2 className={styles.modalTitle}>{modalTitle}</h2>
+
+                {/* Description */}
+                <div className={styles.modalDesc}>
+                  {modalDescription}
+                </div>
+
+                {/* Promo Code Box */}
+                {selectedPromo.code && (
+                  <div className={styles.modalCodeSection}>
+                    <div className={styles.codeBox} style={{ marginBottom: 0, padding: "0.45rem 0.75rem" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
+                        <i className="fa-solid fa-ticket" style={{ color: "#2563eb", fontSize: "0.9rem" }}></i>
+                        <span className={styles.codeText} style={{ fontSize: "1rem" }}>{selectedPromo.code}</span>
+                      </div>
+                      <button 
+                        type="button"
+                        onClick={() => handleCopyCode(selectedPromo.code)}
+                        className={`${styles.copyBtn} ${copiedCode === selectedPromo.code ? styles.copiedBtn : ""}`}
+                        style={{ padding: "0.3rem 0.65rem", fontSize: "0.75rem" }}
+                      >
+                        {copiedCode === selectedPromo.code ? (
+                          <>
+                            <i className="fa-solid fa-check" style={{ marginRight: "0.25rem" }}></i>
+                            {locale === "th" ? "คัดลอกแล้ว" : locale === "cn" ? "已复制" : "Copied!"}
+                          </>
+                        ) : (
+                          <>
+                            <i className="fa-regular fa-copy" style={{ marginRight: "0.25rem" }}></i>
+                            {locale === "th" ? "คัดลอกโค้ด" : locale === "cn" ? "复制优惠码" : "Copy Code"}
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Primary Booking Action */}
+                <Link 
+                  href={`/${locale}/booking${selectedPromo.code ? `?promo=${selectedPromo.code}` : ""}`}
+                  className={styles.bookBtn}
+                  style={{ marginBottom: "0.5rem", padding: "0.75rem", fontSize: "0.9rem" }}
+                  onClick={() => setSelectedPromo(null)}
+                >
+                  <span>{locale === "th" ? "จองทางเว็บพร้อมโค้ดนี้" : locale === "cn" ? "官网使用优惠码预订" : "Book Online With Code"}</span>
+                  <i className="fa-solid fa-arrow-right"></i>
+                </Link>
+
+                {/* Social Quick Claim */}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.6rem" }}>
+                  <a 
+                    href={getSocialLineUrl(selectedPromo.code)}
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className={styles.socialClaimBtn}
+                    style={{ background: "rgba(0, 185, 0, 0.08)", color: "#00B900", border: "1px solid rgba(0, 185, 0, 0.2)", padding: "0.55rem" }}
+                  >
+                    <i className="fa-brands fa-line" style={{ fontSize: "1.1rem" }}></i>
+                    <span>LINE OA</span>
+                  </a>
+                  <a 
+                    href={getSocialWhatsappUrl(selectedPromo.code)}
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className={styles.socialClaimBtn}
+                    style={{ background: "rgba(37, 211, 102, 0.08)", color: "#25D366", border: "1px solid rgba(37, 211, 102, 0.2)", padding: "0.55rem" }}
+                  >
+                    <i className="fa-brands fa-whatsapp" style={{ fontSize: "1.1rem" }}></i>
+                    <span>WhatsApp</span>
+                  </a>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }

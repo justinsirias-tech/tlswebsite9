@@ -131,6 +131,30 @@ export default function AdminPartnersPage() {
     }
   };
 
+  const handleDeleteCode = async (codeId) => {
+    if (!selectedPartnerForCodes) return;
+    if (!window.confirm("Are you sure you want to delete this partner code?")) return;
+
+    try {
+      const res = await fetch(`/api/admin/partners/${selectedPartnerForCodes.id}/codes/${codeId}`, {
+        method: "DELETE"
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.error || "Failed to delete partner code.");
+        return;
+      }
+      if (data.message && data.message.includes("deactivated")) {
+        alert(data.message);
+      }
+      fetchPartnerCodes(selectedPartnerForCodes.id);
+      fetchPartners();
+    } catch (err) {
+      console.error("Failed to delete partner code:", err);
+      alert("Unable to connect to the server.");
+    }
+  };
+
   const handleSubmitCreateCode = async (e) => {
     e.preventDefault();
     if (!selectedPartnerForCodes) return;
@@ -1151,6 +1175,21 @@ export default function AdminPartnersPage() {
                                 }}
                               >
                                 Edit
+                              </button>
+                              <button
+                                onClick={() => handleDeleteCode(pc.id)}
+                                style={{
+                                  background: "#fef2f2",
+                                  border: "1px solid #fecaca",
+                                  color: "#991b1b",
+                                  padding: "0.3rem 0.6rem",
+                                  borderRadius: "6px",
+                                  fontSize: "0.75rem",
+                                  fontWeight: "700",
+                                  cursor: "pointer"
+                                }}
+                              >
+                                Delete
                               </button>
                             </div>
                           </td>

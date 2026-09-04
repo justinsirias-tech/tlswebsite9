@@ -615,12 +615,6 @@ export default function AdminPromoCodesPage() {
                       >
                         Edit
                       </button>
-                      <button 
-                        onClick={() => handleDelete(pc.id)}
-                        style={{ padding: "0.4rem 0.8rem", borderRadius: "6px", background: "#fef2f2", color: "#991b1b", border: "1px solid #fecaca", fontWeight: "600", cursor: "pointer", fontSize: "0.85rem" }}
-                      >
-                        Delete
-                      </button>
                     </div>
                   </td>
                 </tr>

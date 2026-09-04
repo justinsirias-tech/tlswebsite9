@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import styles from "../../admin.module.css";
 
 export default function AdminPromotionsPage() {
@@ -9,8 +9,11 @@ export default function AdminPromotionsPage() {
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [imageError, setImageError] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const fileInputRef = useRef(null);
 
   const initialForm = {
     title: "",
@@ -57,6 +60,8 @@ export default function AdminPromotionsPage() {
     setFormData(initialForm);
     setError("");
     setSuccess("");
+    setImageError("");
+    setUploadingImage(false);
     setShowModal(true);
   };
 
@@ -81,7 +86,49 @@ export default function AdminPromotionsPage() {
     });
     setError("");
     setSuccess("");
+    setImageError("");
+    setUploadingImage(false);
     setShowModal(true);
+  };
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      setImageError("Please select a valid image file (PNG, JPG, WEBP, etc.).");
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      setImageError("Image file size must be less than 10MB.");
+      return;
+    }
+
+    setUploadingImage(true);
+    setImageError("");
+
+    const data = new FormData();
+    data.append("file", file);
+
+    try {
+      const res = await fetch("/api/admin/upload", {
+        method: "POST",
+        body: data
+      });
+      const result = await res.json();
+      if (res.ok && result.url) {
+        setFormData(prev => ({ ...prev, imageUrl: result.url }));
+      } else {
+        setImageError(result.error || "Failed to upload image.");
+      }
+    } catch (err) {
+      console.error("Upload error:", err);
+      setImageError("An error occurred during image upload.");
+    } finally {
+      setUploadingImage(false);
+      if (e.target) e.target.value = "";
+    }
   };
 
   const handleToggleActive = async (id, currentStatus) => {
@@ -396,17 +443,164 @@ export default function AdminPromotionsPage() {
 
                 <div>
                   <label style={{ display: "block", color: "#222945", fontWeight: "600", fontSize: "0.9rem", marginBottom: "0.4rem" }}>
-                    Banner Image URL (Optional)
+                    Banner Image (Optional)
                   </label>
+
                   <input 
-                    type="text" 
-                    placeholder="https://..."
-                    value={formData.imageUrl}
-                    onChange={(e) => setFormData(prev => ({ ...prev, imageUrl: e.target.value }))}
-                    style={{ width: "100%", padding: "0.75rem", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#f8fafc", color: "#222945" }}
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleImageUpload}
+                    accept="image/*"
+                    style={{ display: "none" }}
                   />
+
+                  {formData.imageUrl ? (
+                    <div style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.75rem",
+                      padding: "0.5rem 0.75rem",
+                      border: "1px solid #cbd5e1",
+                      borderRadius: "8px",
+                      background: "#f8fafc"
+                    }}>
+                      <img 
+                        src={formData.imageUrl} 
+                        alt="Preview" 
+                        style={{ width: "42px", height: "42px", objectFit: "cover", borderRadius: "6px", border: "1px solid #e2e8f0", flexShrink: 0 }} 
+                      />
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: "0.8rem", color: "#166534", fontWeight: "700", display: "flex", alignItems: "center", gap: "0.3rem" }}>
+                          <i className="fa-solid fa-circle-check"></i> Image Uploaded
+                        </div>
+                        <div style={{ fontSize: "0.72rem", color: "#64748b", textOverflow: "ellipsis", overflow: "hidden", whiteSpace: "nowrap" }}>
+                          {formData.imageUrl}
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={uploadingImage}
+                        style={{
+                          padding: "0.3rem 0.6rem",
+                          borderRadius: "6px",
+                          border: "1px solid #cbd5e1",
+                          background: "#ffffff",
+                          fontSize: "0.75rem",
+                          fontWeight: "600",
+                          color: "#334155",
+                          cursor: "pointer"
+                        }}
+                      >
+                        Change
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setFormData(prev => ({ ...prev, imageUrl: "" }))}
+                        style={{
+                          padding: "0.3rem 0.6rem",
+                          borderRadius: "6px",
+                          border: "1px solid #fecaca",
+                          background: "#fef2f2",
+                          fontSize: "0.75rem",
+                          fontWeight: "600",
+                          color: "#991b1b",
+                          cursor: "pointer"
+                        }}
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ) : (
+                    <div>
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={uploadingImage}
+                        style={{
+                          width: "100%",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          gap: "0.5rem",
+                          padding: "0.7rem 1rem",
+                          borderRadius: "8px",
+                          border: "1px dashed #94a3b8",
+                          background: "#f8fafc",
+                          color: "#334155",
+                          fontWeight: "600",
+                          fontSize: "0.85rem",
+                          cursor: uploadingImage ? "not-allowed" : "pointer"
+                        }}
+                      >
+                        {uploadingImage ? (
+                          <>
+                            <i className="fa-solid fa-spinner fa-spin"></i>
+                            <span>Uploading image...</span>
+                          </>
+                        ) : (
+                          <>
+                            <i className="fa-solid fa-cloud-arrow-up" style={{ color: "#2563eb", fontSize: "1.1rem" }}></i>
+                            <span>Upload Image File</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Fallback direct URL input */}
+                  <div style={{ marginTop: "0.35rem" }}>
+                    <input 
+                      type="text" 
+                      placeholder="Or paste image URL (https://...)"
+                      value={formData.imageUrl}
+                      onChange={(e) => setFormData(prev => ({ ...prev, imageUrl: e.target.value }))}
+                      style={{ width: "100%", padding: "0.4rem 0.6rem", borderRadius: "6px", border: "1px solid #e2e8f0", background: "#ffffff", color: "#475569", fontSize: "0.75rem" }}
+                    />
+                  </div>
+
+                  {imageError && (
+                    <div style={{ color: "#dc2626", fontSize: "0.75rem", marginTop: "0.3rem" }}>
+                      {imageError}
+                    </div>
+                  )}
                 </div>
               </div>
+
+              {/* Live Banner Preview inside Modal */}
+              {formData.imageUrl && (
+                <div style={{
+                  position: "relative",
+                  borderRadius: "10px",
+                  overflow: "hidden",
+                  border: "1px solid #e2e8f0",
+                  background: "#f8fafc",
+                  maxHeight: "150px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center"
+                }}>
+                  <img 
+                    src={formData.imageUrl} 
+                    alt="Card Preview" 
+                    style={{ width: "100%", maxHeight: "150px", objectFit: "cover" }}
+                    onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                  />
+                  <div style={{
+                    position: "absolute",
+                    top: "0.5rem",
+                    right: "0.5rem",
+                    background: "rgba(0,0,0,0.65)",
+                    color: "white",
+                    padding: "0.2rem 0.55rem",
+                    borderRadius: "4px",
+                    fontSize: "0.7rem",
+                    fontWeight: "600"
+                  }}>
+                    Card Banner Preview
+                  </div>
+                </div>
+              )}
 
               <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginTop: "0.5rem" }}>
                 <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", cursor: "pointer", fontWeight: "600", color: "#222945" }}>
@@ -475,6 +669,13 @@ export default function AdminPromotionsPage() {
                 <tr key={promo.id} style={{ borderBottom: "1px solid #e2e8f0" }}>
                   <td style={{ padding: "1.25rem" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                      {promo.imageUrl && (
+                        <img 
+                          src={promo.imageUrl} 
+                          alt="" 
+                          style={{ width: "48px", height: "48px", objectFit: "cover", borderRadius: "8px", border: "1px solid #e2e8f0", flexShrink: 0 }}
+                        />
+                      )}
                       {promo.badge && (
                         <span style={{ background: "#222945", color: "#ffffff", fontWeight: "700", fontSize: "0.75rem", padding: "0.25rem 0.6rem", borderRadius: "6px", whiteSpace: "nowrap" }}>
                           {promo.badge}

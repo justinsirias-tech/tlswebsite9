@@ -11,7 +11,7 @@ async function verifyAdmin(request) {
     const token = request.cookies.get("adminToken")?.value;
     if (!token) return false;
     const { payload } = await jwtVerify(token, JWT_SECRET);
-    return payload && (payload.role === "SUPERADMIN" || payload.role === "EDITOR");
+    return payload && (payload.role === "SUPERADMIN" || payload.role === "ADMIN" || payload.role === "EDITOR" || payload.role === "staff");
   } catch (error) {
     return false;
   }
