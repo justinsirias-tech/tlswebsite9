@@ -4,76 +4,11 @@ import { useState } from "react";
 import Link from "next/link";
 import styles from "./page.module.css";
 
-const FALLBACK_PROMOTIONS = [
-  {
-    id: "welcome-15",
-    title: "First Order 15% Off",
-    title_th: "ส่วนลด 15% สำหรับการสั่งซักครั้งแรก",
-    title_cn: "首单预约 85 折优惠",
-    description: "Enjoy 15% off your very first laundry or dry cleaning booking in Bangkok & Pattaya.",
-    desc_th: "รับส่วนลดทันที 15% สำหรับบริการซักพับ ซักอบรีด หรือซักแห้งทุกประเภทในการสั่งครั้งแรก",
-    desc_cn: "首次在曼谷或芭堤雅预约洗衣与干洗服务，即可享受 15% 立减优惠。",
-    code: "TLSWELCOME15",
-    badge: "15% OFF",
-    badge_th: "ลด 15%",
-    badge_cn: "85折",
-    category: "welcome",
-    validUntil: "Valid through Sept 30, 2026"
-  },
-  {
-    id: "wash-fold-10",
-    title: "Wash & Fold 10kg Bonus",
-    title_th: "ซักพับ 10 กก. แถมฟรีกระเป๋าและบริการรีดผ้า",
-    title_cn: "水洗 10 公斤赠送精细熨烫",
-    description: "Book 10kg or more of wash & fold and get free complimentary shirt pressing and garment bag.",
-    desc_th: "เมื่อส่งซักพับครบ 10 กิโลกรัม รับฟรีกระเป๋าบรรจุผ้า premium และบริการอัดรีดเสื้อเชิ้ต",
-    desc_cn: "预约 10 公斤及以上水洗折叠服务，免费赠送衬衫熨烫与防尘洗护袋。",
-    code: "WASHRIDER10",
-    badge: "FREE BONUS",
-    badge_th: "แถมฟรี",
-    badge_cn: "免费赠送",
-    category: "monthly",
-    validUntil: "Valid through Oct 15, 2026"
-  },
-  {
-    id: "free-delivery-500",
-    title: "Free Delivery Over 500 THB",
-    title_th: "ฟรีค่าจัดส่ง เมื่อใช้บริการครบ 500 บาท",
-    title_cn: "满 500 泰铢免取送费",
-    description: "Get 100% free doorstep pickup & delivery for all hotel, condo, and home bookings over 500 THB.",
-    desc_th: "บริการรับ-ส่งผ้าฟรีถึงหน้าห้องคอนโดหรือโรงแรม เมื่อมียอดซักผ้าตั้งแต่ 500 บาทขึ้นไป",
-    desc_cn: "在曼谷与芭堤雅订单满 500 泰铢，即享公寓及酒店上门免费取送。",
-    code: "FREEDELIVERY",
-    badge: "FREE SHIPPING",
-    badge_th: "ส่งฟรี",
-    badge_cn: "免运费",
-    category: "monthly",
-    validUntil: "Ongoing Offer"
-  },
-  {
-    id: "express-same-day",
-    title: "Same-Day Express 20% Discount",
-    title_th: "บริการซักด่วนภายในวัน ลด 20%",
-    title_cn: "当日加急服务 20% 折扣",
-    description: "Need clothes cleaned fast for your flight or event? Get 20% off express turnaround fee.",
-    desc_th: "บริการซักด่วนพิเศษเสร็จภายในวันเดียว รับส่วนลดค่าบริการด่วน 20%",
-    desc_cn: "航班หรือ活动急需衣物？享受同日加急加快费用 20% 优惠。",
-    code: "EXPRESS20",
-    badge: "EXPRESS DEAL",
-    badge_th: "ซักด่วนพิเศษ",
-    badge_cn: "加急特惠",
-    category: "flash",
-    validUntil: "Limited Time Flash Deal"
-  }
-];
-
 export default function PromotionsClient({ locale, initialPromotions = [] }) {
   const [activeCategory, setActiveCategory] = useState("all");
   const [copiedCode, setCopiedCode] = useState(null);
 
-  const displayPromotions = (initialPromotions && initialPromotions.length > 0) 
-    ? initialPromotions 
-    : FALLBACK_PROMOTIONS;
+  const displayPromotions = Array.isArray(initialPromotions) ? initialPromotions : [];
 
   const handleCopyCode = (code) => {
     if (!code) return;
@@ -169,91 +104,128 @@ export default function PromotionsClient({ locale, initialPromotions = [] }) {
       </div>
 
       {/* Deals Grid */}
-      <div className={styles.dealsGrid}>
-        {filteredPromotions.map((promo) => {
-          const title = getLocalizedField(promo, "title");
-          const description = getLocalizedField(promo, "description");
-          const badge = getLocalizedField(promo, "badge") || promo.badge;
+      {filteredPromotions.length > 0 ? (
+        <div className={styles.dealsGrid}>
+          {filteredPromotions.map((promo) => {
+            const title = getLocalizedField(promo, "title");
+            const description = getLocalizedField(promo, "description");
+            const badge = getLocalizedField(promo, "badge") || promo.badge;
 
-          return (
-            <div key={promo.id} className={styles.dealCard}>
-              <div className={styles.cardHeader}>
-                <span className={styles.cardCategory}>{promo.category || "Monthly Deal"}</span>
-                {badge && <span className={styles.badge}>{badge}</span>}
-              </div>
-
-              <div className={styles.cardBody}>
-                <h3 className={styles.dealTitle}>{title}</h3>
-                <p className={styles.dealDesc}>{description}</p>
-
-                {promo.validUntil && (
-                  <div className={styles.validityTag}>
-                    <i className="fa-solid fa-clock"></i>
-                    <span>{promo.validUntil}</span>
-                  </div>
-                )}
-
-                {promo.code && (
-                  <div className={styles.codeBox}>
-                    <span className={styles.codeText}>{promo.code}</span>
-                    <button 
-                      onClick={() => handleCopyCode(promo.code)}
-                      className={`${styles.copyBtn} ${copiedCode === promo.code ? styles.copiedBtn : ""}`}
-                    >
-                      {copiedCode === promo.code ? (
-                        <>
-                          <i className="fa-solid fa-check" style={{ marginRight: "0.3rem" }}></i>
-                          {locale === "th" ? "คัดลอกแล้ว" : locale === "cn" ? "已复制" : "Copied!"}
-                        </>
-                      ) : (
-                        <>
-                          <i className="fa-regular fa-copy" style={{ marginRight: "0.3rem" }}></i>
-                          {locale === "th" ? "คัดลอกโค้ด" : locale === "cn" ? "复制优惠码" : "Copy Code"}
-                        </>
-                      )}
-                    </button>
-                  </div>
-                )}
-
-                {/* Primary Booking Link */}
-                <Link 
-                  href={`/${locale}/booking${promo.code ? `?promo=${promo.code}` : ""}`}
-                  className={styles.bookBtn}
-                  style={{ marginBottom: "0.75rem" }}
-                >
-                  <span>{locale === "th" ? "จองทางเว็บพร้อมโค้ดนี้" : locale === "cn" ? "官网使用优惠码预订" : "Book Online With Code"}</span>
-                  <i className="fa-solid fa-arrow-right"></i>
-                </Link>
-
-                {/* Social Media Quick Claim Row */}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem" }}>
-                  <a 
-                    href={getSocialLineUrl(promo.code)}
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className={styles.socialClaimBtn}
-                    style={{ background: "rgba(0, 185, 0, 0.08)", color: "#00B900", border: "1px solid rgba(0, 185, 0, 0.2)" }}
-                  >
-                    <i className="fa-brands fa-line" style={{ fontSize: "1.05rem" }}></i>
-                    <span>LINE OA</span>
-                  </a>
-                  <a 
-                    href={getSocialWhatsappUrl(promo.code)}
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className={styles.socialClaimBtn}
-                    style={{ background: "rgba(37, 211, 102, 0.08)", color: "#25D366", border: "1px solid rgba(37, 211, 102, 0.2)" }}
-                  >
-                    <i className="fa-brands fa-whatsapp" style={{ fontSize: "1.05rem" }}></i>
-                    <span>WhatsApp</span>
-                  </a>
+            return (
+              <div key={promo.id} className={styles.dealCard}>
+                <div className={styles.cardHeader}>
+                  <span className={styles.cardCategory}>{promo.category || "Monthly Deal"}</span>
+                  {badge && <span className={styles.badge}>{badge}</span>}
                 </div>
 
+                <div className={styles.cardBody}>
+                  <h3 className={styles.dealTitle}>{title}</h3>
+                  <p className={styles.dealDesc}>{description}</p>
+
+                  {promo.validUntil && (
+                    <div className={styles.validityTag}>
+                      <i className="fa-solid fa-clock"></i>
+                      <span>{promo.validUntil}</span>
+                    </div>
+                  )}
+
+                  {promo.code && (
+                    <div className={styles.codeBox}>
+                      <span className={styles.codeText}>{promo.code}</span>
+                      <button 
+                        onClick={() => handleCopyCode(promo.code)}
+                        className={`${styles.copyBtn} ${copiedCode === promo.code ? styles.copiedBtn : ""}`}
+                      >
+                        {copiedCode === promo.code ? (
+                          <>
+                            <i className="fa-solid fa-check" style={{ marginRight: "0.3rem" }}></i>
+                            {locale === "th" ? "คัดลอกแล้ว" : locale === "cn" ? "已复制" : "Copied!"}
+                          </>
+                        ) : (
+                          <>
+                            <i className="fa-regular fa-copy" style={{ marginRight: "0.3rem" }}></i>
+                            {locale === "th" ? "คัดลอกโค้ด" : locale === "cn" ? "复制优惠码" : "Copy Code"}
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Primary Booking Link */}
+                  <Link 
+                    href={`/${locale}/booking${promo.code ? `?promo=${promo.code}` : ""}`}
+                    className={styles.bookBtn}
+                    style={{ marginBottom: "0.75rem" }}
+                  >
+                    <span>{locale === "th" ? "จองทางเว็บพร้อมโค้ดนี้" : locale === "cn" ? "官网使用优惠码预订" : "Book Online With Code"}</span>
+                    <i className="fa-solid fa-arrow-right"></i>
+                  </Link>
+
+                  {/* Social Media Quick Claim Row */}
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem" }}>
+                    <a 
+                      href={getSocialLineUrl(promo.code)}
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className={styles.socialClaimBtn}
+                      style={{ background: "rgba(0, 185, 0, 0.08)", color: "#00B900", border: "1px solid rgba(0, 185, 0, 0.2)" }}
+                    >
+                      <i className="fa-brands fa-line" style={{ fontSize: "1.05rem" }}></i>
+                      <span>LINE OA</span>
+                    </a>
+                    <a 
+                      href={getSocialWhatsappUrl(promo.code)}
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className={styles.socialClaimBtn}
+                      style={{ background: "rgba(37, 211, 102, 0.08)", color: "#25D366", border: "1px solid rgba(37, 211, 102, 0.2)" }}
+                    >
+                      <i className="fa-brands fa-whatsapp" style={{ fontSize: "1.05rem" }}></i>
+                      <span>WhatsApp</span>
+                    </a>
+                  </div>
+
+                </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      ) : (
+        <div style={{
+          textAlign: "center",
+          padding: "4rem 2rem",
+          background: "#ffffff",
+          borderRadius: "16px",
+          border: "1px dashed #cbd5e1",
+          margin: "1rem 0"
+        }}>
+          <div style={{ fontSize: "2.5rem", marginBottom: "0.75rem", color: "#94a3b8" }}>
+            <i className="fa-solid fa-tags"></i>
+          </div>
+          <h4 style={{ fontSize: "1.25rem", fontWeight: "700", color: "#334155", marginBottom: "0.5rem" }}>
+            {displayPromotions.length === 0
+              ? (locale === "th" ? "ยังไม่มีโปรโมชั่นที่เปิดใช้งานในขณะนี้" : locale === "cn" ? "暂无正在进行的优惠活动" : "No active promotions at this time")
+              : (locale === "th" ? "ไม่พบโปรโมชั่นในหมวดหมู่นี้" : locale === "cn" ? "该分类下暂无优惠活动" : "No promotions found in this category")}
+          </h4>
+          <p style={{ color: "#64748b", fontSize: "0.95rem", maxWidth: "480px", margin: "0 auto 1.5rem", lineHeight: "1.6" }}>
+            {displayPromotions.length === 0
+              ? (locale === "th" 
+                  ? "โปรดติดตามโปรโมชั่นและข้อเสนอพิเศษใหม่ๆ ได้ในเร็วๆ นี้ หรือสอบถามเจ้าหน้าที่ทาง LINE หรือ WhatsApp ได้ตลอดเวลา"
+                  : locale === "cn"
+                    ? "最新优惠活动即将推出，敬请期待！您也可随时通过 LINE 或 WhatsApp 联系客服咨询。"
+                    : "Check back soon for new special deals, or contact our friendly team via LINE or WhatsApp anytime.")
+              : (locale === "th"
+                  ? "ลองเลือกหมวดหมู่อื่นเพื่อดูโปรโมชั่นที่กำลังเปิดใช้งาน"
+                  : locale === "cn"
+                    ? "请尝试选择其他分类查看正在进行的优惠活动。"
+                    : "Try selecting another category to see currently active offers.")}
+          </p>
+          <Link href={`/${locale}/booking`} className="btn btn-primary" style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", padding: "0.75rem 1.75rem", fontWeight: "700" }}>
+            <span>{locale === "th" ? "จองบริการซักผ้า" : locale === "cn" ? "立即预约洗衣" : "Book Laundry Service"}</span>
+            <i className="fa-solid fa-arrow-right"></i>
+          </Link>
+        </div>
+      )}
     </div>
   );
 }
