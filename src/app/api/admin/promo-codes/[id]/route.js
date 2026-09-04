@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { jwtVerify } from "jose";
 import prisma from "../../../../../lib/prisma";
+import { parseDateInput } from "../../../../../lib/dateUtils";
 
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || "tls-secret-key-2026");
 
@@ -36,8 +37,8 @@ export async function PUT(request, { params }) {
     if (data.maxDiscount !== undefined) updateData.maxDiscount = data.maxDiscount ? parseFloat(data.maxDiscount) : null;
     if (data.usageLimit !== undefined) updateData.usageLimit = data.usageLimit ? parseInt(data.usageLimit) : null;
     if (data.usedCount !== undefined) updateData.usedCount = parseInt(data.usedCount);
-    if (data.startDate !== undefined) updateData.startDate = data.startDate ? new Date(data.startDate) : null;
-    if (data.endDate !== undefined) updateData.endDate = data.endDate ? new Date(data.endDate) : null;
+    if (data.startDate !== undefined) updateData.startDate = parseDateInput(data.startDate);
+    if (data.endDate !== undefined) updateData.endDate = parseDateInput(data.endDate);
     if (data.expiryDate !== undefined) updateData.expiryDate = data.expiryDate || null;
     if (data.isActive !== undefined) updateData.isActive = Boolean(data.isActive);
     if (data.description !== undefined) updateData.description = data.description || null;

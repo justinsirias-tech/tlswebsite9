@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { toInputDateTime, toISOStringOrNull } from "@/lib/dateUtils";
 
 export default function AdminPartnersPage() {
   const [activeTab, setActiveTab] = useState("accounts"); // "accounts" | "sales"
@@ -46,14 +47,6 @@ export default function AdminPartnersPage() {
   const [codeFormError, setCodeFormError] = useState("");
   const [isCodeSubmitting, setIsCodeSubmitting] = useState(false);
 
-  const toInputDateTime = (dateVal) => {
-    if (!dateVal) return "";
-    const d = new Date(dateVal);
-    if (isNaN(d.getTime())) return "";
-    const pad = (n) => String(n).padStart(2, "0");
-    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-  };
-
   const getCodeStatus = (pc) => {
     if (!pc.isActive) {
       return { label: "Disabled", color: "#64748b", bg: "#f1f5f9", border: "#cbd5e1" };
@@ -73,8 +66,8 @@ export default function AdminPartnersPage() {
       return "Always Active (No limits)";
     }
     const formatOpt = { dateStyle: "medium", timeStyle: "short" };
-    const startStr = pc.startDate ? new Date(pc.startDate).toLocaleString("th-TH", formatOpt) : "Now";
-    const endStr = pc.endDate ? new Date(pc.endDate).toLocaleString("th-TH", formatOpt) : "Ongoing";
+    const startStr = pc.startDate ? new Date(pc.startDate).toLocaleString("en-US", formatOpt) : "Now";
+    const endStr = pc.endDate ? new Date(pc.endDate).toLocaleString("en-US", formatOpt) : "Ongoing";
     return `${startStr} → ${endStr}`;
   };
 
@@ -146,15 +139,21 @@ export default function AdminPartnersPage() {
     setIsCodeSubmitting(true);
 
     try {
+      const payload = {
+        ...codeFormData,
+        startDate: toISOStringOrNull(codeFormData.startDate),
+        endDate: toISOStringOrNull(codeFormData.endDate)
+      };
+
       const res = await fetch(`/api/admin/partners/${selectedPartnerForCodes.id}/codes`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(codeFormData)
+        body: JSON.stringify(payload)
       });
 
       const data = await res.json();
       if (!res.ok) {
-        setCodeFormError(data.error || "เกิดข้อผิดพลาดในการสร้างโค้ด");
+        setCodeFormError(data.error || "An error occurred while creating the promo code.");
         return;
       }
 
@@ -162,7 +161,7 @@ export default function AdminPartnersPage() {
       fetchPartnerCodes(selectedPartnerForCodes.id);
       fetchPartners();
     } catch (err) {
-      setCodeFormError("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้");
+      setCodeFormError("Unable to connect to the server.");
     } finally {
       setIsCodeSubmitting(false);
     }
@@ -175,15 +174,21 @@ export default function AdminPartnersPage() {
     setIsCodeSubmitting(true);
 
     try {
+      const payload = {
+        ...codeFormData,
+        startDate: toISOStringOrNull(codeFormData.startDate),
+        endDate: toISOStringOrNull(codeFormData.endDate)
+      };
+
       const res = await fetch(`/api/admin/promo-codes/${editingCode.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(codeFormData)
+        body: JSON.stringify(payload)
       });
 
       const data = await res.json();
       if (!res.ok) {
-        setCodeFormError(data.error || "เกิดข้อผิดพลาดในการแก้ไขโค้ด");
+        setCodeFormError(data.error || "An error occurred while updating the promo code.");
         return;
       }
 
@@ -192,7 +197,7 @@ export default function AdminPartnersPage() {
       if (selectedPartnerForCodes) fetchPartnerCodes(selectedPartnerForCodes.id);
       fetchPartners();
     } catch (err) {
-      setCodeFormError("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้");
+      setCodeFormError("Unable to connect to the server.");
     } finally {
       setIsCodeSubmitting(false);
     }
@@ -308,14 +313,14 @@ export default function AdminPartnersPage() {
 
       const data = await res.json();
       if (!res.ok) {
-        setFormError(data.error || "เกิดข้อผิดพลาดในการสร้าง Partner");
+        setFormError(data.error || "An error occurred while creating the partner account.");
         return;
       }
 
       setIsCreateModalOpen(false);
       fetchPartners();
     } catch (err) {
-      setFormError("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้");
+      setFormError("Unable to connect to the server.");
     } finally {
       setIsSubmitting(false);
     }
@@ -339,7 +344,7 @@ export default function AdminPartnersPage() {
 
       const data = await res.json();
       if (!res.ok) {
-        setFormError(data.error || "เกิดข้อผิดพลาดในการแก้ไข Partner");
+        setFormError(data.error || "An error occurred while updating the partner account.");
         return;
       }
 
@@ -347,7 +352,7 @@ export default function AdminPartnersPage() {
       setEditingPartner(null);
       fetchPartners();
     } catch (err) {
-      setFormError("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้");
+      setFormError("Unable to connect to the server.");
     } finally {
       setIsSubmitting(false);
     }
@@ -362,7 +367,7 @@ export default function AdminPartnersPage() {
             Partners & Sales Management
           </h1>
           <p style={{ color: "#64748b", margin: "0.25rem 0 0 0", fontSize: "0.95rem" }}>
-            จัดการบัญชีพาร์ทเนอร์และตรวจสอบรายงานยอดขายรวมทุก Partner
+            Manage partner accounts and monitor aggregated sales across all partners
           </p>
         </div>
 
@@ -385,7 +390,7 @@ export default function AdminPartnersPage() {
             }}
           >
             <i className="fa-solid fa-plus"></i>
-            <span>สร้าง Partner Account</span>
+            <span>Create Partner Account</span>
           </button>
         )}
       </div>
@@ -429,7 +434,7 @@ export default function AdminPartnersPage() {
           }}
         >
           <i className="fa-solid fa-receipt"></i>
-          <span>All Partner Sales (ยอดขายรวม)</span>
+          <span>All Partner Sales</span>
         </button>
       </div>
 
@@ -439,18 +444,18 @@ export default function AdminPartnersPage() {
           {loadingPartners ? (
             <div style={{ padding: "3rem", textAlign: "center", color: "#64748b" }}>
               <i className="fa-solid fa-spinner fa-spin" style={{ fontSize: "2rem", marginBottom: "0.8rem" }}></i>
-              <div>กำลังโหลดรายชื่อพาร์ทเนอร์...</div>
+              <div>Loading partner accounts...</div>
             </div>
           ) : partners.length === 0 ? (
             <div style={{ padding: "4rem 2rem", textAlign: "center", color: "#94a3b8" }}>
               <i className="fa-solid fa-handshake" style={{ fontSize: "3rem", marginBottom: "1rem", opacity: 0.5 }}></i>
-              <h3 style={{ fontSize: "1.2rem", color: "#475569", margin: "0 0 0.5rem 0" }}>ยังไม่มีบัญชีพาร์ทเนอร์ในระบบ</h3>
-              <p style={{ margin: "0 0 1.5rem 0", fontSize: "0.9rem" }}>คลิกปุ่มด้านล่างเพื่อสร้างบัญชีแรกให้กับพาร์ทเนอร์</p>
+              <h3 style={{ fontSize: "1.2rem", color: "#475569", margin: "0 0 0.5rem 0" }}>No partner accounts found</h3>
+              <p style={{ margin: "0 0 1.5rem 0", fontSize: "0.9rem" }}>Click the button below to create the first partner account</p>
               <button
                 onClick={handleOpenCreate}
                 style={{ background: "#222945", color: "#ffffff", border: "none", padding: "0.6rem 1.2rem", borderRadius: "8px", fontWeight: "700", cursor: "pointer" }}
               >
-                + สร้าง Partner Account
+                + Create Partner Account
               </button>
             </div>
           ) : (
@@ -458,13 +463,13 @@ export default function AdminPartnersPage() {
               <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.9rem" }}>
                 <thead>
                   <tr style={{ background: "#f8fafc", borderBottom: "1px solid #e2e8f0", color: "#475569", fontSize: "0.8rem", textTransform: "uppercase", letterSpacing: "0.5px" }}>
-                    <th style={{ padding: "1rem 1.25rem", textAlign: "left" }}>พาร์ทเนอร์ / บริษัท</th>
-                    <th style={{ padding: "1rem 1.25rem", textAlign: "left" }}>ผู้ติดต่อ & ข้อมูลติดต่อ</th>
-                    <th style={{ padding: "1rem 1.25rem", textAlign: "center" }}>จำนวนโค้ด</th>
-                    <th style={{ padding: "1rem 1.25rem", textAlign: "center" }}>รายการขาย</th>
-                    <th style={{ padding: "1rem 1.25rem", textAlign: "right" }}>ยอดขายรวม (THB)</th>
-                    <th style={{ padding: "1rem 1.25rem", textAlign: "center" }}>สถานะ</th>
-                    <th style={{ padding: "1rem 1.25rem", textAlign: "right" }}>จัดการ</th>
+                    <th style={{ padding: "1rem 1.25rem", textAlign: "left" }}>Partner / Company</th>
+                    <th style={{ padding: "1rem 1.25rem", textAlign: "left" }}>Contact Info</th>
+                    <th style={{ padding: "1rem 1.25rem", textAlign: "center" }}>Promo Codes</th>
+                    <th style={{ padding: "1rem 1.25rem", textAlign: "center" }}>Sales Orders</th>
+                    <th style={{ padding: "1rem 1.25rem", textAlign: "right" }}>Total Revenue (THB)</th>
+                    <th style={{ padding: "1rem 1.25rem", textAlign: "center" }}>Status</th>
+                    <th style={{ padding: "1rem 1.25rem", textAlign: "right" }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -492,7 +497,7 @@ export default function AdminPartnersPage() {
                       <td style={{ padding: "1.1rem 1.25rem", textAlign: "center" }}>
                         <button
                           onClick={() => handleOpenCodesModal(p)}
-                          title="คลิกเพื่อดูและจัดการโค้ดของพาร์ทเนอร์เจ้านี้"
+                          title="Click to view and manage promo codes for this partner"
                           style={{
                             background: "#f0f9ff",
                             color: "#0284c7",
@@ -508,12 +513,12 @@ export default function AdminPartnersPage() {
                           }}
                         >
                           <i className="fa-solid fa-ticket"></i>
-                          <span>{p._count?.codes ?? 0} โค้ด (จัดการ)</span>
+                          <span>{p._count?.codes ?? 0} Codes (Manage)</span>
                         </button>
                       </td>
 
                       <td style={{ padding: "1.1rem 1.25rem", textAlign: "center", fontWeight: "700", color: "#475569" }}>
-                        {p._count?.sales ?? 0} รายการ
+                        {p._count?.sales ?? 0} orders
                       </td>
 
                       <td style={{ padding: "1.1rem 1.25rem", textAlign: "right", fontWeight: "900", color: "#166534", fontSize: "1.05rem" }}>
@@ -557,7 +562,7 @@ export default function AdminPartnersPage() {
                             }}
                           >
                             <i className="fa-solid fa-ticket"></i>
-                            <span>จัดการโค้ด</span>
+                            <span>Manage Codes</span>
                           </button>
                           <button
                             onClick={() => handleOpenEdit(p)}
@@ -572,7 +577,7 @@ export default function AdminPartnersPage() {
                               cursor: "pointer"
                             }}
                           >
-                            แก้ไข
+                            Edit
                           </button>
                         </div>
                       </td>
@@ -608,7 +613,7 @@ export default function AdminPartnersPage() {
                 onChange={(e) => setFilterPartnerId(e.target.value)}
                 style={{ padding: "0.5rem 0.85rem", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#ffffff", fontWeight: "600", color: "#334155" }}
               >
-                <option value="">พาร์ทเนอร์ทั้งหมด (All Partners)</option>
+                <option value="">All Partners</option>
                 {partners.map((p) => (
                   <option key={p.id} value={p.id}>{p.companyName}</option>
                 ))}
@@ -617,10 +622,10 @@ export default function AdminPartnersPage() {
               {/* Period Tabs */}
               <div style={{ display: "flex", background: "#f1f5f9", padding: "0.25rem", borderRadius: "10px" }}>
                 {[
-                  { id: "all", label: "ทั้งหมด" },
-                  { id: "today", label: "วันนี้" },
-                  { id: "month", label: "เดือนนี้" },
-                  { id: "year", label: "ปีนี้" },
+                  { id: "all", label: "All" },
+                  { id: "today", label: "Today" },
+                  { id: "month", label: "This Month" },
+                  { id: "year", label: "This Year" },
                 ].map((t) => (
                   <button
                     key={t.id}
@@ -646,13 +651,13 @@ export default function AdminPartnersPage() {
             {/* Sales Metric */}
             <div style={{ display: "flex", gap: "1.5rem", alignItems: "center" }}>
               <div>
-                <span style={{ fontSize: "0.8rem", color: "#64748b", fontWeight: "600" }}>ยอดรวมทั้งหมด: </span>
+                <span style={{ fontSize: "0.8rem", color: "#64748b", fontWeight: "600" }}>Total Revenue: </span>
                 <span style={{ fontSize: "1.25rem", fontWeight: "900", color: "#166534" }}>
                   ฿{salesSummary.totalRevenue.toLocaleString("en-US", { minimumFractionDigits: 2 })}
                 </span>
               </div>
               <div>
-                <span style={{ fontSize: "0.8rem", color: "#64748b", fontWeight: "600" }}>จำนวนรายการ: </span>
+                <span style={{ fontSize: "0.8rem", color: "#64748b", fontWeight: "600" }}>Total Orders: </span>
                 <span style={{ fontSize: "1.1rem", fontWeight: "800", color: "#0f172a" }}>{salesSummary.count}</span>
               </div>
             </div>
@@ -663,32 +668,32 @@ export default function AdminPartnersPage() {
             {loadingSales ? (
               <div style={{ padding: "3rem", textAlign: "center", color: "#64748b" }}>
                 <i className="fa-solid fa-spinner fa-spin" style={{ fontSize: "2rem", marginBottom: "0.8rem" }}></i>
-                <div>กำลังโหลดข้อมูลรายการขายรวม...</div>
+                <div>Loading partner sales data...</div>
               </div>
             ) : sales.length === 0 ? (
               <div style={{ padding: "4rem 2rem", textAlign: "center", color: "#94a3b8" }}>
                 <i className="fa-solid fa-receipt" style={{ fontSize: "3rem", marginBottom: "1rem", opacity: 0.5 }}></i>
-                <div style={{ fontSize: "1.1rem", color: "#475569" }}>ยังไม่พบรายการขายตามเงื่อนไขที่เลือก</div>
+                <div style={{ fontSize: "1.1rem", color: "#475569" }}>No sales found for the selected filter</div>
               </div>
             ) : (
               <div style={{ overflowX: "auto" }}>
                 <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.9rem" }}>
                   <thead>
                     <tr style={{ background: "#f8fafc", borderBottom: "1px solid #e2e8f0", color: "#475569", fontSize: "0.8rem", textTransform: "uppercase" }}>
-                      <th style={{ padding: "1rem 1.25rem", textAlign: "left" }}>วัน-เวลา</th>
-                      <th style={{ padding: "1rem 1.25rem", textAlign: "left" }}>พาร์ทเนอร์</th>
-                      <th style={{ padding: "1rem 1.25rem", textAlign: "left" }}>โค้ดโปรโมชั่น</th>
-                      <th style={{ padding: "1rem 1.25rem", textAlign: "left" }}>ลูกค้า</th>
-                      <th style={{ padding: "1rem 1.25rem", textAlign: "left" }}>เบอร์โทร</th>
-                      <th style={{ padding: "1rem 1.25rem", textAlign: "right" }}>ราคาขาย (THB)</th>
-                      <th style={{ padding: "1rem 1.25rem", textAlign: "left" }}>หมายเหตุ</th>
+                      <th style={{ padding: "1rem 1.25rem", textAlign: "left" }}>Date & Time</th>
+                      <th style={{ padding: "1rem 1.25rem", textAlign: "left" }}>Partner</th>
+                      <th style={{ padding: "1rem 1.25rem", textAlign: "left" }}>Promo Code</th>
+                      <th style={{ padding: "1rem 1.25rem", textAlign: "left" }}>Customer Name</th>
+                      <th style={{ padding: "1rem 1.25rem", textAlign: "left" }}>Phone Number</th>
+                      <th style={{ padding: "1rem 1.25rem", textAlign: "right" }}>Sale Price (THB)</th>
+                      <th style={{ padding: "1rem 1.25rem", textAlign: "left" }}>Note</th>
                     </tr>
                   </thead>
                   <tbody>
                     {sales.map((s) => (
                       <tr key={s.id} style={{ borderBottom: "1px solid #f1f5f9" }}>
                         <td style={{ padding: "1rem 1.25rem", color: "#64748b", fontSize: "0.85rem", whiteSpace: "nowrap" }}>
-                          {new Date(s.createdAt).toLocaleString("th-TH", { dateStyle: "medium", timeStyle: "short" })}
+                          {new Date(s.createdAt).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" })}
                         </td>
                         <td style={{ padding: "1rem 1.25rem", fontWeight: "700", color: "#0f172a" }}>
                           {s.partner?.companyName}
@@ -726,7 +731,7 @@ export default function AdminPartnersPage() {
           <div style={{ background: "#ffffff", borderRadius: "20px", width: "100%", maxWidth: "520px", padding: "2rem", boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
               <h2 style={{ fontSize: "1.3rem", fontWeight: "800", color: "#0f172a", margin: 0 }}>
-                สร้างบัญชีพาร์ทเนอร์ใหม่
+                Create Partner Account
               </h2>
               <button onClick={() => setIsCreateModalOpen(false)} style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer", fontSize: "1.2rem" }}>
                 ✕
@@ -742,11 +747,11 @@ export default function AdminPartnersPage() {
             <form onSubmit={handleSubmitCreate} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
               <div>
                 <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
-                  ชื่อบริษัท / ร้านค้าพาร์ทเนอร์ *
+                  Company / Business Name *
                 </label>
                 <input
                   type="text"
-                  placeholder="เช่น โรงแรม Grand Hotel หรือ คอนโด Luxury Ville"
+                  placeholder="e.g. Grand Hotel or Luxury Residence"
                   value={formData.companyName}
                   onChange={(e) => setFormData(prev => ({ ...prev, companyName: e.target.value }))}
                   required
@@ -756,11 +761,11 @@ export default function AdminPartnersPage() {
 
               <div>
                 <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
-                  ชื่อผู้ติดต่อ *
+                  Contact Person Name *
                 </label>
                 <input
                   type="text"
-                  placeholder="เช่น คุณวิชัย ผู้จัดการฝ่ายบริการ"
+                  placeholder="e.g. John Doe, Operations Manager"
                   value={formData.contactName}
                   onChange={(e) => setFormData(prev => ({ ...prev, contactName: e.target.value }))}
                   required
@@ -770,7 +775,7 @@ export default function AdminPartnersPage() {
 
               <div>
                 <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
-                  อีเมลสำหรับเข้าสู่ระบบ *
+                  Login Email *
                 </label>
                 <input
                   type="email"
@@ -784,7 +789,7 @@ export default function AdminPartnersPage() {
 
               <div>
                 <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
-                  รหัสผ่านเริ่มต้น (อย่างน้อย 6 ตัวอักษร) *
+                  Initial Password (min. 6 characters) *
                 </label>
                 <input
                   type="password"
@@ -798,11 +803,11 @@ export default function AdminPartnersPage() {
 
               <div>
                 <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
-                  เบอร์โทรศัพท์ผู้ติดต่อ
+                  Phone Number
                 </label>
                 <input
                   type="tel"
-                  placeholder="เช่น 02-123-4567 หรือ 081-xxx-xxxx"
+                  placeholder="e.g. 081-234-5678"
                   value={formData.phone}
                   onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
                   style={{ width: "100%", padding: "0.75rem", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#f8fafc", boxSizing: "border-box" }}
@@ -811,11 +816,11 @@ export default function AdminPartnersPage() {
 
               <div>
                 <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
-                  บันทึกเพิ่มเติม (Note)
+                  Notes / Remarks
                 </label>
                 <input
                   type="text"
-                  placeholder="เช่น โครงการความร่วมมือปี 2026"
+                  placeholder="e.g. Partnership project 2026"
                   value={formData.note}
                   onChange={(e) => setFormData(prev => ({ ...prev, note: e.target.value }))}
                   style={{ width: "100%", padding: "0.75rem", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#f8fafc", boxSizing: "border-box" }}
@@ -828,14 +833,14 @@ export default function AdminPartnersPage() {
                   onClick={() => setIsCreateModalOpen(false)}
                   style={{ padding: "0.75rem 1.25rem", borderRadius: "8px", background: "#f1f5f9", border: "1px solid #cbd5e1", color: "#475569", fontWeight: "700", cursor: "pointer" }}
                 >
-                  ยกเลิก
+                  Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
                   style={{ padding: "0.75rem 1.5rem", borderRadius: "8px", background: "#222945", border: "none", color: "#ffffff", fontWeight: "700", cursor: "pointer", opacity: isSubmitting ? 0.7 : 1 }}
                 >
-                  {isSubmitting ? "กำลังสร้าง..." : "สร้างบัญชี"}
+                  {isSubmitting ? "Creating..." : "Create Account"}
                 </button>
               </div>
             </form>
@@ -849,7 +854,7 @@ export default function AdminPartnersPage() {
           <div style={{ background: "#ffffff", borderRadius: "20px", width: "100%", maxWidth: "520px", padding: "2rem", boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
               <h2 style={{ fontSize: "1.3rem", fontWeight: "800", color: "#0f172a", margin: 0 }}>
-                แก้ไขข้อมูล: {editingPartner?.companyName}
+                Edit Partner: {editingPartner?.companyName}
               </h2>
               <button onClick={() => setIsEditModalOpen(false)} style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer", fontSize: "1.2rem" }}>
                 ✕
@@ -865,7 +870,7 @@ export default function AdminPartnersPage() {
             <form onSubmit={handleSubmitEdit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
               <div>
                 <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
-                  ชื่อบริษัท / ร้านค้าพาร์ทเนอร์ *
+                  Company / Business Name *
                 </label>
                 <input
                   type="text"
@@ -878,7 +883,7 @@ export default function AdminPartnersPage() {
 
               <div>
                 <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
-                  ชื่อผู้ติดต่อ *
+                  Contact Person Name *
                 </label>
                 <input
                   type="text"
@@ -891,7 +896,7 @@ export default function AdminPartnersPage() {
 
               <div>
                 <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
-                  อีเมล *
+                  Email *
                 </label>
                 <input
                   type="email"
@@ -904,11 +909,11 @@ export default function AdminPartnersPage() {
 
               <div>
                 <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
-                  เปลี่ยนรหัสผ่านใหม่ (เว้นว่างหากไม่ต้องการเปลี่ยน)
+                  New Password (leave blank to keep current)
                 </label>
                 <input
                   type="password"
-                  placeholder="กรอกรหัสผ่านใหม่หากต้องการรีเซ็ต"
+                  placeholder="Enter new password to reset"
                   value={formData.password}
                   onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
                   style={{ width: "100%", padding: "0.75rem", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#f8fafc", boxSizing: "border-box" }}
@@ -917,7 +922,7 @@ export default function AdminPartnersPage() {
 
               <div>
                 <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
-                  เบอร์โทรศัพท์ผู้ติดต่อ
+                  Phone Number
                 </label>
                 <input
                   type="tel"
@@ -929,7 +934,7 @@ export default function AdminPartnersPage() {
 
               <div>
                 <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
-                  บันทึกเพิ่มเติม (Note)
+                  Notes / Remarks
                 </label>
                 <input
                   type="text"
@@ -947,7 +952,7 @@ export default function AdminPartnersPage() {
                   onChange={(e) => setFormData(prev => ({ ...prev, isActive: e.target.checked }))}
                 />
                 <label htmlFor="adminPartnerActive" style={{ fontSize: "0.9rem", fontWeight: "700", color: "#334155", cursor: "pointer" }}>
-                  เปิดใช้งานบัญชีนี้ (Active)
+                  Account Active
                 </label>
               </div>
 
@@ -957,14 +962,14 @@ export default function AdminPartnersPage() {
                   onClick={() => setIsEditModalOpen(false)}
                   style={{ padding: "0.75rem 1.25rem", borderRadius: "8px", background: "#f1f5f9", border: "1px solid #cbd5e1", color: "#475569", fontWeight: "700", cursor: "pointer" }}
                 >
-                  ยกเลิก
+                  Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
                   style={{ padding: "0.75rem 1.5rem", borderRadius: "8px", background: "#222945", border: "none", color: "#ffffff", fontWeight: "700", cursor: "pointer", opacity: isSubmitting ? 0.7 : 1 }}
                 >
-                  {isSubmitting ? "กำลังบันทึก..." : "บันทึกข้อมูล"}
+                  {isSubmitting ? "Saving..." : "Save Changes"}
                 </button>
               </div>
             </form>
@@ -987,7 +992,7 @@ export default function AdminPartnersPage() {
                   </h2>
                 </div>
                 <p style={{ margin: "0.25rem 0 0 0", fontSize: "0.85rem", color: "#64748b" }}>
-                  ผู้ติดต่อ: {selectedPartnerForCodes.contactName} ({selectedPartnerForCodes.email})
+                  Contact: {selectedPartnerForCodes.contactName} ({selectedPartnerForCodes.email})
                 </p>
               </div>
 
@@ -1010,7 +1015,7 @@ export default function AdminPartnersPage() {
                   }}
                 >
                   <i className="fa-solid fa-plus"></i>
-                  <span>สร้าง Code ให้ Partner เจ้านี้</span>
+                  <span>Create Code for Partner</span>
                 </button>
 
                 <button
@@ -1027,13 +1032,13 @@ export default function AdminPartnersPage() {
               {loadingPartnerCodes ? (
                 <div style={{ textAlign: "center", padding: "3rem 0", color: "#64748b" }}>
                   <i className="fa-solid fa-spinner fa-spin" style={{ fontSize: "1.8rem", marginBottom: "0.8rem" }}></i>
-                  <div>กำลังโหลดโค้ดของพาร์ทเนอร์...</div>
+                  <div>Loading partner codes...</div>
                 </div>
               ) : partnerCodes.length === 0 ? (
                 <div style={{ textAlign: "center", padding: "3rem 1rem", color: "#94a3b8" }}>
                   <i className="fa-solid fa-ticket" style={{ fontSize: "2.5rem", marginBottom: "0.8rem", opacity: 0.5 }}></i>
-                  <h3 style={{ fontSize: "1.1rem", color: "#475569", margin: "0 0 0.4rem 0" }}>ยังไม่มีโค้ดโปรโมชั่นสำหรับ Partner เจ้านี้</h3>
-                  <p style={{ fontSize: "0.85rem", margin: "0 0 1.25rem 0" }}>คลิกปุ่มด้านล่างเพื่อสร้างโค้ดส่วนลดให้พาร์ทเนอร์นำไปใช้งาน</p>
+                  <h3 style={{ fontSize: "1.1rem", color: "#475569", margin: "0 0 0.4rem 0" }}>No promo codes for this partner</h3>
+                  <p style={{ fontSize: "0.85rem", margin: "0 0 1.25rem 0" }}>Click the button below to create promo codes for this partner</p>
                   <button
                     onClick={handleOpenCreateCode}
                     style={{
@@ -1046,19 +1051,19 @@ export default function AdminPartnersPage() {
                       cursor: "pointer"
                     }}
                   >
-                    + สร้าง Code ให้ Partner เจ้านี้
+                    + Create Code for Partner
                   </button>
                 </div>
               ) : (
                 <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.9rem" }}>
                   <thead>
                     <tr style={{ background: "#f8fafc", borderBottom: "1px solid #e2e8f0", color: "#475569", fontSize: "0.75rem", textTransform: "uppercase" }}>
-                      <th style={{ padding: "0.75rem 1rem", textAlign: "left" }}>โค้ด (Code)</th>
-                      <th style={{ padding: "0.75rem 1rem", textAlign: "left" }}>ส่วนลด</th>
-                      <th style={{ padding: "0.75rem 1rem", textAlign: "left" }}>กำหนดการ (Schedule)</th>
-                      <th style={{ padding: "0.75rem 1rem", textAlign: "center" }}>จำนวนใช้ / จำกัด</th>
-                      <th style={{ padding: "0.75rem 1rem", textAlign: "center" }}>สถานะ</th>
-                      <th style={{ padding: "0.75rem 1rem", textAlign: "right" }}>จัดการ</th>
+                      <th style={{ padding: "0.75rem 1rem", textAlign: "left" }}>Promo Code</th>
+                      <th style={{ padding: "0.75rem 1rem", textAlign: "left" }}>Discount</th>
+                      <th style={{ padding: "0.75rem 1rem", textAlign: "left" }}>Schedule</th>
+                      <th style={{ padding: "0.75rem 1rem", textAlign: "center" }}>Usage / Limit</th>
+                      <th style={{ padding: "0.75rem 1rem", textAlign: "center" }}>Status</th>
+                      <th style={{ padding: "0.75rem 1rem", textAlign: "right" }}>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -1090,7 +1095,7 @@ export default function AdminPartnersPage() {
                             {pc.discountType === "PERCENTAGE" ? `${pc.discountValue}% OFF` : `${pc.discountValue} THB`}
                             {pc.discountTarget === "DELIVERY" && (
                               <span style={{ display: "block", fontSize: "0.7rem", color: "#0284c7" }}>
-                                (ค่าจัดส่ง)
+                                (Delivery fee only)
                               </span>
                             )}
                           </td>
@@ -1100,7 +1105,7 @@ export default function AdminPartnersPage() {
                           </td>
 
                           <td style={{ padding: "0.85rem 1rem", textAlign: "center", fontWeight: "700", color: "#334155" }}>
-                            {pc._count?.sales ?? pc.usedCount} {pc.usageLimit ? `/ ${pc.usageLimit}` : "(ไม่จำกัด)"}
+                            {pc._count?.sales ?? pc.usedCount} {pc.usageLimit ? `/ ${pc.usageLimit}` : "(Unlimited)"}
                           </td>
 
                           <td style={{ padding: "0.85rem 1rem", textAlign: "center" }}>
@@ -1151,7 +1156,7 @@ export default function AdminPartnersPage() {
                                   cursor: "pointer"
                                 }}
                               >
-                                แก้ไข
+                                Edit
                               </button>
                             </div>
                           </td>
@@ -1169,7 +1174,7 @@ export default function AdminPartnersPage() {
                 onClick={() => setSelectedPartnerForCodes(null)}
                 style={{ padding: "0.6rem 1.25rem", borderRadius: "8px", background: "#f1f5f9", border: "1px solid #cbd5e1", color: "#475569", fontWeight: "700", cursor: "pointer" }}
               >
-                ปิดหน้าต่าง
+                Close
               </button>
             </div>
           </div>
@@ -1183,10 +1188,10 @@ export default function AdminPartnersPage() {
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
               <div>
                 <h3 style={{ fontSize: "1.25rem", fontWeight: "800", color: "#0f172a", margin: 0 }}>
-                  สร้างโค้ดให้ {selectedPartnerForCodes.companyName}
+                  Create Code for {selectedPartnerForCodes.companyName}
                 </h3>
                 <p style={{ margin: "0.2rem 0 0 0", fontSize: "0.85rem", color: "#64748b" }}>
-                  โค้ดนี้จะผูกกับพาร์ทเนอร์เจ้านี้โดยอัตโนมัติ
+                  This promo code will be assigned to this partner account automatically
                 </p>
               </div>
               <button onClick={() => setIsCreateCodeModalOpen(false)} style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer", fontSize: "1.2rem" }}>
@@ -1203,11 +1208,11 @@ export default function AdminPartnersPage() {
             <form onSubmit={handleSubmitCreateCode} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
               <div>
                 <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
-                  รหัสโค้ด (Promo Code) *
+                  Promo Code *
                 </label>
                 <input
                   type="text"
-                  placeholder="เช่น GRAND20 หรือ LUXURY15"
+                  placeholder="e.g. GRAND20 or LUXURY15"
                   value={codeFormData.code}
                   onChange={(e) => setCodeFormData(prev => ({ ...prev, code: e.target.value.toUpperCase() }))}
                   required
@@ -1218,21 +1223,21 @@ export default function AdminPartnersPage() {
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
                 <div>
                   <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
-                    ประเภทส่วนลด
+                    Discount Type
                   </label>
                   <select
                     value={codeFormData.discountType}
                     onChange={(e) => setCodeFormData(prev => ({ ...prev, discountType: e.target.value }))}
                     style={{ width: "100%", padding: "0.75rem", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#f8fafc", boxSizing: "border-box" }}
                   >
-                    <option value="PERCENTAGE">เปอร์เซ็นต์ (%)</option>
-                    <option value="FIXED">จำนวนเงินคงที่ (THB)</option>
+                    <option value="PERCENTAGE">Percentage (%)</option>
+                    <option value="FIXED">Fixed Amount (THB)</option>
                   </select>
                 </div>
 
                 <div>
                   <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
-                    มูลค่าส่วนลด *
+                    Discount Value *
                   </label>
                   <input
                     type="number"
@@ -1249,15 +1254,15 @@ export default function AdminPartnersPage() {
 
               <div>
                 <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
-                  เป้าหมายส่วนลด (Discount Target)
+                  Discount Target
                 </label>
                 <select
                   value={codeFormData.discountTarget}
                   onChange={(e) => setCodeFormData(prev => ({ ...prev, discountTarget: e.target.value }))}
                   style={{ width: "100%", padding: "0.75rem", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#f8fafc", boxSizing: "border-box" }}
                 >
-                  <option value="ALL">ลดทั้งบิล (All Items)</option>
-                  <option value="DELIVERY">ลดเฉพาะค่าจัดส่ง (Delivery Only)</option>
+                  <option value="ALL">Entire Order (All Items)</option>
+                  <option value="DELIVERY">Delivery Fee Only</option>
                 </select>
               </div>
 
@@ -1265,7 +1270,7 @@ export default function AdminPartnersPage() {
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
                 <div>
                   <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
-                    วัน-เวลาเริ่มต้น
+                    Start Date & Time
                   </label>
                   <input
                     type="datetime-local"
@@ -1273,12 +1278,12 @@ export default function AdminPartnersPage() {
                     onChange={(e) => setCodeFormData(prev => ({ ...prev, startDate: e.target.value }))}
                     style={{ width: "100%", padding: "0.75rem", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#f8fafc", boxSizing: "border-box", fontSize: "0.85rem" }}
                   />
-                  <span style={{ fontSize: "0.75rem", color: "#64748b" }}>เว้นว่างหากเริ่มทันที</span>
+                  <span style={{ fontSize: "0.75rem", color: "#64748b" }}>Leave blank to start immediately</span>
                 </div>
 
                 <div>
                   <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
-                    วัน-เวลาสิ้นสุด
+                    End Date & Time
                   </label>
                   <input
                     type="datetime-local"
@@ -1286,17 +1291,17 @@ export default function AdminPartnersPage() {
                     onChange={(e) => setCodeFormData(prev => ({ ...prev, endDate: e.target.value }))}
                     style={{ width: "100%", padding: "0.75rem", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#f8fafc", boxSizing: "border-box", fontSize: "0.85rem" }}
                   />
-                  <span style={{ fontSize: "0.75rem", color: "#64748b" }}>เว้นว่างหากไม่มีวันหมดอายุ</span>
+                  <span style={{ fontSize: "0.75rem", color: "#64748b" }}>Leave blank for no expiration</span>
                 </div>
               </div>
 
               <div>
                 <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
-                  จำกัดจำนวนครั้งที่ใช้ได้ (Usage Limit)
+                  Usage Limit
                 </label>
                 <input
                   type="number"
-                  placeholder="เว้นว่างหากไม่จำกัด"
+                  placeholder="Leave blank for unlimited"
                   value={codeFormData.usageLimit}
                   onChange={(e) => setCodeFormData(prev => ({ ...prev, usageLimit: e.target.value }))}
                   style={{ width: "100%", padding: "0.75rem", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#f8fafc", boxSizing: "border-box" }}
@@ -1305,11 +1310,11 @@ export default function AdminPartnersPage() {
 
               <div>
                 <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
-                  คำอธิบาย / หมายเหตุ
+                  Description / Notes
                 </label>
                 <input
                   type="text"
-                  placeholder="เช่น ส่วนลดพิเศษสำหรับลูกค้าเครือ Partner"
+                  placeholder="e.g. Exclusive discount for partner guests"
                   value={codeFormData.description}
                   onChange={(e) => setCodeFormData(prev => ({ ...prev, description: e.target.value }))}
                   style={{ width: "100%", padding: "0.75rem", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#f8fafc", boxSizing: "border-box" }}
@@ -1322,14 +1327,14 @@ export default function AdminPartnersPage() {
                   onClick={() => setIsCreateCodeModalOpen(false)}
                   style={{ padding: "0.75rem 1.25rem", borderRadius: "8px", background: "#f1f5f9", border: "1px solid #cbd5e1", color: "#475569", fontWeight: "700", cursor: "pointer" }}
                 >
-                  ยกเลิก
+                  Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isCodeSubmitting}
                   style={{ padding: "0.75rem 1.5rem", borderRadius: "8px", background: "#222945", border: "none", color: "#ffffff", fontWeight: "700", cursor: "pointer", opacity: isCodeSubmitting ? 0.7 : 1 }}
                 >
-                  {isCodeSubmitting ? "กำลังสร้าง..." : "สร้างโค้ด"}
+                  {isCodeSubmitting ? "Creating..." : "Create Code"}
                 </button>
               </div>
             </form>
@@ -1344,10 +1349,10 @@ export default function AdminPartnersPage() {
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
               <div>
                 <h3 style={{ fontSize: "1.25rem", fontWeight: "800", color: "#0f172a", margin: 0 }}>
-                  แก้ไขโค้ด: {editingCode.code}
+                  Edit Promo Code: {editingCode.code}
                 </h3>
                 <p style={{ margin: "0.2rem 0 0 0", fontSize: "0.85rem", color: "#64748b" }}>
-                  แก้ไขเงื่อนไข วันเวลา และสถานะการใช้งาน
+                  Modify conditions, schedule, and active status
                 </p>
               </div>
               <button onClick={() => setIsEditCodeModalOpen(false)} style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer", fontSize: "1.2rem" }}>
@@ -1365,21 +1370,21 @@ export default function AdminPartnersPage() {
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
                 <div>
                   <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
-                    ประเภทส่วนลด
+                    Discount Type
                   </label>
                   <select
                     value={codeFormData.discountType}
                     onChange={(e) => setCodeFormData(prev => ({ ...prev, discountType: e.target.value }))}
                     style={{ width: "100%", padding: "0.75rem", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#f8fafc", boxSizing: "border-box" }}
                   >
-                    <option value="PERCENTAGE">เปอร์เซ็นต์ (%)</option>
-                    <option value="FIXED">จำนวนเงินคงที่ (THB)</option>
+                    <option value="PERCENTAGE">Percentage (%)</option>
+                    <option value="FIXED">Fixed Amount (THB)</option>
                   </select>
                 </div>
 
                 <div>
                   <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
-                    มูลค่าส่วนลด *
+                    Discount Value *
                   </label>
                   <input
                     type="number"
@@ -1397,7 +1402,7 @@ export default function AdminPartnersPage() {
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
                 <div>
                   <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
-                    วัน-เวลาเริ่มต้น
+                    Start Date & Time
                   </label>
                   <input
                     type="datetime-local"
@@ -1409,7 +1414,7 @@ export default function AdminPartnersPage() {
 
                 <div>
                   <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
-                    วัน-เวลาสิ้นสุด
+                    End Date & Time
                   </label>
                   <input
                     type="datetime-local"
@@ -1422,7 +1427,7 @@ export default function AdminPartnersPage() {
 
               <div>
                 <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
-                  คำอธิบาย
+                  Description / Notes
                 </label>
                 <input
                   type="text"
@@ -1440,7 +1445,7 @@ export default function AdminPartnersPage() {
                   onChange={(e) => setCodeFormData(prev => ({ ...prev, isActive: e.target.checked }))}
                 />
                 <label htmlFor="adminEditCodeActive" style={{ fontSize: "0.9rem", fontWeight: "700", color: "#334155", cursor: "pointer" }}>
-                  เปิดใช้งานโค้ดนี้ (Active)
+                  Enable this code (Active)
                 </label>
               </div>
 
@@ -1450,14 +1455,14 @@ export default function AdminPartnersPage() {
                   onClick={() => setIsEditCodeModalOpen(false)}
                   style={{ padding: "0.75rem 1.25rem", borderRadius: "8px", background: "#f1f5f9", border: "1px solid #cbd5e1", color: "#475569", fontWeight: "700", cursor: "pointer" }}
                 >
-                  ยกเลิก
+                  Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isCodeSubmitting}
                   style={{ padding: "0.75rem 1.5rem", borderRadius: "8px", background: "#222945", border: "none", color: "#ffffff", fontWeight: "700", cursor: "pointer", opacity: isCodeSubmitting ? 0.7 : 1 }}
                 >
-                  {isCodeSubmitting ? "กำลังบันทึก..." : "อัปเดตโค้ด"}
+                  {isCodeSubmitting ? "Saving..." : "Update Code"}
                 </button>
               </div>
             </form>

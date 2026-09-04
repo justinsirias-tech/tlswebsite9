@@ -30,7 +30,7 @@ export async function GET(request) {
 
 export async function POST() {
   return NextResponse.json(
-    { error: "ไม่อนุญาตให้พาร์ทเนอร์สร้างโค้ดเอง กรุณาติดต่อผู้ดูแลระบบ TLS เพื่อสร้างโค้ดโปรโมชั่น" },
+    { error: "Partners are not permitted to create promo codes directly. Please contact TLS Administrator to create promo codes." },
     { status: 403 }
   );
 }

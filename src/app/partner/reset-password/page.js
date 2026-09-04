@@ -21,17 +21,17 @@ function ResetPasswordContent() {
     setError("");
 
     if (!token) {
-      setError("ไม่พบโทเค็นสำหรับการรีเซ็ตรหัสผ่าน กรุณาตรวจสอบลิงก์ในอีเมลอีกครั้ง");
+      setError("Reset token not found. Please check your email link again.");
       return;
     }
 
     if (password.length < 6) {
-      setError("รหัสผ่านต้องมีความยาวอย่างน้อย 6 ตัวอักษร");
+      setError("Password must be at least 6 characters long.");
       return;
     }
 
     if (password !== confirmPassword) {
-      setError("รหัสผ่านและการยืนยันรหัสผ่านไม่ตรงกัน");
+      setError("Passwords do not match.");
       return;
     }
 
@@ -46,7 +46,7 @@ function ResetPasswordContent() {
 
       const data = await res.json();
       if (!res.ok) {
-        setError(data.error || "ไม่สามารถรีเซ็ตรหัสผ่านได้ กรุณาขอลิงก์ใหม่อีกครั้ง");
+        setError(data.error || "Unable to reset password. Please request a new link.");
         return;
       }
 
@@ -55,7 +55,7 @@ function ResetPasswordContent() {
         router.push("/partner/login");
       }, 3000);
     } catch (err) {
-      setError("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้");
+      setError("Unable to connect to the server.");
     } finally {
       setLoading(false);
     }
@@ -95,10 +95,10 @@ function ResetPasswordContent() {
             <i className="fa-solid fa-lock-open"></i>
           </div>
           <h1 style={{ fontSize: "1.5rem", fontWeight: "800", color: "#0f172a", margin: "0 0 0.4rem 0" }}>
-            ตั้งรหัสผ่านใหม่
+            Set New Password
           </h1>
           <p style={{ fontSize: "0.9rem", color: "#64748b", margin: 0 }}>
-            กำหนดรหัสผ่านใหม่สำหรับบัญชี Partner Portal ของคุณ
+            Create a new password for your Partner Portal account.
           </p>
         </div>
 
@@ -119,10 +119,10 @@ function ResetPasswordContent() {
               <i className="fa-solid fa-check"></i>
             </div>
             <h3 style={{ fontSize: "1.2rem", fontWeight: "700", color: "#166534", marginBottom: "0.5rem" }}>
-              ตั้งรหัสผ่านใหม่สำเร็จ!
+              Password Reset Successful!
             </h3>
             <p style={{ fontSize: "0.9rem", color: "#64748b", marginBottom: "1.5rem" }}>
-              กำลังนำคุณไปยังหน้าเข้าสู่ระบบใน 3 วินาที...
+              Redirecting you to the sign in page in 3 seconds...
             </p>
             <Link
               href="/partner/login"
@@ -137,7 +137,7 @@ function ResetPasswordContent() {
                 fontSize: "0.95rem"
               }}
             >
-              เข้าสู่ระบบทันที
+              Sign In Now
             </Link>
           </div>
         ) : (
@@ -164,7 +164,7 @@ function ResetPasswordContent() {
             <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
               <div>
                 <label style={{ display: "block", fontSize: "0.9rem", fontWeight: "700", color: "#334155", marginBottom: "0.4rem" }}>
-                  รหัสผ่านใหม่ (อย่างน้อย 6 ตัวอักษร)
+                  New Password (min 6 characters)
                 </label>
                 <div style={{ position: "relative" }}>
                   <input
@@ -207,7 +207,7 @@ function ResetPasswordContent() {
 
               <div>
                 <label style={{ display: "block", fontSize: "0.9rem", fontWeight: "700", color: "#334155", marginBottom: "0.4rem" }}>
-                  ยืนยันรหัสผ่านใหม่อีกครั้ง
+                  Confirm New Password
                 </label>
                 <input
                   type={showPass ? "text" : "password"}
@@ -246,7 +246,7 @@ function ResetPasswordContent() {
                   opacity: loading ? 0.7 : 1
                 }}
               >
-                {loading ? "กำลังบันทึก..." : "บันทึกรหัสผ่านใหม่"}
+                {loading ? "Saving..." : "Save New Password"}
               </button>
 
               <Link
@@ -260,7 +260,7 @@ function ResetPasswordContent() {
                   marginTop: "0.5rem"
                 }}
               >
-                ยกเลิกและกลับไปหน้าเข้าสู่ระบบ
+                Cancel and Back to Sign In
               </Link>
             </form>
           </>

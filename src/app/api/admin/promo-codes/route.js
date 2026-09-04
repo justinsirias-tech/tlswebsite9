@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { jwtVerify } from "jose";
 import prisma from "../../../../lib/prisma";
+import { parseDateInput } from "../../../../lib/dateUtils";
 
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || "tls-secret-key-2026");
 
@@ -67,8 +68,8 @@ export async function POST(request) {
         minOrderValue: data.minOrderValue ? parseFloat(data.minOrderValue) : 0,
         maxDiscount: data.maxDiscount ? parseFloat(data.maxDiscount) : null,
         usageLimit: data.usageLimit ? parseInt(data.usageLimit) : null,
-        startDate: data.startDate ? new Date(data.startDate) : null,
-        endDate: data.endDate ? new Date(data.endDate) : null,
+        startDate: parseDateInput(data.startDate),
+        endDate: parseDateInput(data.endDate),
         expiryDate: data.expiryDate || null,
         isActive: data.isActive !== undefined ? Boolean(data.isActive) : true,
         description: data.description || null

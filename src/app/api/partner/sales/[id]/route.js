@@ -24,7 +24,7 @@ export async function PUT(request, { params }) {
 
     if (!existingSale) {
       return NextResponse.json(
-        { error: "ไม่พบรายการขายนี้ หรือคุณไม่มีสิทธิ์แก้ไข" },
+        { error: "Sale record not found or you do not have permission to edit it." },
         { status: 404 }
       );
     }
@@ -38,7 +38,7 @@ export async function PUT(request, { params }) {
     if (data.saleAmount !== undefined) {
       const amount = parseFloat(data.saleAmount);
       if (isNaN(amount) || amount < 0) {
-        return NextResponse.json({ error: "ราคาขายต้องเป็นจำนวนเงินที่ถูกต้อง" }, { status: 400 });
+        return NextResponse.json({ error: "Sale price must be a valid positive number." }, { status: 400 });
       }
       updateData.saleAmount = amount;
     }
@@ -51,7 +51,7 @@ export async function PUT(request, { params }) {
         }
       });
       if (!code) {
-        return NextResponse.json({ error: "โค้ดส่วนลดไม่ถูกต้อง" }, { status: 400 });
+        return NextResponse.json({ error: "Invalid promo code." }, { status: 400 });
       }
       updateData.promoCodeId = code.id;
     }

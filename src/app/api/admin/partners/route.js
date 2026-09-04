@@ -79,7 +79,7 @@ export async function POST(request) {
 
     if (!companyName || !contactName || !email || !password) {
       return NextResponse.json(
-        { error: "กรุณาระบุข้อมูลจำเป็นให้ครบถ้วน: ชื่อบริษัท/ร้าน, ชื่อผู้ติดต่อ, อีเมล, รหัสผ่าน" },
+        { error: "Please fill in all required fields: Company Name, Contact Name, Email, and Password." },
         { status: 400 }
       );
     }
@@ -93,7 +93,7 @@ export async function POST(request) {
 
     if (existing) {
       return NextResponse.json(
-        { error: `อีเมล '${cleanEmail}' มีอยู่ในระบบแล้ว กรุณาใช้อีเมลอื่น` },
+        { error: `Email '${cleanEmail}' is already registered. Please use another email address.` },
         { status: 400 }
       );
     }

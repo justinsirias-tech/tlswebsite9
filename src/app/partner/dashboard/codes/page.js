@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { toInputDateTime, toISOStringOrNull } from "@/lib/dateUtils";
 
 export default function PartnerCodesPage() {
   const [codes, setCodes] = useState([]);
@@ -27,14 +28,6 @@ export default function PartnerCodesPage() {
   const [formError, setFormError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const toInputDateTime = (dateVal) => {
-    if (!dateVal) return "";
-    const d = new Date(dateVal);
-    if (isNaN(d.getTime())) return "";
-    const pad = (n) => String(n).padStart(2, "0");
-    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-  };
-
   const getPromoStatus = (pc) => {
     if (!pc.isActive) {
       return { label: "Disabled", color: "#64748b", bg: "#f1f5f9", border: "#cbd5e1" };
@@ -54,8 +47,8 @@ export default function PartnerCodesPage() {
       return "Always Active (No limits)";
     }
     const formatOpt = { dateStyle: "medium", timeStyle: "short" };
-    const startStr = pc.startDate ? new Date(pc.startDate).toLocaleString("th-TH", formatOpt) : "Now";
-    const endStr = pc.endDate ? new Date(pc.endDate).toLocaleString("th-TH", formatOpt) : "Ongoing";
+    const startStr = pc.startDate ? new Date(pc.startDate).toLocaleString("en-US", formatOpt) : "Now";
+    const endStr = pc.endDate ? new Date(pc.endDate).toLocaleString("en-US", formatOpt) : "Ongoing";
     return `${startStr} → ${endStr}`;
   };
 
@@ -116,24 +109,27 @@ export default function PartnerCodesPage() {
     e.preventDefault();
     setFormError("");
     setIsSubmitting(true);
-
     try {
+      const payload = {
+        ...formData,
+        startDate: toISOStringOrNull(formData.startDate),
+        endDate: toISOStringOrNull(formData.endDate)
+      };
+
       const res = await fetch("/api/partner/codes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(payload)
       });
-
       const data = await res.json();
       if (!res.ok) {
-        setFormError(data.error || "เกิดข้อผิดพลาดในการสร้างโค้ด");
+        setFormError(data.error || "An error occurred while creating the code.");
         return;
       }
-
       setIsCreateModalOpen(false);
       fetchCodes();
     } catch (err) {
-      setFormError("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้");
+      setFormError("Unable to connect to the server.");
     } finally {
       setIsSubmitting(false);
     }
@@ -146,15 +142,21 @@ export default function PartnerCodesPage() {
     setIsSubmitting(true);
 
     try {
+      const payload = {
+        ...formData,
+        startDate: toISOStringOrNull(formData.startDate),
+        endDate: toISOStringOrNull(formData.endDate)
+      };
+
       const res = await fetch(`/api/partner/codes/${editingCode.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(payload)
       });
 
       const data = await res.json();
       if (!res.ok) {
-        setFormError(data.error || "เกิดข้อผิดพลาดในการแก้ไขโค้ด");
+        setFormError(data.error || "An error occurred while updating the code.");
         return;
       }
 
@@ -162,7 +164,7 @@ export default function PartnerCodesPage() {
       setEditingCode(null);
       fetchCodes();
     } catch (err) {
-      setFormError("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้");
+      setFormError("Unable to connect to the server.");
     } finally {
       setIsSubmitting(false);
     }
@@ -179,10 +181,10 @@ export default function PartnerCodesPage() {
       }}>
         <div>
           <h1 style={{ fontSize: "1.6rem", fontWeight: "800", color: "#0f172a", margin: "0 0 0.3rem 0" }}>
-            จัดการโค้ดโปรโมชั่น (My Promo Codes)
+            My Promo Codes
           </h1>
           <p style={{ fontSize: "0.9rem", color: "#64748b", margin: 0 }}>
-            สร้างและกำหนดเงื่อนไขวันเวลาการเปิด-ปิดใช้งานโค้ดของพาร์ทเนอร์
+            Manage and configure schedule & active status of partner promo codes
           </p>
         </div>
 
@@ -199,7 +201,7 @@ export default function PartnerCodesPage() {
           gap: "0.5rem"
         }}>
           <i className="fa-solid fa-shield-halved"></i>
-          <span>โค้ดโปรโมชั่นออกโดย Admin TLS (ติดต่อแอดมินเพื่อขอโค้ดเพิ่ม)</span>
+          <span>Promo codes are issued by TLS Admin (contact Admin for new codes)</span>
         </div>
       </div>
 
@@ -213,25 +215,25 @@ export default function PartnerCodesPage() {
         {loading ? (
           <div style={{ textAlign: "center", padding: "4rem 0", color: "#64748b" }}>
             <i className="fa-solid fa-spinner fa-spin" style={{ fontSize: "1.8rem", marginBottom: "0.8rem" }}></i>
-            <div>กำลังโหลดข้อมูลโค้ด...</div>
+            <div>Loading promo codes...</div>
           </div>
         ) : codes.length === 0 ? (
           <div style={{ textAlign: "center", padding: "4rem 2rem", color: "#94a3b8" }}>
             <i className="fa-solid fa-ticket" style={{ fontSize: "2.5rem", marginBottom: "1rem", opacity: 0.5 }}></i>
-            <h3 style={{ fontSize: "1.1rem", color: "#475569", margin: "0 0 0.5rem 0" }}>ยังไม่มีโค้ดโปรโมชั่นสำหรับพาร์ทเนอร์ของคุณ</h3>
-            <p style={{ fontSize: "0.85rem", margin: 0 }}>กรุณาติดต่อทีมงานผู้ดูแลระบบ TLS เพื่อสร้างโค้ดโปรโมชั่นสำหรับพาร์ทเนอร์ของคุณ</p>
+            <h3 style={{ fontSize: "1.1rem", color: "#475569", margin: "0 0 0.5rem 0" }}>No promo codes available for your partner account</h3>
+            <p style={{ fontSize: "0.85rem", margin: 0 }}>Please contact the TLS Admin team to create a promo code for your account.</p>
           </div>
         ) : (
           <div style={{ overflowX: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.9rem" }}>
               <thead>
                 <tr style={{ background: "#f8fafc", borderBottom: "1px solid #e2e8f0", color: "#475569", fontSize: "0.8rem", textTransform: "uppercase", letterSpacing: "0.5px" }}>
-                  <th style={{ padding: "1rem 1.25rem", textAlign: "left" }}>โค้ด (Code)</th>
-                  <th style={{ padding: "1rem 1.25rem", textAlign: "left" }}>ส่วนลด</th>
-                  <th style={{ padding: "1rem 1.25rem", textAlign: "left" }}>กำหนดการใช้งาน (Schedule)</th>
-                  <th style={{ padding: "1rem 1.25rem", textAlign: "center" }}>จำนวนที่ใช้</th>
-                  <th style={{ padding: "1rem 1.25rem", textAlign: "left" }}>สถานะ</th>
-                  <th style={{ padding: "1rem 1.25rem", textAlign: "center" }}>จัดการ</th>
+                  <th style={{ padding: "1rem 1.25rem", textAlign: "left" }}>Promo Code</th>
+                  <th style={{ padding: "1rem 1.25rem", textAlign: "left" }}>Discount</th>
+                  <th style={{ padding: "1rem 1.25rem", textAlign: "left" }}>Schedule</th>
+                  <th style={{ padding: "1rem 1.25rem", textAlign: "center" }}>Usage / Limit</th>
+                  <th style={{ padding: "1rem 1.25rem", textAlign: "left" }}>Status</th>
+                  <th style={{ padding: "1rem 1.25rem", textAlign: "center" }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -264,7 +266,7 @@ export default function PartnerCodesPage() {
                         {pc.discountType === "PERCENTAGE" ? `${pc.discountValue}% OFF` : `${pc.discountValue} THB OFF`}
                         {pc.discountTarget === "DELIVERY" && (
                           <span style={{ display: "block", fontSize: "0.75rem", color: "#0284c7", fontWeight: "600" }}>
-                            (เฉพาะค่าจัดส่ง)
+                            (Delivery fee only)
                           </span>
                         )}
                       </td>
@@ -274,7 +276,7 @@ export default function PartnerCodesPage() {
                       </td>
 
                       <td style={{ padding: "1rem 1.25rem", textAlign: "center", fontWeight: "700", color: "#334155" }}>
-                        {pc._count?.sales ?? pc.usedCount} {pc.usageLimit ? `/ ${pc.usageLimit}` : "(ไม่จำกัด)"}
+                        {pc._count?.sales ?? pc.usedCount} {pc.usageLimit ? `/ ${pc.usageLimit}` : "(Unlimited)"}
                       </td>
 
                       <td style={{ padding: "1rem 1.25rem" }}>
@@ -330,7 +332,7 @@ export default function PartnerCodesPage() {
                           }}
                         >
                           <i className="fa-solid fa-pen-to-square"></i>
-                          <span>แก้ไข</span>
+                          <span>Edit</span>
                         </button>
                       </td>
                     </tr>
@@ -367,7 +369,7 @@ export default function PartnerCodesPage() {
           }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
               <h2 style={{ fontSize: "1.3rem", fontWeight: "800", color: "#0f172a", margin: 0 }}>
-                แก้ไขโค้ด: {editingCode?.code}
+                Edit Promo Code: {editingCode?.code}
               </h2>
               <button
                 onClick={() => setIsEditModalOpen(false)}
@@ -387,7 +389,7 @@ export default function PartnerCodesPage() {
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
                 <div>
                   <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
-                    วัน-เวลาเริ่มต้น (Start Date)
+                    Start Date & Time
                   </label>
                   <input
                     type="datetime-local"
@@ -395,12 +397,12 @@ export default function PartnerCodesPage() {
                     onChange={(e) => setFormData(prev => ({ ...prev, startDate: e.target.value }))}
                     style={{ width: "100%", padding: "0.75rem", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#f8fafc", boxSizing: "border-box", fontSize: "0.85rem" }}
                   />
-                  <span style={{ fontSize: "0.75rem", color: "#64748b" }}>เว้นว่างหากเริ่มทันที</span>
+                  <span style={{ fontSize: "0.75rem", color: "#64748b" }}>Leave blank to start immediately</span>
                 </div>
 
                 <div>
                   <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
-                    วัน-เวลาสิ้นสุด (End Date)
+                    End Date & Time
                   </label>
                   <input
                     type="datetime-local"
@@ -408,13 +410,13 @@ export default function PartnerCodesPage() {
                     onChange={(e) => setFormData(prev => ({ ...prev, endDate: e.target.value }))}
                     style={{ width: "100%", padding: "0.75rem", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#f8fafc", boxSizing: "border-box", fontSize: "0.85rem" }}
                   />
-                  <span style={{ fontSize: "0.75rem", color: "#64748b" }}>เว้นว่างหากไม่มีวันหมดอายุ</span>
+                  <span style={{ fontSize: "0.75rem", color: "#64748b" }}>Leave blank for no expiration</span>
                 </div>
               </div>
 
               <div>
                 <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
-                  คำอธิบาย / รายละเอียดโค้ด
+                  Description / Notes
                 </label>
                 <input
                   type="text"
@@ -432,7 +434,7 @@ export default function PartnerCodesPage() {
                   onChange={(e) => setFormData(prev => ({ ...prev, isActive: e.target.checked }))}
                 />
                 <label htmlFor="partnerCodeActive" style={{ fontSize: "0.9rem", fontWeight: "700", color: "#334155", cursor: "pointer" }}>
-                  เปิดใช้งานโค้ดนี้ (Active)
+                  Enable this code (Active)
                 </label>
               </div>
 
@@ -442,14 +444,14 @@ export default function PartnerCodesPage() {
                   onClick={() => setIsEditModalOpen(false)}
                   style={{ padding: "0.75rem 1.25rem", borderRadius: "8px", background: "#f1f5f9", border: "1px solid #cbd5e1", color: "#475569", fontWeight: "700", cursor: "pointer" }}
                 >
-                  ยกเลิก
+                  Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
                   style={{ padding: "0.75rem 1.5rem", borderRadius: "8px", background: "#222945", border: "none", color: "#ffffff", fontWeight: "700", cursor: "pointer", opacity: isSubmitting ? 0.7 : 1 }}
                 >
-                  {isSubmitting ? "กำลังบันทึก..." : "อัปเดตโค้ด"}
+                  {isSubmitting ? "Saving..." : "Update Code"}
                 </button>
               </div>
             </form>

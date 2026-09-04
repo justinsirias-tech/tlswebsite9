@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { toInputDateTime, toISOStringOrNull } from "@/lib/dateUtils";
 
 export default function AdminPromoCodesPage() {
   const [promoCodes, setPromoCodes] = useState([]);
@@ -10,19 +11,6 @@ export default function AdminPromoCodesPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-
-  const toInputDateTime = (dateStr) => {
-    if (!dateStr) return "";
-    const d = new Date(dateStr);
-    if (isNaN(d.getTime())) return "";
-    const pad = (n) => String(n).padStart(2, "0");
-    const year = d.getFullYear();
-    const month = pad(d.getMonth() + 1);
-    const day = pad(d.getDate());
-    const hours = pad(d.getHours());
-    const mins = pad(d.getMinutes());
-    return `${year}-${month}-${day}T${hours}:${mins}`;
-  };
 
   const getPromoStatus = (pc) => {
     if (!pc.isActive) {
@@ -180,10 +168,16 @@ export default function AdminPromoCodesPage() {
       const url = editingId ? `/api/admin/promo-codes/${editingId}` : "/api/admin/promo-codes";
       const method = editingId ? "PUT" : "POST";
 
+      const payload = {
+        ...formData,
+        startDate: toISOStringOrNull(formData.startDate),
+        endDate: toISOStringOrNull(formData.endDate)
+      };
+
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(payload)
       });
 
       const data = await res.json();

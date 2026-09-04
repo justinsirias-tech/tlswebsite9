@@ -30,7 +30,7 @@ export default function PartnerDashboardOverview() {
     return (
       <div style={{ textAlign: "center", padding: "4rem 0", color: "#64748b" }}>
         <i className="fa-solid fa-spinner fa-spin" style={{ fontSize: "2rem", marginBottom: "1rem" }}></i>
-        <div>กำลังโหลดสถิติและข้อมูลยอดขาย...</div>
+        <div>Loading sales statistics and overview...</div>
       </div>
     );
   }
@@ -44,7 +44,7 @@ export default function PartnerDashboardOverview() {
 
   const metricCards = [
     {
-      title: "ยอดขายวันนี้",
+      title: "Today's Sales",
       subtitle: "Today",
       amount: stats.today.amount,
       count: stats.today.count,
@@ -54,7 +54,7 @@ export default function PartnerDashboardOverview() {
       icon: "fa-calendar-day"
     },
     {
-      title: "ยอดขายเดือนนี้",
+      title: "This Month's Sales",
       subtitle: "This Month",
       amount: stats.thisMonth.amount,
       count: stats.thisMonth.count,
@@ -64,7 +64,7 @@ export default function PartnerDashboardOverview() {
       icon: "fa-calendar-week"
     },
     {
-      title: "ยอดขายปีนี้",
+      title: "This Year's Sales",
       subtitle: "This Year",
       amount: stats.thisYear.amount,
       count: stats.thisYear.count,
@@ -74,7 +74,7 @@ export default function PartnerDashboardOverview() {
       icon: "fa-calendar"
     },
     {
-      title: "ยอดขายทั้งหมด",
+      title: "Total Sales",
       subtitle: "All Time",
       amount: stats.allTime.amount,
       count: stats.allTime.count,
@@ -100,17 +100,17 @@ export default function PartnerDashboardOverview() {
       }}>
         <div>
           <h1 style={{ fontSize: "1.6rem", fontWeight: "800", color: "#0f172a", margin: "0 0 0.3rem 0" }}>
-            ยินดีต้อนรับ, {data?.partner?.companyName}
+            Welcome, {data?.partner?.companyName}
           </h1>
           <p style={{ fontSize: "0.9rem", color: "#64748b", margin: 0 }}>
-            สรุปยอดขายด้วย Promo Code พาร์ทเนอร์ประจำวันที่ {new Date().toLocaleDateString("th-TH", { dateStyle: "long" })}
+            Partner promo code sales summary as of {new Date().toLocaleDateString("en-US", { dateStyle: "long" })}
           </p>
         </div>
 
         <div style={{ display: "flex", gap: "0.75rem" }}>
           <button
             onClick={fetchDashboard}
-            title="รีเฟรชข้อมูล"
+            title="Refresh data"
             style={{
               padding: "0.75rem 1rem",
               borderRadius: "10px",
@@ -125,7 +125,7 @@ export default function PartnerDashboardOverview() {
             }}
           >
             <i className="fa-solid fa-arrows-rotate"></i>
-            <span>รีเฟรช</span>
+            <span>Refresh</span>
           </button>
 
           <Link
@@ -144,7 +144,7 @@ export default function PartnerDashboardOverview() {
             }}
           >
             <i className="fa-solid fa-plus"></i>
-            <span>บันทึกรายการขาย</span>
+            <span>Record Sale</span>
           </Link>
         </div>
       </div>
@@ -200,7 +200,7 @@ export default function PartnerDashboardOverview() {
                 ฿{card.amount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </div>
               <div style={{ fontSize: "0.85rem", color: "#64748b", fontWeight: "600", marginTop: "0.5rem" }}>
-                {card.count.toLocaleString()} รายการขาย
+                {card.count.toLocaleString()} orders
               </div>
             </div>
           </div>
@@ -218,28 +218,28 @@ export default function PartnerDashboardOverview() {
         }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.25rem" }}>
             <h2 style={{ fontSize: "1.15rem", fontWeight: "800", color: "#0f172a", margin: 0 }}>
-              ยอดขายแยกตามโค้ดโปรโมชั่น
+              Sales Breakdown by Promo Code
             </h2>
             <Link
               href="/partner/dashboard/codes"
               style={{ fontSize: "0.85rem", color: "#2563eb", fontWeight: "700", textDecoration: "none" }}
             >
-              จัดการโค้ด →
+              Manage Codes →
             </Link>
           </div>
 
           {(!data?.codesBreakdown || data.codesBreakdown.length === 0) ? (
             <div style={{ textAlign: "center", padding: "2.5rem 0", color: "#94a3b8" }}>
               <i className="fa-solid fa-ticket" style={{ fontSize: "2rem", marginBottom: "0.75rem", opacity: 0.5 }}></i>
-              <div>ยังไม่มีข้อมูลยอดขายจากโค้ด</div>
+              <div>No sales recorded for promo codes yet</div>
             </div>
           ) : (
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.9rem" }}>
               <thead>
                 <tr style={{ borderBottom: "1px solid #e2e8f0", color: "#64748b", textAlign: "left", fontSize: "0.8rem", textTransform: "uppercase" }}>
-                  <th style={{ padding: "0.75rem 0.5rem" }}>โค้ด (Code)</th>
-                  <th style={{ padding: "0.75rem 0.5rem", textAlign: "center" }}>จำนวนขาย</th>
-                  <th style={{ padding: "0.75rem 0.5rem", textAlign: "right" }}>ยอดรวม (THB)</th>
+                  <th style={{ padding: "0.75rem 0.5rem" }}>Promo Code</th>
+                  <th style={{ padding: "0.75rem 0.5rem", textAlign: "center" }}>Sales Count</th>
+                  <th style={{ padding: "0.75rem 0.5rem", textAlign: "right" }}>Total Revenue (THB)</th>
                 </tr>
               </thead>
               <tbody>
@@ -250,7 +250,7 @@ export default function PartnerDashboardOverview() {
                         {c.code}
                       </span>
                       <div style={{ fontSize: "0.75rem", color: "#64748b", marginTop: "0.2rem" }}>
-                        {c.discountType === "PERCENTAGE" ? `ลด ${c.discountValue}%` : `ลด ${c.discountValue} บาท`}
+                        {c.discountType === "PERCENTAGE" ? `${c.discountValue}% off` : `฿${c.discountValue} off`}
                       </div>
                     </td>
                     <td style={{ padding: "0.85rem 0.5rem", textAlign: "center", fontWeight: "700", color: "#475569" }}>
@@ -275,28 +275,28 @@ export default function PartnerDashboardOverview() {
         }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.25rem" }}>
             <h2 style={{ fontSize: "1.15rem", fontWeight: "800", color: "#0f172a", margin: 0 }}>
-              รายการขายล่าสุด
+              Recent Sales
             </h2>
             <Link
               href="/partner/dashboard/sales"
               style={{ fontSize: "0.85rem", color: "#2563eb", fontWeight: "700", textDecoration: "none" }}
             >
-              ดูทั้งหมด →
+              View All →
             </Link>
           </div>
 
           {(!data?.recentSales || data.recentSales.length === 0) ? (
             <div style={{ textAlign: "center", padding: "2.5rem 0", color: "#94a3b8" }}>
               <i className="fa-solid fa-receipt" style={{ fontSize: "2rem", marginBottom: "0.75rem", opacity: 0.5 }}></i>
-              <div>ยังไม่มีรายการขายที่บันทึก</div>
+              <div>No sales recorded yet</div>
             </div>
           ) : (
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.9rem" }}>
               <thead>
                 <tr style={{ borderBottom: "1px solid #e2e8f0", color: "#64748b", textAlign: "left", fontSize: "0.8rem", textTransform: "uppercase" }}>
-                  <th style={{ padding: "0.75rem 0.5rem" }}>ลูกค้า</th>
-                  <th style={{ padding: "0.75rem 0.5rem" }}>โค้ด</th>
-                  <th style={{ padding: "0.75rem 0.5rem", textAlign: "right" }}>ราคาขาย</th>
+                  <th style={{ padding: "0.75rem 0.5rem" }}>Customer</th>
+                  <th style={{ padding: "0.75rem 0.5rem" }}>Code</th>
+                  <th style={{ padding: "0.75rem 0.5rem", textAlign: "right" }}>Sale Price</th>
                 </tr>
               </thead>
               <tbody>

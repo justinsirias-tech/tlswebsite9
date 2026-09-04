@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import styles from "../../admin.module.css";
+import { toISOStringOrNull } from "@/lib/dateUtils";
 
 export default function PopupsAdminPage() {
   const [popups, setPopups] = useState([]);
@@ -112,10 +113,16 @@ export default function PopupsAdminPage() {
     }
 
     try {
+      const payload = {
+        ...formData,
+        startDate: toISOStringOrNull(formData.startDate),
+        endDate: toISOStringOrNull(formData.endDate)
+      };
+
       const res = await fetch("/api/admin/popups", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(payload)
       });
       const data = await res.json();
       if (res.ok && data.success) {

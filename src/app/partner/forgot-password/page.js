@@ -24,13 +24,13 @@ export default function PartnerForgotPassword() {
 
       const data = await res.json();
       if (!res.ok) {
-        setErrorMsg(data.error || "เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง");
+        setErrorMsg(data.error || "An error occurred. Please try again.");
         return;
       }
 
-      setStatusMsg(data.message || "ส่งลิงก์รีเซ็ตรหัสผ่านไปยังอีเมลของคุณแล้ว");
+      setStatusMsg(data.message || "A password reset link has been sent to your email.");
     } catch (err) {
-      setErrorMsg("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้");
+      setErrorMsg("Unable to connect to the server.");
     } finally {
       setLoading(false);
     }
@@ -70,10 +70,10 @@ export default function PartnerForgotPassword() {
             <i className="fa-solid fa-key"></i>
           </div>
           <h1 style={{ fontSize: "1.5rem", fontWeight: "800", color: "#0f172a", margin: "0 0 0.4rem 0" }}>
-            ลืมรหัสผ่าน Partner
+            Forgot Partner Password
           </h1>
           <p style={{ fontSize: "0.9rem", color: "#64748b", margin: 0 }}>
-            กรอกอีเมลที่ลงทะเบียนไว้เพื่อรับลิงก์ตั้งรหัสผ่านใหม่
+            Enter your registered partner email to receive a password reset link.
           </p>
         </div>
 
@@ -118,7 +118,7 @@ export default function PartnerForgotPassword() {
         <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
           <div>
             <label style={{ display: "block", fontSize: "0.9rem", fontWeight: "700", color: "#334155", marginBottom: "0.4rem" }}>
-              อีเมลพาร์ทเนอร์
+              Partner Email
             </label>
             <input
               type="email"
@@ -156,7 +156,7 @@ export default function PartnerForgotPassword() {
               opacity: loading ? 0.7 : 1
             }}
           >
-            {loading ? "กำลังส่งลิงก์..." : "ส่งลิงก์รีเซ็ตรหัสผ่าน"}
+            {loading ? "Sending link..." : "Send Reset Link"}
           </button>
 
           <Link
@@ -171,7 +171,7 @@ export default function PartnerForgotPassword() {
             }}
           >
             <i className="fa-solid fa-arrow-left" style={{ marginRight: "0.4rem" }}></i>
-            กลับไปหน้าเข้าสู่ระบบ
+            Back to Sign In
           </Link>
         </form>
       </div>

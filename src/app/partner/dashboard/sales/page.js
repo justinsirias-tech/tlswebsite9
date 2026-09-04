@@ -110,14 +110,14 @@ export default function PartnerSalesPage() {
 
       const data = await res.json();
       if (!res.ok) {
-        setFormError(data.error || "เกิดข้อผิดพลาดในการบันทึก");
+        setFormError(data.error || "An error occurred while saving.");
         return;
       }
 
       setIsAddModalOpen(false);
       fetchSales();
     } catch (err) {
-      setFormError("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้");
+      setFormError("Unable to connect to the server.");
     } finally {
       setIsSubmitting(false);
     }
@@ -138,7 +138,7 @@ export default function PartnerSalesPage() {
 
       const data = await res.json();
       if (!res.ok) {
-        setFormError(data.error || "เกิดข้อผิดพลาดในการแก้ไข");
+        setFormError(data.error || "An error occurred while updating.");
         return;
       }
 
@@ -146,7 +146,7 @@ export default function PartnerSalesPage() {
       setEditingSale(null);
       fetchSales();
     } catch (err) {
-      setFormError("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้");
+      setFormError("Unable to connect to the server.");
     } finally {
       setIsSubmitting(false);
     }
@@ -163,10 +163,10 @@ export default function PartnerSalesPage() {
       }}>
         <div>
           <h1 style={{ fontSize: "1.6rem", fontWeight: "800", color: "#0f172a", margin: "0 0 0.3rem 0" }}>
-            บันทึกรายการขาย (Sales Tracking)
+            Sales Tracking
           </h1>
           <p style={{ fontSize: "0.9rem", color: "#64748b", margin: 0 }}>
-            รายการขายทั้งหมดที่บันทึกโดยใช้ Promo Code ของพาร์ทเนอร์
+            All sales orders recorded using partner promo codes
           </p>
         </div>
 
@@ -188,7 +188,7 @@ export default function PartnerSalesPage() {
           }}
         >
           <i className="fa-solid fa-plus"></i>
-          <span>เพิ่มรายการขาย</span>
+          <span>Record New Sale</span>
         </button>
       </div>
 
@@ -210,10 +210,10 @@ export default function PartnerSalesPage() {
           {/* Period Tabs */}
           <div style={{ display: "flex", background: "#f1f5f9", padding: "0.25rem", borderRadius: "10px" }}>
             {[
-              { id: "all", label: "ทั้งหมด" },
-              { id: "today", label: "วันนี้" },
-              { id: "month", label: "เดือนนี้" },
-              { id: "year", label: "ปีนี้" },
+              { id: "all", label: "All" },
+              { id: "today", label: "Today" },
+              { id: "month", label: "This Month" },
+              { id: "year", label: "This Year" },
             ].map((t) => (
               <button
                 key={t.id}
@@ -250,10 +250,10 @@ export default function PartnerSalesPage() {
               outline: "none"
             }}
           >
-            <option value="">ทุกโค้ด (All Codes)</option>
+            <option value="">All Promo Codes</option>
             {codes.map((c) => (
               <option key={c.id} value={c.id}>
-                {c.code} ({c.discountType === "PERCENTAGE" ? `${c.discountValue}%` : `${c.discountValue}฿`})
+                {c.code} ({c.discountType === "PERCENTAGE" ? `${c.discountValue}%` : `฿${c.discountValue}`})
               </option>
             ))}
           </select>
@@ -262,11 +262,11 @@ export default function PartnerSalesPage() {
         {/* Summary Metric */}
         <div style={{ display: "flex", gap: "1.5rem", alignItems: "center" }}>
           <div>
-            <span style={{ fontSize: "0.8rem", color: "#64748b", fontWeight: "600" }}>จำนวนรายการ: </span>
+            <span style={{ fontSize: "0.8rem", color: "#64748b", fontWeight: "600" }}>Total Orders: </span>
             <span style={{ fontSize: "1rem", fontWeight: "800", color: "#0f172a" }}>{summary.totalCount}</span>
           </div>
           <div>
-            <span style={{ fontSize: "0.8rem", color: "#64748b", fontWeight: "600" }}>ยอดรวมทั้งหมด: </span>
+            <span style={{ fontSize: "0.8rem", color: "#64748b", fontWeight: "600" }}>Total Revenue: </span>
             <span style={{ fontSize: "1.2rem", fontWeight: "900", color: "#166534" }}>
               ฿{summary.totalAmount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </span>
@@ -284,13 +284,13 @@ export default function PartnerSalesPage() {
         {loading ? (
           <div style={{ textAlign: "center", padding: "4rem 0", color: "#64748b" }}>
             <i className="fa-solid fa-spinner fa-spin" style={{ fontSize: "1.8rem", marginBottom: "0.8rem" }}></i>
-            <div>กำลังโหลดรายการขาย...</div>
+            <div>Loading sales orders...</div>
           </div>
         ) : sales.length === 0 ? (
           <div style={{ textAlign: "center", padding: "4rem 2rem", color: "#94a3b8" }}>
             <i className="fa-solid fa-receipt" style={{ fontSize: "2.5rem", marginBottom: "1rem", opacity: 0.5 }}></i>
-            <h3 style={{ fontSize: "1.1rem", color: "#475569", margin: "0 0 0.5rem 0" }}>ยังไม่พบรายการขายตามเงื่อนไขที่เลือก</h3>
-            <p style={{ fontSize: "0.85rem", margin: "0 0 1.5rem 0" }}>คลิกปุ่มด้านล่างเพื่อบันทึกรายการขายลูกค้ารายแรก</p>
+            <h3 style={{ fontSize: "1.1rem", color: "#475569", margin: "0 0 0.5rem 0" }}>No sales found for the selected filter</h3>
+            <p style={{ fontSize: "0.85rem", margin: "0 0 1.5rem 0" }}>Click the button below to record your first sale</p>
             <button
               onClick={handleOpenAdd}
               style={{
@@ -303,7 +303,7 @@ export default function PartnerSalesPage() {
                 cursor: "pointer"
               }}
             >
-              + บันทึกรายการขายใหม่
+              + Record New Sale
             </button>
           </div>
         ) : (
@@ -311,18 +311,18 @@ export default function PartnerSalesPage() {
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.9rem" }}>
               <thead>
                 <tr style={{ background: "#f8fafc", borderBottom: "1px solid #e2e8f0", color: "#475569", fontSize: "0.8rem", textTransform: "uppercase", letterSpacing: "0.5px" }}>
-                  <th style={{ padding: "1rem 1.25rem", textAlign: "left" }}>วัน-เวลาที่บันทึก</th>
-                  <th style={{ padding: "1rem 1.25rem", textAlign: "left" }}>โค้ดที่ใช้</th>
-                  <th style={{ padding: "1rem 1.25rem", textAlign: "left" }}>ชื่อลูกค้า</th>
-                  <th style={{ padding: "1rem 1.25rem", textAlign: "left" }}>เบอร์โทรศัพท์</th>
-                  <th style={{ padding: "1rem 1.25rem", textAlign: "right" }}>ราคาขาย (THB)</th>
-                  <th style={{ padding: "1rem 1.25rem", textAlign: "left" }}>หมายเหตุ</th>
-                  <th style={{ padding: "1rem 1.25rem", textAlign: "center" }}>จัดการ</th>
+                  <th style={{ padding: "1rem 1.25rem", textAlign: "left" }}>Date & Time</th>
+                  <th style={{ padding: "1rem 1.25rem", textAlign: "left" }}>Promo Code</th>
+                  <th style={{ padding: "1rem 1.25rem", textAlign: "left" }}>Customer Name</th>
+                  <th style={{ padding: "1rem 1.25rem", textAlign: "left" }}>Phone Number</th>
+                  <th style={{ padding: "1rem 1.25rem", textAlign: "right" }}>Sale Amount (THB)</th>
+                  <th style={{ padding: "1rem 1.25rem", textAlign: "left" }}>Note</th>
+                  <th style={{ padding: "1rem 1.25rem", textAlign: "center" }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {sales.map((s) => {
-                  const dateStr = new Date(s.createdAt).toLocaleString("th-TH", {
+                  const dateStr = new Date(s.createdAt).toLocaleString("en-US", {
                     dateStyle: "medium",
                     timeStyle: "short"
                   });
@@ -375,7 +375,7 @@ export default function PartnerSalesPage() {
                           }}
                         >
                           <i className="fa-solid fa-pen-to-square"></i>
-                          <span>แก้ไข</span>
+                          <span>Edit</span>
                         </button>
                       </td>
                     </tr>
@@ -410,7 +410,7 @@ export default function PartnerSalesPage() {
           }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
               <h2 style={{ fontSize: "1.3rem", fontWeight: "800", color: "#0f172a", margin: 0 }}>
-                บันทึกรายการขายใหม่
+                Record New Sale
               </h2>
               <button
                 onClick={() => setIsAddModalOpen(false)}
@@ -429,7 +429,7 @@ export default function PartnerSalesPage() {
             <form onSubmit={handleSubmitAdd} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
               <div>
                 <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
-                  เลือกโค้ดส่วนลด (Promo Code) *
+                  Select Promo Code *
                 </label>
                 <select
                   value={formData.promoCodeId}
@@ -439,7 +439,7 @@ export default function PartnerSalesPage() {
                 >
                   {codes.map((c) => (
                     <option key={c.id} value={c.id}>
-                      {c.code} — {c.discountType === "PERCENTAGE" ? `ลด ${c.discountValue}%` : `ลด ${c.discountValue} THB`}
+                      {c.code} — {c.discountType === "PERCENTAGE" ? `${c.discountValue}% off` : `฿${c.discountValue} off`}
                     </option>
                   ))}
                 </select>
@@ -447,11 +447,11 @@ export default function PartnerSalesPage() {
 
               <div>
                 <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
-                  ชื่อลูกค้า *
+                  Customer Name *
                 </label>
                 <input
                   type="text"
-                  placeholder="เช่น คุณสมชาย ใจดี"
+                  placeholder="e.g. John Doe"
                   value={formData.customerName}
                   onChange={(e) => setFormData(prev => ({ ...prev, customerName: e.target.value }))}
                   required
@@ -461,11 +461,11 @@ export default function PartnerSalesPage() {
 
               <div>
                 <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
-                  เบอร์โทรศัพท์ *
+                  Phone Number *
                 </label>
                 <input
                   type="tel"
-                  placeholder="เช่น 0812345678"
+                  placeholder="e.g. 0812345678"
                   value={formData.customerPhone}
                   onChange={(e) => setFormData(prev => ({ ...prev, customerPhone: e.target.value }))}
                   required
@@ -475,13 +475,13 @@ export default function PartnerSalesPage() {
 
               <div>
                 <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
-                  ราคาขาย (บาท) *
+                  Sale Price (THB) *
                 </label>
                 <input
                   type="number"
                   step="0.01"
                   min="0"
-                  placeholder="เช่น 550.00"
+                  placeholder="e.g. 550.00"
                   value={formData.saleAmount}
                   onChange={(e) => setFormData(prev => ({ ...prev, saleAmount: e.target.value }))}
                   required
@@ -491,11 +491,11 @@ export default function PartnerSalesPage() {
 
               <div>
                 <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
-                  หมายเหตุ (Optional)
+                  Note (Optional)
                 </label>
                 <input
                   type="text"
-                  placeholder="รายละเอียดเพิ่มเติม เช่น รายการซักแห้งสูท"
+                  placeholder="Additional details, e.g. dry clean suit"
                   value={formData.note}
                   onChange={(e) => setFormData(prev => ({ ...prev, note: e.target.value }))}
                   style={{ width: "100%", padding: "0.75rem", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#f8fafc", boxSizing: "border-box" }}
@@ -508,14 +508,14 @@ export default function PartnerSalesPage() {
                   onClick={() => setIsAddModalOpen(false)}
                   style={{ padding: "0.75rem 1.25rem", borderRadius: "8px", background: "#f1f5f9", border: "1px solid #cbd5e1", color: "#475569", fontWeight: "700", cursor: "pointer" }}
                 >
-                  ยกเลิก
+                  Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
                   style={{ padding: "0.75rem 1.5rem", borderRadius: "8px", background: "#222945", border: "none", color: "#ffffff", fontWeight: "700", cursor: "pointer", opacity: isSubmitting ? 0.7 : 1 }}
                 >
-                  {isSubmitting ? "กำลังบันทึก..." : "บันทึกรายการ"}
+                  {isSubmitting ? "Saving..." : "Save Sale"}
                 </button>
               </div>
             </form>
@@ -546,7 +546,7 @@ export default function PartnerSalesPage() {
           }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
               <h2 style={{ fontSize: "1.3rem", fontWeight: "800", color: "#0f172a", margin: 0 }}>
-                แก้ไขรายการขาย
+                Edit Sale Order
               </h2>
               <button
                 onClick={() => setIsEditModalOpen(false)}
@@ -565,7 +565,7 @@ export default function PartnerSalesPage() {
             <form onSubmit={handleSubmitEdit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
               <div>
                 <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
-                  โค้ดส่วนลด (Promo Code)
+                  Promo Code
                 </label>
                 <select
                   value={formData.promoCodeId}
@@ -575,7 +575,7 @@ export default function PartnerSalesPage() {
                 >
                   {codes.map((c) => (
                     <option key={c.id} value={c.id}>
-                      {c.code} — {c.discountType === "PERCENTAGE" ? `ลด ${c.discountValue}%` : `ลด ${c.discountValue} THB`}
+                      {c.code} — {c.discountType === "PERCENTAGE" ? `${c.discountValue}% off` : `฿${c.discountValue} off`}
                     </option>
                   ))}
                 </select>
@@ -583,7 +583,7 @@ export default function PartnerSalesPage() {
 
               <div>
                 <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
-                  ชื่อลูกค้า *
+                  Customer Name *
                 </label>
                 <input
                   type="text"
@@ -596,7 +596,7 @@ export default function PartnerSalesPage() {
 
               <div>
                 <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
-                  เบอร์โทรศัพท์ *
+                  Phone Number *
                 </label>
                 <input
                   type="tel"
@@ -609,7 +609,7 @@ export default function PartnerSalesPage() {
 
               <div>
                 <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
-                  ราคาขาย (บาท) *
+                  Sale Price (THB) *
                 </label>
                 <input
                   type="number"
@@ -624,7 +624,7 @@ export default function PartnerSalesPage() {
 
               <div>
                 <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
-                  หมายเหตุ (Optional)
+                  Note (Optional)
                 </label>
                 <input
                   type="text"
@@ -634,20 +634,20 @@ export default function PartnerSalesPage() {
                 />
               </div>
 
-              <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.75rem", marginTop: "1rem" }}>
+              <div style={{ display: "flex", borderBottom: "none", justifyContent: "flex-end", gap: "0.75rem", marginTop: "1rem" }}>
                 <button
                   type="button"
                   onClick={() => setIsEditModalOpen(false)}
                   style={{ padding: "0.75rem 1.25rem", borderRadius: "8px", background: "#f1f5f9", border: "1px solid #cbd5e1", color: "#475569", fontWeight: "700", cursor: "pointer" }}
                 >
-                  ยกเลิก
+                  Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
                   style={{ padding: "0.75rem 1.5rem", borderRadius: "8px", background: "#222945", border: "none", color: "#ffffff", fontWeight: "700", cursor: "pointer", opacity: isSubmitting ? 0.7 : 1 }}
                 >
-                  {isSubmitting ? "กำลังบันทึก..." : "อัปเดตรายการ"}
+                  {isSubmitting ? "Saving..." : "Update Sale"}
                 </button>
               </div>
             </form>

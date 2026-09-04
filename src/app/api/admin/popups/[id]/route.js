@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { jwtVerify } from "jose";
 import prisma from "../../../../../lib/prisma";
+import { parseDateInput } from "../../../../../lib/dateUtils";
 
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || "tls-secret-key-2026");
 
@@ -29,8 +30,8 @@ export async function PUT(request, { params }) {
     const updateData = {};
     if (data.name !== undefined) updateData.name = data.name;
     if (data.imageUrl !== undefined) updateData.imageUrl = data.imageUrl;
-    if (data.startDate !== undefined) updateData.startDate = new Date(data.startDate);
-    if (data.endDate !== undefined) updateData.endDate = new Date(data.endDate);
+    if (data.startDate !== undefined) updateData.startDate = parseDateInput(data.startDate);
+    if (data.endDate !== undefined) updateData.endDate = parseDateInput(data.endDate);
     if (data.isActive !== undefined) updateData.isActive = data.isActive;
 
     const popup = await prisma.popupTemplate.update({

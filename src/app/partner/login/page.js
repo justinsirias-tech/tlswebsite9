@@ -27,14 +27,14 @@ export default function PartnerLogin() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || "อีเมลหรือรหัสผ่านไม่ถูกต้อง");
+        setError(data.error || "Invalid email or password.");
         return;
       }
 
       router.push("/partner/dashboard");
       router.refresh();
     } catch (err) {
-      setError("ไม่สามารถเชื่อมต่อระบบได้ กรุณาลองใหม่อีกครั้ง");
+      setError("Unable to connect to the server. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -77,7 +77,7 @@ export default function PartnerLogin() {
             Partner Portal
           </h1>
           <p style={{ fontSize: "0.9rem", color: "#64748b", margin: 0 }}>
-            That's Laundry Shop — สำหรับพาร์ทเนอร์
+            That's Laundry Shop — Exclusive Partner Access
           </p>
         </div>
 
@@ -103,7 +103,7 @@ export default function PartnerLogin() {
         <form onSubmit={handleLogin} style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
           <div>
             <label style={{ display: "block", fontSize: "0.9rem", fontWeight: "700", color: "#334155", marginBottom: "0.4rem" }}>
-              อีเมลพาร์ทเนอร์
+              Partner Email
             </label>
             <input
               type="email"
@@ -128,13 +128,13 @@ export default function PartnerLogin() {
           <div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.4rem" }}>
               <label style={{ fontSize: "0.9rem", fontWeight: "700", color: "#334155" }}>
-                รหัสผ่าน
+                Password
               </label>
               <Link 
                 href="/partner/forgot-password" 
                 style={{ fontSize: "0.85rem", color: "#2563eb", textDecoration: "none", fontWeight: "600" }}
               >
-                ลืมรหัสผ่าน?
+                Forgot Password?
               </Link>
             </div>
             <div style={{ position: "relative" }}>
@@ -194,13 +194,13 @@ export default function PartnerLogin() {
               opacity: loading ? 0.7 : 1
             }}
           >
-            {loading ? "กำลังเข้าสู่ระบบ..." : "เข้าสู่ระบบ Partner"}
+            {loading ? "Signing in..." : "Sign In to Partner Portal"}
           </button>
         </form>
 
         <div style={{ marginTop: "2rem", textAlign: "center", borderTop: "1px solid #e2e8f0", paddingTop: "1.25rem" }}>
           <span style={{ fontSize: "0.85rem", color: "#64748b" }}>
-            ยังไม่มีบัญชีพาร์ทเนอร์? ติดต่อผู้ดูแลระบบ TLS เพื่อเปิดบัญชี
+            Don't have a partner account? Contact TLS Administrator to get started.
           </span>
         </div>
       </div>

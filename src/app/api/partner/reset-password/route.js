@@ -31,14 +31,14 @@ export async function POST(request) {
       payload = verified.payload;
     } catch (jwtErr) {
       return NextResponse.json(
-        { error: "ลิงก์รีเซ็ตรหัสผ่านหมดอายุหรือไม่ถูกต้อง กรุณาทำรายการใหม่อีกครั้ง" },
+        { error: "Password reset link is expired or invalid. Please submit a new request." },
         { status: 400 }
       );
     }
 
     if (payload?.type !== "PARTNER_RESET" || !payload?.partnerId) {
       return NextResponse.json(
-        { error: "ลิงก์รีเซ็ตรหัสผ่านไม่ถูกต้อง" },
+        { error: "Invalid password reset link." },
         { status: 400 }
       );
     }
@@ -55,7 +55,7 @@ export async function POST(request) {
 
     if (!partner) {
       return NextResponse.json(
-        { error: "ลิงก์นี้ถูกใช้งานไปแล้วหรือหมดอายุ กรุณาขอลิงก์รีเซ็ตใหม่อีกครั้ง" },
+        { error: "This reset link has already been used or has expired. Please request a new link." },
         { status: 400 }
       );
     }
@@ -73,7 +73,7 @@ export async function POST(request) {
 
     return NextResponse.json({
       success: true,
-      message: "ตั้งรหัสผ่านใหม่เรียบร้อยแล้ว สามารถเข้าสู่ระบบด้วยรหัสผ่านใหม่ได้ทันที"
+      message: "Password reset successfully. You can now log in with your new password."
     });
   } catch (error) {
     console.error("[PARTNER_RESET_PASSWORD_ERROR]", error);

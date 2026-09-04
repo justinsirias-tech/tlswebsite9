@@ -44,16 +44,16 @@ export default function PartnerDashboardLayout({ children }) {
       <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#f8fafc", color: "#64748b", fontFamily: "sans-serif" }}>
         <div style={{ textAlign: "center" }}>
           <i className="fa-solid fa-spinner fa-spin" style={{ fontSize: "2rem", color: "#222945", marginBottom: "1rem" }}></i>
-          <div>กำลังโหลดข้อมูล Partner Portal...</div>
+          <div>Loading Partner Portal...</div>
         </div>
       </div>
     );
   }
 
   const navItems = [
-    { label: "ภาพรวม (Overview)", href: "/partner/dashboard", icon: "fa-chart-pie" },
-    { label: "รายการขาย (Sales)", href: "/partner/dashboard/sales", icon: "fa-receipt" },
-    { label: "จัดการโค้ด (My Codes)", href: "/partner/dashboard/codes", icon: "fa-ticket" },
+    { label: "Overview", href: "/partner/dashboard", icon: "fa-chart-pie" },
+    { label: "Sales Tracking", href: "/partner/dashboard/sales", icon: "fa-receipt" },
+    { label: "My Promo Codes", href: "/partner/dashboard/codes", icon: "fa-ticket" },
   ];
 
   return (
@@ -138,7 +138,7 @@ export default function PartnerDashboardLayout({ children }) {
 
           <button
             onClick={handleLogout}
-            title="ออกจากระบบ"
+            title="Sign Out"
             style={{
               background: "rgba(239, 68, 68, 0.15)",
               color: "#fca5a5",
@@ -154,7 +154,7 @@ export default function PartnerDashboardLayout({ children }) {
             }}
           >
             <i className="fa-solid fa-right-from-bracket"></i>
-            <span>ออก</span>
+            <span>Sign Out</span>
           </button>
         </div>
       </header>

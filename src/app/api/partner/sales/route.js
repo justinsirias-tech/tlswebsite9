@@ -81,7 +81,7 @@ export async function POST(request) {
 
     if (!promoCodeId || !customerName || !customerPhone || saleAmount === undefined || saleAmount === null) {
       return NextResponse.json(
-        { error: "กรุณาระบุข้อมูลให้ครบถ้วน: Code, ชื่อลูกค้า, เบอร์โทร, และราคาขาย" },
+        { error: "Please fill in all required fields: Promo Code, Customer Name, Phone Number, and Sale Price." },
         { status: 400 }
       );
     }
@@ -89,7 +89,7 @@ export async function POST(request) {
     const amount = parseFloat(saleAmount);
     if (isNaN(amount) || amount < 0) {
       return NextResponse.json(
-        { error: "ราคาขายต้องเป็นจำนวนเงินที่ถูกต้อง" },
+        { error: "Sale price must be a valid positive number." },
         { status: 400 }
       );
     }
@@ -104,7 +104,7 @@ export async function POST(request) {
 
     if (!code) {
       return NextResponse.json(
-        { error: "ไม่พบโค้ดส่วนลดนี้ หรือคุณไม่มีสิทธิ์ใช้งานโค้ดนี้" },
+        { error: "Promo code not found or you do not have permission to use it." },
         { status: 404 }
       );
     }

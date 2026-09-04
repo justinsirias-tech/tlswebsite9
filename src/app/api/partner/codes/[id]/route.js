@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "../../../../../lib/prisma";
 import { getPartnerSession } from "../../../../../lib/partnerAuth";
+import { parseDateInput } from "../../../../../lib/dateUtils";
 
 export const dynamic = 'force-dynamic';
 
@@ -31,8 +32,8 @@ export async function PUT(request, { params }) {
 
     const updateData = {};
     if (data.isActive !== undefined) updateData.isActive = Boolean(data.isActive);
-    if (data.startDate !== undefined) updateData.startDate = data.startDate ? new Date(data.startDate) : null;
-    if (data.endDate !== undefined) updateData.endDate = data.endDate ? new Date(data.endDate) : null;
+    if (data.startDate !== undefined) updateData.startDate = parseDateInput(data.startDate);
+    if (data.endDate !== undefined) updateData.endDate = parseDateInput(data.endDate);
     if (data.description !== undefined) updateData.description = data.description || null;
     if (data.discountValue !== undefined) updateData.discountValue = parseFloat(data.discountValue);
     if (data.minOrderValue !== undefined) updateData.minOrderValue = data.minOrderValue ? parseFloat(data.minOrderValue) : 0;
