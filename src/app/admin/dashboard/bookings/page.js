@@ -101,6 +101,7 @@ export default function BookingsPage() {
       time: "",
       paymentMethod: "",
       expressService: "",
+      promoCode: "",
       notes: "",
       roomNo: "",
       deliveryRoomNo: ""
@@ -141,6 +142,8 @@ export default function BookingsPage() {
         details.expressService = trimmed.replace("Express Service:", "").trim();
       } else if (trimmed.startsWith("Notes:")) {
         details.notes = trimmed.replace("Notes:", "").trim();
+      } else if (trimmed.startsWith("Promo Code:")) {
+        details.promoCode = trimmed.replace("Promo Code:", "").trim();
       }
     });
 
@@ -752,6 +755,15 @@ export default function BookingsPage() {
                             <i className="fa-solid fa-bolt" style={{ marginRight: "6px" }}></i> {details.expressService || "Standard"}
                           </div>
                         </div>
+
+                        {details.promoCode && (
+                          <div>
+                            <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: "600", textTransform: "uppercase" }}>Promo Code</div>
+                            <div style={{ fontSize: "0.95rem", fontWeight: "700", color: "#166534", marginTop: "0.15rem", fontFamily: "monospace" }}>
+                              <i className="fa-solid fa-ticket" style={{ marginRight: "6px", color: "#16a34a" }}></i> {details.promoCode}
+                            </div>
+                          </div>
+                        )}
 
                         <div>
                           <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: "600", textTransform: "uppercase" }}>Placed On</div>

@@ -53,6 +53,7 @@ function parseServiceDetails(serviceStr) {
     pickupMethod: "",
     time: "",
     notes: "",
+    promoCode: "",
     roomNo: "",
     deliveryRoomNo: ""
   };
@@ -88,6 +89,8 @@ function parseServiceDetails(serviceStr) {
       details.time = trimmed.replace("Time:", "").trim();
     } else if (trimmed.startsWith("Notes:")) {
       details.notes = trimmed.replace("Notes:", "").trim();
+    } else if (trimmed.startsWith("Promo Code:")) {
+      details.promoCode = trimmed.replace("Promo Code:", "").trim();
     }
   });
 
@@ -286,6 +289,17 @@ async function sendConfirmationEmail(booking) {
                 ${serviceBadgesHtml}
               </div>
             </div>
+
+            <!-- Promo Code -->
+            ${details.promoCode ? `
+            <div style="background: #f0fdf4; border: 1px solid #bbf7d0; padding: 12px 15px; border-radius: 8px; margin-bottom: 25px;">
+              <div style="font-size: 10px; color: #166534; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">
+                Applied Promo Code
+              </div>
+              <div style="font-size: 15px; color: #14532d; font-weight: 800; font-family: monospace;">
+                🎟️ ${details.promoCode}
+              </div>
+            </div>` : ''}
 
             <!-- Addresses Grid -->
             <div style="margin-bottom: 25px; border-top: 1px solid #f1f5f9; padding-top: 20px;">
