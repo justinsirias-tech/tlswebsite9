@@ -265,6 +265,28 @@ Notes: ${specialInst}`.trim();
           console.log("%c📧 Automated Email Sent!", "color: #10b981; font-weight: bold; font-size: 14px;");
           console.log("%cPreview the email here: " + resData.emailPreviewUrl, "color: #3b82f6; font-size: 14px;");
         }
+
+        // Trigger Google Tag Manager & Google Ads Conversion Event
+        if (typeof window !== 'undefined') {
+          window.dataLayer = window.dataLayer || [];
+          window.dataLayer.push({
+            event: 'form_submission',
+            event_category: 'Booking',
+            event_action: 'Submit',
+            form_name: 'Booking Form',
+            conversion_type_id: '6677228879',
+            value: 60,
+            currency: 'THB'
+          });
+          if (typeof window.gtag === 'function') {
+            window.gtag('event', 'conversion', {
+              send_to: 'AW-10923232152',
+              value: 60.0,
+              currency: 'THB'
+            });
+          }
+        }
+
         setIsSubmitted(true);
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
