@@ -85,8 +85,7 @@ export default function Home() {
             fill
             priority
             fetchPriority="high"
-            unoptimized={true}
-            sizes="100vw"
+            sizes="(max-width: 768px) 100vw, 100vw"
             style={{ objectFit: "cover", objectPosition: "center" }}
           />
           <div className={styles.heroOverlay}></div>

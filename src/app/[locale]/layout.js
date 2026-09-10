@@ -28,9 +28,11 @@ export default async function RootLayout({ children, params }) {
     <html lang={locale} suppressHydrationWarning>
       <head>
         <link rel="preload" href="/assets/hero_bg_v2.webp" as="image" type="image/webp" />
-        <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
-        <link rel="preconnect" href="https://maps.googleapis.com" />
-        <link rel="preconnect" href="https://maps.gstatic.com" />
+        <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com" />
+        <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://maps.googleapis.com" />
+        <link rel="preconnect" href="https://maps.googleapis.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://maps.gstatic.com" crossOrigin="anonymous" />
         <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" precedence="default" />
       </head>
