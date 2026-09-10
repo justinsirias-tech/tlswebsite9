@@ -24,9 +24,11 @@ export default async function sitemap() {
     { path: '/booking', changeFrequency: 'yearly', priority: 0.9 },
     { path: '/contact', changeFrequency: 'yearly', priority: 0.5 },
     { path: '/about', changeFrequency: 'yearly', priority: 0.7 },
+    { path: '/promotions', changeFrequency: 'weekly', priority: 0.9 },
     { path: '/articles', changeFrequency: 'weekly', priority: 0.8 },
     { path: '/hotels', changeFrequency: 'weekly', priority: 0.8 },
     { path: '/condominiums', changeFrequency: 'weekly', priority: 0.8 },
+    { path: '/terms', changeFrequency: 'monthly', priority: 0.4 },
   ];
 
   for (const locale of locales) {
