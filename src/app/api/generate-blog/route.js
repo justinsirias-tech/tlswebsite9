@@ -21,7 +21,7 @@ export async function POST(request) {
       return NextResponse.json({ error: "Missing topic" }, { status: 400 });
     }
 
-    const images = await getUniqueLaundryImages(3);
+    const images = await getUniqueLaundryImages(3, topic);
     const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
     const prompt = `You are an expert SEO content writer for a luxury laundry service in Thailand called "That Laundry Shop".
     I want you to write a massive, highly-detailed, SEO-optimized article based on the following topic: "${topic}".

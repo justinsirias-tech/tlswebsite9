@@ -7,9 +7,6 @@ const nextConfig = {
   experimental: {
     cpus: 1, // Limit build workers to 1 to prevent database connection exhaustion
   },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
   images: {
     remotePatterns: [
       {
@@ -19,6 +16,10 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: 'flagcdn.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'storage.googleapis.com',
       },
     ],
   },

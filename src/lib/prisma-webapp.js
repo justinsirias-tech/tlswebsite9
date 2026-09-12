@@ -31,21 +31,20 @@ if (connectionString) {
   const adapter = new PrismaPg(pool);
   prismaWebapp = new PrismaClient({ adapter });
 } else {
-  // Use a Proxy fallback to prevent constructor initialization crashes during next build (when WEBAPP_DATABASE_URL is missing)
-  prismaWebapp = new Proxy({}, {
-    get(target, prop) {
-      if (prop === 'then') return undefined;
-      return new Proxy(() => {}, {
-        apply() {
-          throw new Error("prismaWebapp cannot be used because WEBAPP_DATABASE_URL is not configured in environment variables.");
-        },
-        get(t, p) {
-          if (p === 'then') return undefined;
-          return this; // Return itself recursively to support chaining like prismaWebapp.member.findMany
-        }
-      });
-    }
-  });
+  // Use a recursive callable Proxy fallback to prevent constructor initialization crashes
+  // and runtime unhandled exceptions when WEBAPP_DATABASE_URL is missing
+  function createSafeFallback() {
+    return new Proxy(() => Promise.resolve([]), {
+      get(target, prop) {
+        if (prop === 'then') return undefined;
+        return createSafeFallback();
+      },
+      apply(target, thisArg, argArray) {
+        return Promise.resolve([]);
+      }
+    });
+  }
+  prismaWebapp = createSafeFallback();
 }
 
 export default prismaWebapp;

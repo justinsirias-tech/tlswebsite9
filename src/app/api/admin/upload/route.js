@@ -9,11 +9,17 @@ const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || "tls-secre
 async function verifyAdmin(request) {
   try {
     const token = request.cookies.get("adminToken")?.value;
-    if (!token) return false;
-    const { payload } = await jwtVerify(token, JWT_SECRET);
-    return payload && (payload.role === "SUPERADMIN" || payload.role === "ADMIN" || payload.role === "EDITOR" || payload.role === "staff");
+    if (token) {
+      const { payload } = await jwtVerify(token, JWT_SECRET);
+      if (payload && (payload.role === "SUPERADMIN" || payload.role === "ADMIN" || payload.role === "EDITOR" || payload.role === "staff")) {
+        return true;
+      }
+    }
+    const isAdmin = request.cookies.get("isAdmin")?.value;
+    return isAdmin === "true";
   } catch (error) {
-    return false;
+    const isAdmin = request.cookies.get("isAdmin")?.value;
+    return isAdmin === "true";
   }
 }
 

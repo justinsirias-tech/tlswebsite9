@@ -109,7 +109,12 @@ export default async function ArticleDetails({ params }) {
           <div 
             className="article-content"
             style={{ lineHeight: "1.8", color: "var(--text-color)", fontSize: "1.1rem" }}
-            dangerouslySetInnerHTML={{ __html: article.content }} 
+            dangerouslySetInnerHTML={{ 
+              __html: (article.content || '').replace(
+                /<img\b(?![^>]*\bonerror=)/gi,
+                `<img onerror="this.onerror=null;this.src='/assets/hero_laundry.webp';" `
+              ) 
+            }} 
           />
         </div>
       </section>

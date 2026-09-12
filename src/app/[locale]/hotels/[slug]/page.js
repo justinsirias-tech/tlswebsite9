@@ -12,7 +12,7 @@ export async function generateStaticParams() {
   const locales = ['en', 'th', 'cn'];
   try {
     const locations = await prisma.location.findMany({
-      where: { type: 'hotel' },
+      where: { type: { in: ['hotel', 'apartment'] } },
       select: { slug: true }
     });
     const paths = [];

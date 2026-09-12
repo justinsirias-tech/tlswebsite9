@@ -10,10 +10,16 @@ export default async function MembershipsAdminPage() {
     orderBy: { createdAt: "desc" }
   });
 
-  const members = await prismaWebapp.member.findMany({
-    where: { isMember: true },
-    orderBy: { createdAt: "desc" }
-  });
+  let members = [];
+  try {
+    members = await prismaWebapp.member.findMany({
+      where: { isMember: true },
+      orderBy: { createdAt: "desc" }
+    }) || [];
+  } catch (err) {
+    console.warn("Could not fetch webapp members (WEBAPP_DATABASE_URL may not be configured):", err?.message);
+    members = [];
+  }
 
   // Serialize Date objects to strings for Client Component usage
   const serializedRequests = requests.map(req => ({

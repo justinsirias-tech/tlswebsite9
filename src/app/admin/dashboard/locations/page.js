@@ -15,6 +15,13 @@ export default function LocationsAdminPage() {
   const [isGeneratingAI, setIsGeneratingAI] = useState(false);
   const [isTranslating, setIsTranslating] = useState(false);
 
+  // Batch AI Generation Modal state
+  const [isBatchModalOpen, setIsBatchModalOpen] = useState(false);
+  const [isGeneratingBatch, setIsGeneratingBatch] = useState(false);
+  const [batchCity, setBatchCity] = useState("both"); // 'both' | 'Bangkok' | 'Pattaya'
+  const [batchType, setBatchType] = useState("all");  // 'all' | 'hotel' | 'condo' | 'apartment'
+  const [batchStatusMsg, setBatchStatusMsg] = useState("");
+
   const cities = ["Bangkok", "Pattaya"];
 
   const toTitleCase = (str) => {
@@ -203,6 +210,43 @@ export default function LocationsAdminPage() {
     }
   };
 
+  const handleGenerate30Listings = async () => {
+    setIsGeneratingBatch(true);
+    setBatchStatusMsg("Connecting to Gemini AI and researching luxury properties...");
+
+    try {
+      const res = await fetch("/api/admin/generate-listings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          city: batchCity,
+          type: batchType,
+          count: 30
+        })
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setBatchStatusMsg(`Successfully generated and saved ${data.count} new luxury properties!`);
+        await fetchLocations();
+        setTimeout(() => {
+          setIsBatchModalOpen(false);
+          setIsGeneratingBatch(false);
+          setBatchStatusMsg("");
+        }, 1800);
+      } else {
+        alert("Failed to generate listings: " + (data.error || "Unknown server error"));
+        setIsGeneratingBatch(false);
+        setBatchStatusMsg("");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Network error occurred while calling generate listings API.");
+      setIsGeneratingBatch(false);
+      setBatchStatusMsg("");
+    }
+  };
+
   const filteredLocations = locations
     .filter(l => l.city === activeCity)
     .filter(l => activeType === "all" || l.type === activeType)
@@ -226,9 +270,32 @@ export default function LocationsAdminPage() {
     <div className={styles.adminPage}>
       <div className={styles.pageHeader}>
         <h1><i className="fa-solid fa-building"></i> Building Directory</h1>
-        <button className="btn btn-primary" onClick={() => openModal()}>
-          <i className="fa-solid fa-plus"></i> Add Location
-        </button>
+        <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
+          <button 
+            type="button"
+            className="btn" 
+            onClick={() => setIsBatchModalOpen(true)}
+            style={{
+              background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #d946ef 100%)",
+              color: "white",
+              border: "none",
+              boxShadow: "0 4px 14px rgba(139, 92, 246, 0.35)",
+              display: "flex",
+              alignItems: "center",
+              gap: "0.5rem",
+              fontWeight: "600",
+              padding: "0.6rem 1.25rem",
+              borderRadius: "8px",
+              cursor: "pointer",
+              transition: "transform 0.15s ease"
+            }}
+          >
+            <i className="fa-solid fa-wand-magic-sparkles"></i> AI Generate 30 Listings
+          </button>
+          <button className="btn btn-primary" onClick={() => openModal()}>
+            <i className="fa-solid fa-plus"></i> Add Location
+          </button>
+        </div>
       </div>
 
       {/* Category Summary Stats Badges */}
@@ -667,6 +734,210 @@ export default function LocationsAdminPage() {
                 <button type="submit" className="btn btn-primary">Save Location</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* AI Generate 30 Listings Modal */}
+      {isBatchModalOpen && (
+        <div className={styles.modalOverlay} onClick={() => !isGeneratingBatch && setIsBatchModalOpen(false)}>
+          <div 
+            className={styles.modal} 
+            onClick={(e) => e.stopPropagation()}
+            style={{ maxWidth: "540px", borderRadius: "16px", overflow: "hidden" }}
+          >
+            {/* Modal Header */}
+            <div style={{
+              background: "linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #c026d3 100%)",
+              padding: "1.5rem",
+              color: "white",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center"
+            }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                <div style={{
+                  background: "rgba(255, 255, 255, 0.2)",
+                  width: "42px",
+                  height: "42px",
+                  borderRadius: "10px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "1.3rem"
+                }}>
+                  <i className="fa-solid fa-wand-magic-sparkles"></i>
+                </div>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: "1.25rem", fontWeight: "700" }}>AI Batch Generator</h3>
+                  <p style={{ margin: 0, fontSize: "0.85rem", opacity: 0.9 }}>Add 30 authentic luxury properties automatically</p>
+                </div>
+              </div>
+              {!isGeneratingBatch && (
+                <button 
+                  onClick={() => setIsBatchModalOpen(false)}
+                  style={{
+                    background: "transparent",
+                    border: "none",
+                    color: "white",
+                    fontSize: "1.2rem",
+                    cursor: "pointer",
+                    padding: "0.25rem"
+                  }}
+                >
+                  <i className="fa-solid fa-xmark"></i>
+                </button>
+              )}
+            </div>
+
+            {/* Modal Body */}
+            <div style={{ padding: "1.5rem" }}>
+              {isGeneratingBatch ? (
+                <div style={{ textAlign: "center", padding: "2rem 1rem" }}>
+                  <div style={{ fontSize: "2.5rem", color: "var(--primary)", marginBottom: "1rem" }}>
+                    <i className="fa-solid fa-spinner fa-spin"></i>
+                  </div>
+                  <h4 style={{ fontSize: "1.15rem", marginBottom: "0.5rem", fontWeight: "700" }}>
+                    Generating 30 Luxury Listings...
+                  </h4>
+                  <p style={{ color: "var(--text-light)", fontSize: "0.9rem", lineHeight: "1.5" }}>
+                    {batchStatusMsg || "Consulting Google Gemini AI to research authentic properties and draft bespoke SEO articles..."}
+                  </p>
+                  <div style={{
+                    marginTop: "1.5rem",
+                    background: "rgba(99, 102, 241, 0.1)",
+                    border: "1px dashed rgba(99, 102, 241, 0.3)",
+                    padding: "0.75rem 1rem",
+                    borderRadius: "8px",
+                    fontSize: "0.82rem",
+                    color: "var(--text-dark)"
+                  }}>
+                    <i className="fa-solid fa-shield-halved" style={{ color: "#6366f1", marginRight: "0.5rem" }}></i>
+                    Zero-duplicate filter active &bull; High-res verified architecture photos assigned
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  {/* City Selection */}
+                  <div className="form-group" style={{ marginBottom: "1.25rem" }}>
+                    <label className="form-label" style={{ fontWeight: "600", marginBottom: "0.5rem", display: "block" }}>
+                      Target City
+                    </label>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "0.5rem" }}>
+                      {[
+                        { id: "both", label: "Balanced (15 BKK + 15 PTY)" },
+                        { id: "Bangkok", label: "Bangkok Only (30)" },
+                        { id: "Pattaya", label: "Pattaya Only (30)" }
+                      ].map(opt => (
+                        <button
+                          key={opt.id}
+                          type="button"
+                          onClick={() => setBatchCity(opt.id)}
+                          style={{
+                            padding: "0.75rem 0.5rem",
+                            borderRadius: "8px",
+                            border: batchCity === opt.id ? "2px solid #6366f1" : "1px solid rgba(0,0,0,0.1)",
+                            background: batchCity === opt.id ? "rgba(99, 102, 241, 0.08)" : "var(--surface)",
+                            color: batchCity === opt.id ? "#4f46e5" : "inherit",
+                            fontWeight: batchCity === opt.id ? "700" : "500",
+                            fontSize: "0.85rem",
+                            cursor: "pointer",
+                            transition: "all 0.15s ease"
+                          }}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Property Type Selection */}
+                  <div className="form-group" style={{ marginBottom: "1.5rem" }}>
+                    <label className="form-label" style={{ fontWeight: "600", marginBottom: "0.5rem", display: "block" }}>
+                      Property Type Mix
+                    </label>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: "0.5rem" }}>
+                      {[
+                        { id: "all", label: "All Types" },
+                        { id: "hotel", label: "Hotels" },
+                        { id: "condo", label: "Condos" },
+                        { id: "apartment", label: "Apartments" }
+                      ].map(opt => (
+                        <button
+                          key={opt.id}
+                          type="button"
+                          onClick={() => setBatchType(opt.id)}
+                          style={{
+                            padding: "0.6rem 0.5rem",
+                            borderRadius: "8px",
+                            border: batchType === opt.id ? "2px solid #6366f1" : "1px solid rgba(0,0,0,0.1)",
+                            background: batchType === opt.id ? "rgba(99, 102, 241, 0.08)" : "var(--surface)",
+                            color: batchType === opt.id ? "#4f46e5" : "inherit",
+                            fontWeight: batchType === opt.id ? "700" : "500",
+                            fontSize: "0.85rem",
+                            cursor: "pointer",
+                            transition: "all 0.15s ease"
+                          }}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Features note */}
+                  <div style={{
+                    background: "rgba(0,0,0,0.03)",
+                    padding: "0.85rem 1rem",
+                    borderRadius: "8px",
+                    marginBottom: "1.5rem",
+                    fontSize: "0.82rem",
+                    color: "var(--text-light)",
+                    lineHeight: "1.5"
+                  }}>
+                    <strong style={{ color: "var(--text-dark)", display: "block", marginBottom: "0.25rem" }}>
+                      <i className="fa-solid fa-circle-check" style={{ color: "#10b981", marginRight: "0.35rem" }}></i>
+                      Automatic Quality Guarantees:
+                    </strong>
+                    &bull; Compares against existing {locations.length} directory listings to ensure 0 duplicate names.<br/>
+                    &bull; Completes bilingual English & Thai names, transport access, full addresses, amenities & articles.<br/>
+                    &bull; Assigns verified high-definition architecture and hotel photography.
+                  </div>
+
+                  {/* Modal Actions */}
+                  <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.75rem" }}>
+                    <button 
+                      type="button" 
+                      className="btn btn-outline" 
+                      onClick={() => setIsBatchModalOpen(false)}
+                      style={{ padding: "0.6rem 1.25rem" }}
+                    >
+                      Cancel
+                    </button>
+                    <button 
+                      type="button" 
+                      onClick={handleGenerate30Listings}
+                      style={{
+                        background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #d946ef 100%)",
+                        color: "white",
+                        border: "none",
+                        fontWeight: "600",
+                        padding: "0.6rem 1.5rem",
+                        borderRadius: "8px",
+                        cursor: "pointer",
+                        boxShadow: "0 4px 12px rgba(139, 92, 246, 0.35)",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "0.5rem"
+                      }}
+                    >
+                      <i className="fa-solid fa-wand-magic-sparkles"></i>
+                      Generate 30 Listings Now
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}

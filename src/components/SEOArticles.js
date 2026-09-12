@@ -16,17 +16,30 @@ const stripHtml = (html) => {
   return html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
 };
 
+const FALLBACK_IMAGE = "/assets/hero_laundry.webp";
+
 const ArticleCard = ({ id, title, content }) => {
-  const imageUrl = getFirstImage(content);
+  const initialImage = getFirstImage(content);
+  const [imgSrc, setImgSrc] = useState(initialImage || FALLBACK_IMAGE);
   const plainText = stripHtml(content);
 
   return (
     <article className={styles.articleCard}>
-      {imageUrl && (
-        <div className={styles.cardImageContainer}>
-          <Image src={imageUrl} alt={title} fill className={styles.cardImage} sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" priority={false} />
-        </div>
-      )}
+      <div className={styles.cardImageContainer}>
+        <Image 
+          src={imgSrc} 
+          alt={title || "Article image"} 
+          fill 
+          className={styles.cardImage} 
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" 
+          priority={false} 
+          onError={() => {
+            if (imgSrc !== FALLBACK_IMAGE) {
+              setImgSrc(FALLBACK_IMAGE);
+            }
+          }}
+        />
+      </div>
       <h3 className={styles.articleTitle}>{title}</h3>
       <p className={styles.articleText}>
         {plainText.substring(0, 140)}...
