@@ -148,7 +148,10 @@ export default function ManageArticles() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ topic }),
       });
-      if (!genRes.ok) throw new Error("Generation failed");
+      if (!genRes.ok) {
+        const errData = await genRes.json().catch(() => ({}));
+        throw new Error(errData.error || "Generation failed");
+      }
       const generatedData = await genRes.json();
 
       const saveRes = await fetch("/api/articles", {
@@ -159,13 +162,16 @@ export default function ManageArticles() {
           content: generatedData.content
         }),
       });
-      if (!saveRes.ok) throw new Error("Saving failed");
+      if (!saveRes.ok) {
+        const errData = await saveRes.json().catch(() => ({}));
+        throw new Error(errData.error || "Saving failed");
+      }
       
       setTopic("");
       fetchArticles();
       alert("Article generated and published successfully!");
     } catch (err) {
-      alert("An error occurred during generation.");
+      alert(err.message || "An error occurred during generation.");
     } finally {
       setLoading(false);
     }
