@@ -40,7 +40,7 @@ export default function PromotionsClient({ locale, initialPromotions = [] }) {
 
   const filteredPromotions = activeCategory === "all"
     ? displayPromotions
-    : displayPromotions.filter(p => p.category === activeCategory);
+    : displayPromotions.filter(p => (p.category || "").toLowerCase() === activeCategory.toLowerCase());
 
   const getLocalizedField = (promo, field) => {
     if (locale === "th" && promo[`${field}_th`]) return promo[`${field}_th`];
@@ -119,6 +119,12 @@ export default function PromotionsClient({ locale, initialPromotions = [] }) {
           className={`${styles.filterBtn} ${activeCategory === "flash" ? styles.activeFilterBtn : ""}`}
         >
           {locale === "th" ? "แฟลชดีล" : locale === "cn" ? "限时抢购" : "Flash Sales"}
+        </button>
+        <button 
+          onClick={() => setActiveCategory("partner")}
+          className={`${styles.filterBtn} ${activeCategory === "partner" ? styles.activeFilterBtn : ""}`}
+        >
+          {locale === "th" ? "โปรพาร์ทเนอร์" : locale === "cn" ? "合作特惠" : "Partner Deals"}
         </button>
       </div>
 
@@ -321,20 +327,43 @@ export default function PromotionsClient({ locale, initialPromotions = [] }) {
                 )}
 
                 {/* Primary Booking Action */}
-                <Link 
-                  href={`/${locale}/booking${selectedPromo.code ? `?promo=${selectedPromo.code}` : ""}`}
-                  className={styles.bookBtn}
-                  style={{ marginBottom: "0.5rem", padding: "0.75rem", fontSize: "0.9rem" }}
-                  onClick={() => setSelectedPromo(null)}
-                >
-                  <span>{locale === "th" ? "จองทางเว็บพร้อมโค้ดนี้" : locale === "cn" ? "官网使用优惠码预订" : "Book Online With Code"}</span>
-                  <i className="fa-solid fa-arrow-right"></i>
-                </Link>
+                {(() => {
+                  const defaultBookUrl = `/${locale}/booking${selectedPromo.code ? `?promo=${selectedPromo.code}` : ""}`;
+                  const targetBookUrl = (selectedPromo.bookUrl && selectedPromo.bookUrl.trim()) ? selectedPromo.bookUrl.trim() : defaultBookUrl;
+                  const isExternal = targetBookUrl.startsWith("http://") || targetBookUrl.startsWith("https://");
+
+                  if (isExternal) {
+                    return (
+                      <a 
+                        href={targetBookUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={styles.bookBtn}
+                        style={{ marginBottom: "0.5rem", padding: "0.75rem", fontSize: "0.9rem", textDecoration: "none", display: "flex", alignItems: "center", justifyContent: "center" }}
+                      >
+                        <span>{locale === "th" ? "จองบริการพร้อมโค้ดนี้" : locale === "cn" ? "官网使用优惠码预订" : "Book Online With Code"}</span>
+                        <i className="fa-solid fa-arrow-right"></i>
+                      </a>
+                    );
+                  }
+
+                  return (
+                    <Link 
+                      href={targetBookUrl}
+                      className={styles.bookBtn}
+                      style={{ marginBottom: "0.5rem", padding: "0.75rem", fontSize: "0.9rem" }}
+                      onClick={() => setSelectedPromo(null)}
+                    >
+                      <span>{locale === "th" ? "จองทางเว็บพร้อมโค้ดนี้" : locale === "cn" ? "官网使用优惠码预订" : "Book Online With Code"}</span>
+                      <i className="fa-solid fa-arrow-right"></i>
+                    </Link>
+                  );
+                })()}
 
                 {/* Social Quick Claim */}
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.6rem" }}>
                   <a 
-                    href={getSocialLineUrl(selectedPromo.code)}
+                    href={selectedPromo.lineUrl?.trim() || getSocialLineUrl(selectedPromo.code)}
                     target="_blank" 
                     rel="noopener noreferrer"
                     className={styles.socialClaimBtn}
@@ -344,7 +373,7 @@ export default function PromotionsClient({ locale, initialPromotions = [] }) {
                     <span>LINE OA</span>
                   </a>
                   <a 
-                    href={getSocialWhatsappUrl(selectedPromo.code)}
+                    href={selectedPromo.whatsappUrl?.trim() || getSocialWhatsappUrl(selectedPromo.code)}
                     target="_blank" 
                     rel="noopener noreferrer"
                     className={styles.socialClaimBtn}

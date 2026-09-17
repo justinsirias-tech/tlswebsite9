@@ -46,26 +46,57 @@ export async function GET(request) {
             id: true,
             code: true,
             discountType: true,
-            discountValue: true
+            discountValue: true,
+            maxDiscount: true
           }
         }
       },
       orderBy: { createdAt: "desc" }
     });
 
-    const formattedSales = sales.map(s => ({
-      ...s,
-      promoCode: s.partnerCode
-    }));
+    let totalGrossAmount = 0;
+    let totalDiscountAmount = 0;
+    let totalNetAmount = 0;
 
-    const totalAmount = sales.reduce((acc, curr) => acc + (curr.saleAmount || 0), 0);
+    const formattedSales = sales.map(s => {
+      const gross = Number(s.saleAmount) || 0;
+      let discount = 0;
+
+      const pc = s.partnerCode;
+      if (pc) {
+        if (pc.discountType === "PERCENTAGE") {
+          const raw = gross * ((Number(pc.discountValue) || 0) / 100);
+          discount = pc.maxDiscount ? Math.min(raw, Number(pc.maxDiscount)) : raw;
+        } else if (pc.discountType === "FIXED") {
+          discount = Math.min(gross, Number(pc.discountValue) || 0);
+        }
+      }
+
+      discount = Math.round(discount * 100) / 100;
+      const net = Math.max(0, Math.round((gross - discount) * 100) / 100);
+
+      totalGrossAmount += gross;
+      totalDiscountAmount += discount;
+      totalNetAmount += net;
+
+      return {
+        ...s,
+        promoCode: pc,
+        originalAmount: gross,
+        discountAmount: discount,
+        netAmount: net
+      };
+    });
 
     return NextResponse.json({
       success: true,
       sales: formattedSales,
       summary: {
         totalCount: sales.length,
-        totalAmount: Math.round(totalAmount * 100) / 100
+        totalGrossAmount: Math.round(totalGrossAmount * 100) / 100,
+        totalDiscountAmount: Math.round(totalDiscountAmount * 100) / 100,
+        totalNetAmount: Math.round(totalNetAmount * 100) / 100,
+        totalAmount: Math.round(totalNetAmount * 100) / 100
       }
     });
   } catch (error) {

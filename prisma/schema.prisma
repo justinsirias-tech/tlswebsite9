@@ -161,6 +161,9 @@ model Promotion {
   imageUrl    String?
   category    String   @default("monthly")
   validUntil  String?
+  bookUrl     String?
+  lineUrl     String?
+  whatsappUrl String?
   isActive    Boolean  @default(true)
   sortOrder   Int      @default(0)
   createdAt   DateTime @default(now())

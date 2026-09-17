@@ -29,6 +29,9 @@ export default function AdminPromotionsPage() {
     imageUrl: "",
     category: "monthly",
     validUntil: "",
+    bookUrl: "",
+    lineUrl: "",
+    whatsappUrl: "",
     isActive: true,
     sortOrder: 0
   };
@@ -81,6 +84,9 @@ export default function AdminPromotionsPage() {
       imageUrl: promo.imageUrl || "",
       category: promo.category || "monthly",
       validUntil: promo.validUntil || "",
+      bookUrl: promo.bookUrl || "",
+      lineUrl: promo.lineUrl || "",
+      whatsappUrl: promo.whatsappUrl || "",
       isActive: promo.isActive !== undefined ? promo.isActive : true,
       sortOrder: promo.sortOrder || 0
     });
@@ -312,6 +318,7 @@ export default function AdminPromotionsPage() {
                     <option value="monthly">Monthly Deal</option>
                     <option value="flash">Flash Sale</option>
                     <option value="welcome">Welcome Offer</option>
+                    <option value="partner">Partner Deal</option>
                     <option value="seasonal">Seasonal Special</option>
                   </select>
                 </div>
@@ -564,6 +571,65 @@ export default function AdminPromotionsPage() {
                       {imageError}
                     </div>
                   )}
+                </div>
+              </div>
+
+              {/* Custom Action Button URLs (Optional) */}
+              <div style={{ background: "#f8fafc", padding: "1.25rem", borderRadius: "10px", border: "1px solid #e2e8f0" }}>
+                <label style={{ display: "block", color: "#222945", fontWeight: "700", fontSize: "0.95rem", marginBottom: "0.4rem" }}>
+                  <i className="fa-solid fa-link" style={{ marginRight: "0.5rem", color: "#2563eb" }}></i>
+                  Custom Action Button URLs (Optional)
+                </label>
+                <div style={{ background: "#eff6ff", border: "1px solid #bfdbfe", padding: "0.65rem 0.9rem", borderRadius: "8px", marginBottom: "0.85rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                  <i className="fa-solid fa-circle-info" style={{ color: "#2563eb", fontSize: "1rem" }}></i>
+                  <span style={{ color: "#1e40af", fontSize: "0.83rem", fontWeight: "600" }}>
+                    หากไม่ใส่อะไร (เว้นว่างไว้) ระบบจะใช้ค่า Default เดิมโดยอัตโนมัติทั้งหมดครับ
+                  </span>
+                </div>
+
+                <div style={{ display: "grid", gap: "0.75rem" }}>
+                  <div>
+                    <label style={{ display: "block", color: "#334155", fontWeight: "600", fontSize: "0.85rem", marginBottom: "0.25rem" }}>
+                      1. Book Online Button URL <span style={{ color: "#64748b", fontWeight: "400", fontSize: "0.8rem" }}>(เว้นว่าง = ค่าเดิม: จองทางเว็บพร้อมใส่โค้ด)</span>
+                    </label>
+                    <input 
+                      type="text" 
+                      placeholder="ค่าเดิม: /[locale]/booking?promo=CODE (หรือใส่ URL อื่นตามต้องการ)"
+                      value={formData.bookUrl}
+                      onChange={(e) => setFormData(prev => ({ ...prev, bookUrl: e.target.value }))}
+                      style={{ width: "100%", padding: "0.65rem 0.8rem", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#ffffff", color: "#222945", fontSize: "0.85rem" }}
+                    />
+                  </div>
+
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
+                    <div>
+                      <label style={{ display: "block", color: "#00B900", fontWeight: "700", fontSize: "0.85rem", marginBottom: "0.25rem" }}>
+                        <i className="fa-brands fa-line" style={{ marginRight: "0.35rem" }}></i>
+                        2. LINE OA URL <span style={{ color: "#64748b", fontWeight: "400", fontSize: "0.78rem" }}>(เว้นว่าง = LINE ทางการ)</span>
+                      </label>
+                      <input 
+                        type="text" 
+                        placeholder="ค่าเดิม: LINE OA ทางการ @ThatLaundryShop"
+                        value={formData.lineUrl}
+                        onChange={(e) => setFormData(prev => ({ ...prev, lineUrl: e.target.value }))}
+                        style={{ width: "100%", padding: "0.65rem 0.8rem", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#ffffff", color: "#222945", fontSize: "0.85rem" }}
+                      />
+                    </div>
+
+                    <div>
+                      <label style={{ display: "block", color: "#25D366", fontWeight: "700", fontSize: "0.85rem", marginBottom: "0.25rem" }}>
+                        <i className="fa-brands fa-whatsapp" style={{ marginRight: "0.35rem" }}></i>
+                        3. WhatsApp URL <span style={{ color: "#64748b", fontWeight: "400", fontSize: "0.78rem" }}>(เว้นว่าง = WhatsApp ทางการ)</span>
+                      </label>
+                      <input 
+                        type="text" 
+                        placeholder="ค่าเดิม: WhatsApp ทางการของร้าน"
+                        value={formData.whatsappUrl}
+                        onChange={(e) => setFormData(prev => ({ ...prev, whatsappUrl: e.target.value }))}
+                        style={{ width: "100%", padding: "0.65rem 0.8rem", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#ffffff", color: "#222945", fontSize: "0.85rem" }}
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
 

@@ -1,31 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { toInputDateTime, toISOStringOrNull } from "@/lib/dateUtils";
+import Link from "next/link";
 
 export default function PartnerCodesPage() {
   const [codes, setCodes] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  // Modals
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [editingCode, setEditingCode] = useState(null);
-
-  const initialForm = {
-    code: "",
-    discountType: "PERCENTAGE",
-    discountValue: "15",
-    minOrderValue: "0",
-    maxDiscount: "",
-    usageLimit: "",
-    startDate: "",
-    endDate: "",
-    description: "",
-    isActive: true
-  };
-  const [formData, setFormData] = useState(initialForm);
-  const [formError, setFormError] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [copiedCode, setCopiedCode] = useState(null);
+  const [copiedLink, setCopiedLink] = useState(null);
+  const [togglingId, setTogglingId] = useState(null);
 
   const getPromoStatus = (pc) => {
     if (!pc.isActive) {
@@ -33,21 +16,21 @@ export default function PartnerCodesPage() {
     }
     const now = new Date();
     if (pc.startDate && new Date(pc.startDate) > now) {
-      return { label: "Upcoming (Auto)", color: "#0284c7", bg: "#f0f9ff", border: "#bae6fd" };
+      return { label: "Upcoming", color: "#0284c7", bg: "#f0f9ff", border: "#bae6fd" };
     }
     if (pc.endDate && new Date(pc.endDate) < now) {
-      return { label: "Expired (Auto)", color: "#dc2626", bg: "#fef2f2", border: "#fecaca" };
+      return { label: "Expired", color: "#dc2626", bg: "#fef2f2", border: "#fecaca" };
     }
     return { label: "Active", color: "#166534", bg: "#dcfce7", border: "#bbf7d0" };
   };
 
   const formatSchedule = (pc) => {
     if (!pc.startDate && !pc.endDate) {
-      return "Always Active (No limits)";
+      return "Always Active (No expiration)";
     }
     const formatOpt = { dateStyle: "medium", timeStyle: "short" };
     const startStr = pc.startDate ? new Date(pc.startDate).toLocaleString("en-US", formatOpt) : "Now";
-    const endStr = pc.endDate ? new Date(pc.endDate).toLocaleString("en-US", formatOpt) : "Ongoing";
+    const endStr = pc.endDate ? new Date(pc.endDate).toLocaleString("en-US", formatOpt) : "No expiration";
     return `${startStr} → ${endStr}`;
   };
 
@@ -67,122 +50,115 @@ export default function PartnerCodesPage() {
   };
 
   useEffect(() => {
-    fetchCodes();
+    let ignore = false;
+    async function loadCodes() {
+      try {
+        const res = await fetch("/api/partner/codes");
+        const data = await res.json();
+        if (!ignore && res.ok && data.success) {
+          setCodes(data.codes || []);
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        if (!ignore) setLoading(false);
+      }
+    }
+    loadCodes();
+    return () => {
+      ignore = true;
+    };
   }, []);
 
-  const handleOpenEdit = (pc) => {
-    setFormError("");
-    setEditingCode(pc);
-    setFormData({
-      code: pc.code,
-      discountType: pc.discountType || "PERCENTAGE",
-      discountValue: String(pc.discountValue ?? "15"),
-      minOrderValue: String(pc.minOrderValue ?? "0"),
-      maxDiscount: pc.maxDiscount !== null && pc.maxDiscount !== undefined ? String(pc.maxDiscount) : "",
-      usageLimit: pc.usageLimit !== null && pc.usageLimit !== undefined ? String(pc.usageLimit) : "",
-      startDate: toInputDateTime(pc.startDate),
-      endDate: toInputDateTime(pc.endDate),
-      description: pc.description || "",
-      isActive: pc.isActive
-    });
-    setIsEditModalOpen(true);
+  const handleCopyCode = (code) => {
+    navigator.clipboard.writeText(code);
+    setCopiedCode(code);
+    setTimeout(() => setCopiedCode(null), 2500);
+  };
+
+  const handleCopyLink = (code) => {
+    const origin = typeof window !== "undefined" ? window.location.origin : "https://www.thatlaundryshop.com";
+    const link = `${origin}/th/booking?promo=${encodeURIComponent(code)}`;
+    navigator.clipboard.writeText(link);
+    setCopiedLink(code);
+    setTimeout(() => setCopiedLink(null), 2500);
   };
 
   const handleToggleActive = async (id, currentStatus) => {
+    const newStatus = !currentStatus;
+    // Optimistic UI update
+    setTogglingId(id);
+    setCodes((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, isActive: newStatus } : c))
+    );
+
     try {
       const res = await fetch(`/api/partner/codes/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ isActive: !currentStatus })
+        body: JSON.stringify({ isActive: newStatus })
       });
-      if (res.ok) {
-        fetchCodes();
+
+      if (!res.ok) {
+        // Rollback on error
+        setCodes((prev) =>
+          prev.map((c) => (c.id === id ? { ...c, isActive: currentStatus } : c))
+        );
+      } else {
+        const data = await res.json();
+        if (data.success && data.partnerCode) {
+          setCodes((prev) =>
+            prev.map((c) => (c.id === id ? { ...c, ...data.partnerCode } : c))
+          );
+        }
       }
     } catch (err) {
       console.error(err);
-    }
-  };
-
-  const handleSubmitCreate = async (e) => {
-    e.preventDefault();
-    setFormError("");
-    setIsSubmitting(true);
-    try {
-      const payload = {
-        ...formData,
-        startDate: toISOStringOrNull(formData.startDate),
-        endDate: toISOStringOrNull(formData.endDate)
-      };
-
-      const res = await fetch("/api/partner/codes", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        setFormError(data.error || "An error occurred while creating the code.");
-        return;
-      }
-      setIsCreateModalOpen(false);
-      fetchCodes();
-    } catch (err) {
-      setFormError("Unable to connect to the server.");
+      // Rollback on network failure
+      setCodes((prev) =>
+        prev.map((c) => (c.id === id ? { ...c, isActive: currentStatus } : c))
+      );
     } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleSubmitEdit = async (e) => {
-    e.preventDefault();
-    if (!editingCode) return;
-    setFormError("");
-    setIsSubmitting(true);
-
-    try {
-      const payload = {
-        ...formData,
-        startDate: toISOStringOrNull(formData.startDate),
-        endDate: toISOStringOrNull(formData.endDate)
-      };
-
-      const res = await fetch(`/api/partner/codes/${editingCode.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
-
-      const data = await res.json();
-      if (!res.ok) {
-        setFormError(data.error || "An error occurred while updating the code.");
-        return;
-      }
-
-      setIsEditModalOpen(false);
-      setEditingCode(null);
-      fetchCodes();
-    } catch (err) {
-      setFormError("Unable to connect to the server.");
-    } finally {
-      setIsSubmitting(false);
+      setTogglingId(null);
     }
   };
 
   return (
-    <div>
+    <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
       {/* Top Header */}
       <div style={{
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
-        marginBottom: "1.5rem"
+        flexWrap: "wrap",
+        gap: "1rem"
       }}>
         <div>
-          <h1 style={{ fontSize: "1.6rem", fontWeight: "800", color: "#0f172a", margin: "0 0 0.3rem 0" }}>
-            My Promo Codes
-          </h1>
-          <p style={{ fontSize: "0.9rem", color: "#64748b", margin: 0 }}>
-            Manage and configure schedule & active status of partner promo codes
+          <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
+            <Link
+              href="/partner/dashboard"
+              style={{
+                width: "32px",
+                height: "32px",
+                borderRadius: "8px",
+                background: "#ffffff",
+                border: "1px solid #e2e8f0",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "#64748b",
+                textDecoration: "none"
+              }}
+              title="Back to Overview"
+            >
+              <i className="fa-solid fa-arrow-left"></i>
+            </Link>
+            <h1 style={{ fontSize: "1.6rem", fontWeight: "900", color: "#0f172a", margin: 0, letterSpacing: "-0.5px" }}>
+              My Promo Codes
+            </h1>
+          </div>
+          <p style={{ fontSize: "0.85rem", color: "#64748b", margin: "0.3rem 0 0 0" }}>
+            Manage active status of promo codes and copy direct referral booking links for your guests.
           </p>
         </div>
 
@@ -190,143 +166,266 @@ export default function PartnerCodesPage() {
           background: "#f0f9ff",
           border: "1px solid #bae6fd",
           color: "#0369a1",
-          padding: "0.6rem 1rem",
-          borderRadius: "10px",
+          padding: "0.6rem 1.1rem",
+          borderRadius: "12px",
           fontSize: "0.85rem",
-          fontWeight: "600",
+          fontWeight: "700",
           display: "flex",
           alignItems: "center",
           gap: "0.5rem"
         }}>
-          <i className="fa-solid fa-shield-halved"></i>
-          <span>Promo codes are issued by TLS Admin (contact Admin for new codes)</span>
+          <i className="fa-solid fa-shield-halved" style={{ color: "#0284c7" }}></i>
+          <span>Official Partner Code Portfolio</span>
         </div>
       </div>
 
-      {/* Codes Table */}
+      {/* Codes Table Container */}
       <div style={{
         background: "#ffffff",
-        borderRadius: "16px",
-        boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+        borderRadius: "20px",
+        border: "1px solid #e2e8f0",
+        boxShadow: "0 4px 15px rgba(0, 0, 0, 0.03)",
         overflow: "hidden"
       }}>
         {loading ? (
           <div style={{ textAlign: "center", padding: "4rem 0", color: "#64748b" }}>
-            <i className="fa-solid fa-spinner fa-spin" style={{ fontSize: "1.8rem", marginBottom: "0.8rem" }}></i>
+            <i className="fa-solid fa-spinner fa-spin" style={{ fontSize: "1.8rem", marginBottom: "0.8rem", color: "#0284c7" }}></i>
             <div>Loading promo codes...</div>
           </div>
         ) : codes.length === 0 ? (
           <div style={{ textAlign: "center", padding: "4rem 2rem", color: "#94a3b8" }}>
-            <i className="fa-solid fa-ticket" style={{ fontSize: "2.5rem", marginBottom: "1rem", opacity: 0.5 }}></i>
-            <h3 style={{ fontSize: "1.1rem", color: "#475569", margin: "0 0 0.5rem 0" }}>No promo codes available for your partner account</h3>
-            <p style={{ fontSize: "0.85rem", margin: 0 }}>Please contact the TLS Admin team to create a promo code for your account.</p>
+            <div style={{
+              width: "56px",
+              height: "56px",
+              borderRadius: "16px",
+              background: "#f1f5f9",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              margin: "0 auto 1rem",
+              color: "#94a3b8"
+            }}>
+              <i className="fa-solid fa-ticket" style={{ fontSize: "1.6rem" }}></i>
+            </div>
+            <h3 style={{ fontSize: "1.1rem", fontWeight: "800", color: "#1e293b", margin: "0 0 0.35rem 0" }}>
+              No promo codes found
+            </h3>
+            <p style={{ fontSize: "0.85rem", color: "#64748b", margin: "0" }}>
+              Please reach out to the TLS Partner Desk to generate a custom code for your property.
+            </p>
           </div>
         ) : (
           <div style={{ overflowX: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.9rem" }}>
               <thead>
-                <tr style={{ background: "#f8fafc", borderBottom: "1px solid #e2e8f0", color: "#475569", fontSize: "0.8rem", textTransform: "uppercase", letterSpacing: "0.5px" }}>
-                  <th style={{ padding: "1rem 1.25rem", textAlign: "left" }}>Promo Code</th>
-                  <th style={{ padding: "1rem 1.25rem", textAlign: "left" }}>Discount</th>
-                  <th style={{ padding: "1rem 1.25rem", textAlign: "left" }}>Schedule</th>
-                  <th style={{ padding: "1rem 1.25rem", textAlign: "center" }}>Usage / Limit</th>
+                <tr style={{ background: "#f8fafc", borderBottom: "1px solid #e2e8f0", color: "#64748b", fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                  <th style={{ padding: "1rem 1.25rem", textAlign: "left" }}>Promo Code & Quick Copy</th>
+                  <th style={{ padding: "1rem 1.25rem", textAlign: "left" }}>Discount Rate</th>
+                  <th style={{ padding: "1rem 1.25rem", textAlign: "left" }}>Schedule / Validity</th>
+                  <th style={{ padding: "1rem 1.25rem", textAlign: "center" }}>Orders Used</th>
                   <th style={{ padding: "1rem 1.25rem", textAlign: "left" }}>Status</th>
-                  <th style={{ padding: "1rem 1.25rem", textAlign: "center" }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {codes.map((pc) => {
                   const status = getPromoStatus(pc);
+                  const isCopied = copiedCode === pc.code;
+                  const isLinkCopied = copiedLink === pc.code;
+                  const isToggling = togglingId === pc.id;
+                  const isCurrentlyActive = Boolean(pc.isActive);
+
                   return (
                     <tr key={pc.id} style={{ borderBottom: "1px solid #f1f5f9" }}>
+                      {/* Code & Quick Copy */}
                       <td style={{ padding: "1rem 1.25rem" }}>
-                        <span style={{
-                          fontFamily: "monospace",
-                          fontWeight: "800",
-                          color: "#222945",
-                          background: "#f1f5f9",
-                          border: "1px solid #cbd5e1",
-                          padding: "0.3rem 0.6rem",
-                          borderRadius: "6px",
-                          fontSize: "0.95rem",
-                          letterSpacing: "1px"
-                        }}>
-                          {pc.code}
-                        </span>
+                        <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
+                          <span style={{
+                            fontFamily: "monospace",
+                            fontWeight: "900",
+                            color: "#0f172a",
+                            background: "#f1f5f9",
+                            border: "1px solid #cbd5e1",
+                            padding: "0.3rem 0.65rem",
+                            borderRadius: "8px",
+                            fontSize: "1rem",
+                            letterSpacing: "1px"
+                          }}>
+                            {pc.code}
+                          </span>
+
+                          <button
+                            onClick={() => handleCopyCode(pc.code)}
+                            title="Copy code"
+                            style={{
+                              background: isCopied ? "#059669" : "#ffffff",
+                              color: isCopied ? "#ffffff" : "#475569",
+                              border: isCopied ? "1px solid #059669" : "1px solid #cbd5e1",
+                              padding: "0.3rem 0.55rem",
+                              borderRadius: "6px",
+                              cursor: "pointer",
+                              fontSize: "0.75rem",
+                              fontWeight: "700",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "0.3rem",
+                              transition: "all 0.15s ease"
+                            }}
+                          >
+                            <i className={`fa-solid ${isCopied ? "fa-check" : "fa-copy"}`}></i>
+                            <span>{isCopied ? "Copied" : "Copy Code"}</span>
+                          </button>
+
+                          <button
+                            onClick={() => handleCopyLink(pc.code)}
+                            title="Copy direct booking link with promo code"
+                            style={{
+                              background: isLinkCopied ? "#0284c7" : "#f0f9ff",
+                              color: isLinkCopied ? "#ffffff" : "#0284c7",
+                              border: isLinkCopied ? "1px solid #0284c7" : "1px solid #bae6fd",
+                              padding: "0.3rem 0.55rem",
+                              borderRadius: "6px",
+                              cursor: "pointer",
+                              fontSize: "0.75rem",
+                              fontWeight: "700",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "0.3rem",
+                              transition: "all 0.15s ease"
+                            }}
+                          >
+                            <i className={`fa-solid ${isLinkCopied ? "fa-check" : "fa-link"}`}></i>
+                            <span>{isLinkCopied ? "Link Copied" : "Booking Link"}</span>
+                          </button>
+                        </div>
+
                         {pc.description && (
-                          <div style={{ fontSize: "0.8rem", color: "#64748b", marginTop: "0.3rem" }}>
+                          <div style={{ fontSize: "0.8rem", color: "#64748b", marginTop: "0.35rem" }}>
                             {pc.description}
                           </div>
                         )}
                       </td>
 
-                      <td style={{ padding: "1rem 1.25rem", fontWeight: "800", color: "#0f172a" }}>
-                        {pc.discountType === "PERCENTAGE" ? `${pc.discountValue}% OFF` : `${pc.discountValue} THB OFF`}
+                      {/* Discount */}
+                      <td style={{ padding: "1rem 1.25rem" }}>
+                        <span style={{
+                          background: "#ecfdf5",
+                          color: "#059669",
+                          border: "1px solid #a7f3d0",
+                          padding: "0.3rem 0.7rem",
+                          borderRadius: "9999px",
+                          fontWeight: "800",
+                          fontSize: "0.85rem"
+                        }}>
+                          {pc.discountType === "PERCENTAGE" ? `${pc.discountValue}% OFF` : `฿${pc.discountValue} OFF`}
+                        </span>
                       </td>
 
+                      {/* Schedule */}
                       <td style={{ padding: "1rem 1.25rem", color: "#475569", fontSize: "0.85rem", maxWidth: "240px", lineHeight: "1.4" }}>
                         {formatSchedule(pc)}
                       </td>
 
-                      <td style={{ padding: "1rem 1.25rem", textAlign: "center", fontWeight: "700", color: "#334155" }}>
-                        {pc._count?.sales ?? pc.usedCount} {pc.usageLimit ? `/ ${pc.usageLimit}` : "(Unlimited)"}
+                      {/* Orders Used */}
+                      <td style={{ padding: "1rem 1.25rem", textAlign: "center", fontWeight: "800", color: "#0f172a" }}>
+                        {pc._count?.sales ?? pc.usedCount ?? 0} {pc.usageLimit ? `/ ${pc.usageLimit}` : "orders"}
                       </td>
 
+                      {/* Status Toggle Button */}
                       <td style={{ padding: "1rem 1.25rem" }}>
-                        <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem", alignItems: "flex-start" }}>
-                          <span style={{
-                            background: status.bg,
-                            color: status.color,
-                            border: `1px solid ${status.border}`,
-                            padding: "0.25rem 0.6rem",
-                            borderRadius: "12px",
-                            fontWeight: "700",
-                            fontSize: "0.75rem",
-                            display: "inline-flex",
-                            alignItems: "center",
-                            gap: "0.35rem"
-                          }}>
-                            <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: status.color }}></span>
-                            {status.label}
-                          </span>
+                        <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem", alignItems: "flex-start" }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                            {/* Interactive ON / OFF Toggle Switch */}
+                            <button
+                              type="button"
+                              role="switch"
+                              aria-checked={isCurrentlyActive}
+                              disabled={isToggling}
+                              onClick={() => handleToggleActive(pc.id, isCurrentlyActive)}
+                              style={{
+                                position: "relative",
+                                width: "48px",
+                                height: "26px",
+                                borderRadius: "9999px",
+                                background: isCurrentlyActive ? "#10b981" : "#cbd5e1",
+                                border: "none",
+                                cursor: isToggling ? "wait" : "pointer",
+                                transition: "background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
+                                padding: "2px",
+                                display: "inline-flex",
+                                alignItems: "center",
+                                outline: "none",
+                                boxShadow: isCurrentlyActive
+                                  ? "0 2px 8px rgba(16, 185, 129, 0.35)"
+                                  : "inset 0 1px 2px rgba(0, 0, 0, 0.1)",
+                                flexShrink: 0
+                              }}
+                              title={isCurrentlyActive ? "Click to disable this code" : "Click to enable this code"}
+                            >
+                              <span
+                                style={{
+                                  width: "22px",
+                                  height: "22px",
+                                  borderRadius: "50%",
+                                  background: "#ffffff",
+                                  boxShadow: "0 1px 4px rgba(0, 0, 0, 0.25)",
+                                  transform: isCurrentlyActive ? "translateX(22px)" : "translateX(0px)",
+                                  transition: "transform 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  fontSize: "0.65rem",
+                                  color: isCurrentlyActive ? "#10b981" : "#94a3b8"
+                                }}
+                              >
+                                {isToggling ? (
+                                  <i className="fa-solid fa-spinner fa-spin" style={{ fontSize: "0.6rem" }}></i>
+                                ) : (
+                                  <i
+                                    className={`fa-solid ${isCurrentlyActive ? "fa-check" : "fa-power-off"}`}
+                                    style={{ fontSize: "0.55rem" }}
+                                  ></i>
+                                )}
+                              </span>
+                            </button>
 
-                          <button
-                            onClick={() => handleToggleActive(pc.id, pc.isActive)}
-                            style={{
-                              background: "none",
-                              border: "none",
-                              color: "#64748b",
-                              textDecoration: "underline",
-                              fontSize: "0.75rem",
-                              cursor: "pointer",
-                              padding: 0
-                            }}
-                          >
-                            {pc.isActive ? "Turn Off" : "Turn On"}
-                          </button>
+                            {/* Status label beside toggle */}
+                            <span style={{
+                              fontSize: "0.85rem",
+                              fontWeight: "700",
+                              color: isCurrentlyActive ? "#059669" : "#64748b",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "0.35rem"
+                            }}>
+                              <span style={{
+                                width: "7px",
+                                height: "7px",
+                                borderRadius: "50%",
+                                background: isCurrentlyActive ? "#10b981" : "#94a3b8"
+                              }}></span>
+                              {isCurrentlyActive ? "Active" : "Disabled"}
+                            </span>
+                          </div>
+
+                          {/* Extra scheduled badge if active but not currently ongoing */}
+                          {isCurrentlyActive && (status.label === "Upcoming" || status.label === "Expired") && (
+                            <span style={{
+                              background: status.bg,
+                              color: status.color,
+                              border: `1px solid ${status.border}`,
+                              padding: "0.15rem 0.55rem",
+                              borderRadius: "9999px",
+                              fontSize: "0.7rem",
+                              fontWeight: "700",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "0.25rem"
+                            }}>
+                              <i className="fa-regular fa-clock" style={{ fontSize: "0.65rem" }}></i>
+                              <span>{status.label}</span>
+                            </span>
+                          )}
                         </div>
-                      </td>
-
-                      <td style={{ padding: "1rem 1.25rem", textAlign: "center" }}>
-                        <button
-                          onClick={() => handleOpenEdit(pc)}
-                          style={{
-                            padding: "0.4rem 0.8rem",
-                            borderRadius: "6px",
-                            background: "#f1f5f9",
-                            color: "#334155",
-                            border: "1px solid #cbd5e1",
-                            fontWeight: "700",
-                            fontSize: "0.8rem",
-                            cursor: "pointer",
-                            display: "inline-flex",
-                            alignItems: "center",
-                            gap: "0.3rem"
-                          }}
-                        >
-                          <i className="fa-solid fa-pen-to-square"></i>
-                          <span>Edit</span>
-                        </button>
                       </td>
                     </tr>
                   );
@@ -336,121 +435,8 @@ export default function PartnerCodesPage() {
           </div>
         )}
       </div>
-
-      {/* Modal: Edit Code */}
-      {isEditModalOpen && (
-        <div style={{
-          position: "fixed",
-          inset: 0,
-          background: "rgba(15, 23, 42, 0.6)",
-          backdropFilter: "blur(4px)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          zIndex: 100,
-          padding: "1rem"
-        }}>
-          <div style={{
-            background: "#ffffff",
-            borderRadius: "20px",
-            width: "100%",
-            maxWidth: "540px",
-            padding: "2rem",
-            maxHeight: "90vh",
-            overflowY: "auto",
-            boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)"
-          }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
-              <h2 style={{ fontSize: "1.3rem", fontWeight: "800", color: "#0f172a", margin: 0 }}>
-                Edit Promo Code: {editingCode?.code}
-              </h2>
-              <button
-                onClick={() => setIsEditModalOpen(false)}
-                style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer", fontSize: "1.2rem" }}
-              >
-                ✕
-              </button>
-            </div>
-
-            {formError && (
-              <div style={{ background: "#fef2f2", border: "1px solid #fecaca", color: "#991b1b", padding: "0.75rem", borderRadius: "8px", fontSize: "0.85rem", marginBottom: "1rem" }}>
-                {formError}
-              </div>
-            )}
-
-            <form onSubmit={handleSubmitEdit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-                <div>
-                  <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
-                    Start Date & Time
-                  </label>
-                  <input
-                    type="datetime-local"
-                    value={formData.startDate}
-                    onChange={(e) => setFormData(prev => ({ ...prev, startDate: e.target.value }))}
-                    style={{ width: "100%", padding: "0.75rem", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#f8fafc", boxSizing: "border-box", fontSize: "0.85rem" }}
-                  />
-                  <span style={{ fontSize: "0.75rem", color: "#64748b" }}>Leave blank to start immediately</span>
-                </div>
-
-                <div>
-                  <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
-                    End Date & Time
-                  </label>
-                  <input
-                    type="datetime-local"
-                    value={formData.endDate}
-                    onChange={(e) => setFormData(prev => ({ ...prev, endDate: e.target.value }))}
-                    style={{ width: "100%", padding: "0.75rem", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#f8fafc", boxSizing: "border-box", fontSize: "0.85rem" }}
-                  />
-                  <span style={{ fontSize: "0.75rem", color: "#64748b" }}>Leave blank for no expiration</span>
-                </div>
-              </div>
-
-              <div>
-                <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
-                  Description / Notes
-                </label>
-                <input
-                  type="text"
-                  value={formData.description}
-                  onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                  style={{ width: "100%", padding: "0.75rem", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#f8fafc", boxSizing: "border-box" }}
-                />
-              </div>
-
-              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginTop: "0.5rem" }}>
-                <input
-                  type="checkbox"
-                  id="partnerCodeActive"
-                  checked={formData.isActive}
-                  onChange={(e) => setFormData(prev => ({ ...prev, isActive: e.target.checked }))}
-                />
-                <label htmlFor="partnerCodeActive" style={{ fontSize: "0.9rem", fontWeight: "700", color: "#334155", cursor: "pointer" }}>
-                  Enable this code (Active)
-                </label>
-              </div>
-
-              <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.75rem", marginTop: "1rem" }}>
-                <button
-                  type="button"
-                  onClick={() => setIsEditModalOpen(false)}
-                  style={{ padding: "0.75rem 1.25rem", borderRadius: "8px", background: "#f1f5f9", border: "1px solid #cbd5e1", color: "#475569", fontWeight: "700", cursor: "pointer" }}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  style={{ padding: "0.75rem 1.5rem", borderRadius: "8px", background: "#222945", border: "none", color: "#ffffff", fontWeight: "700", cursor: "pointer", opacity: isSubmitting ? 0.7 : 1 }}
-                >
-                  {isSubmitting ? "Saving..." : "Update Code"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
+
+

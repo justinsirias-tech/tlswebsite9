@@ -41,6 +41,9 @@ export async function PUT(request, { params }) {
     if (data.imageUrl !== undefined) updateData.imageUrl = data.imageUrl;
     if (data.category !== undefined) updateData.category = data.category;
     if (data.validUntil !== undefined) updateData.validUntil = data.validUntil;
+    if (data.bookUrl !== undefined) updateData.bookUrl = data.bookUrl && data.bookUrl.trim() ? data.bookUrl.trim() : null;
+    if (data.lineUrl !== undefined) updateData.lineUrl = data.lineUrl && data.lineUrl.trim() ? data.lineUrl.trim() : null;
+    if (data.whatsappUrl !== undefined) updateData.whatsappUrl = data.whatsappUrl && data.whatsappUrl.trim() ? data.whatsappUrl.trim() : null;
     if (data.isActive !== undefined) updateData.isActive = Boolean(data.isActive);
     if (data.sortOrder !== undefined) updateData.sortOrder = parseInt(data.sortOrder);
 

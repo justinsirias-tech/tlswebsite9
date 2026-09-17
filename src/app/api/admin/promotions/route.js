@@ -66,6 +66,9 @@ export async function POST(request) {
         imageUrl: data.imageUrl || null,
         category: data.category || "monthly",
         validUntil: data.validUntil || null,
+        bookUrl: data.bookUrl && data.bookUrl.trim() ? data.bookUrl.trim() : null,
+        lineUrl: data.lineUrl && data.lineUrl.trim() ? data.lineUrl.trim() : null,
+        whatsappUrl: data.whatsappUrl && data.whatsappUrl.trim() ? data.whatsappUrl.trim() : null,
         isActive: data.isActive !== undefined ? Boolean(data.isActive) : true,
         sortOrder: data.sortOrder ? parseInt(data.sortOrder) : 0
       }
