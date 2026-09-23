@@ -71,7 +71,16 @@
     "hotelLaundryPattayaOnly": "(Pattaya Only)",
     "hotelLaundryDesc": "Exclusive high-volume white-glove service for luxury hotels and resorts in Pattaya. Perfect bedding, towels, and guest laundry.",
     "fbLaundry": "F&B Laundry Service",
-    "fbLaundryDesc": "Specialized stain removal and hygiene-focused cleaning for restaurant linens, chef uniforms, and front-of-house aprons."
+    "fbLaundryDesc": "Specialized stain removal and hygiene-focused cleaning for restaurant linens, chef uniforms, and front-of-house aprons.",
+    "howItWorksTitle": "How It Works",
+    "step1Title": "Book Online",
+    "step1Desc": "Choose your service, schedule a convenient pickup time, and submit your request in seconds.",
+    "step2Title": "Doorstep Pickup",
+    "step2Desc": "Our friendly concierge arrives at your hotel, condo, or home to collect your garments safely.",
+    "step3Title": "Artisanal Care",
+    "step3Desc": "Expert sorting, eco-friendly washing or dry cleaning, and meticulous hand-ironing.",
+    "step4Title": "Fresh Delivery",
+    "step4Desc": "Clean, crisp, and beautifully packaged garments delivered back to your door on time."
   },
   "Pricing": {
     "metaTitle": "Pricing | That Laundry Shop",

@@ -71,7 +71,16 @@
     "hotelLaundryPattayaOnly": "（仅限芭堤雅）",
     "hotelLaundryDesc": "为芭堤雅豪华酒店和度假村提供独家大批量白手套服务。完美床品、毛巾和客人洗衣服务。",
     "fbLaundry": "餐饮布草服务",
-    "fbLaundryDesc": "专注于餐馆布草、厨师制服和前台围裙的专业去污和卫生清洁服务。"
+    "fbLaundryDesc": "专注于餐馆布草、厨师制服和前台围裙的专业去污和卫生清洁服务。",
+    "howItWorksTitle": "服务流程",
+    "step1Title": "在线预约",
+    "step1Desc": "选择您的洗衣服务，预约方便的取件时间，轻松几步即可完成下单。",
+    "step2Title": "上门取件",
+    "step2Desc": "我们的礼宾团队将前往您的酒店、公寓或家中安全收取衣物。",
+    "step3Title": "专业洗护",
+    "step3Desc": "精细分类，环保水洗或干洗工艺，配合专业手工熨烫，呵护每一件衣物。",
+    "step4Title": "准时送达",
+    "step4Desc": "洁净平整、精致包装的衣物将按时送回您的手中，随时可穿。"
   },
   "Pricing": {
     "metaTitle": "价格 | That Laundry Shop",
