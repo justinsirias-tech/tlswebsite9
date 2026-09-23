@@ -270,7 +270,28 @@ Notes: ${specialInst}`.trim();
         if (typeof window !== 'undefined') {
           window.dataLayer = window.dataLayer || [];
           window.dataLayer.push({
+            event: 'booking_success',
+            form_id: 'gform_1',
+            event_category: 'Booking',
+            event_action: 'Submit Success',
+            form_name: 'Booking Form',
+            conversion_type_id: '6677228879',
+            value: 60,
+            currency: 'THB'
+          });
+          window.dataLayer.push({
+            event: 'Booking_success',
+            form_id: 'gform_1',
+            event_category: 'Booking',
+            event_action: 'Submit Success',
+            form_name: 'Booking Form',
+            conversion_type_id: '6677228879',
+            value: 60,
+            currency: 'THB'
+          });
+          window.dataLayer.push({
             event: 'form_submission',
+            form_id: 'form_1',
             event_category: 'Booking',
             event_action: 'Submit',
             form_name: 'Booking Form',
@@ -280,7 +301,7 @@ Notes: ${specialInst}`.trim();
           });
           if (typeof window.gtag === 'function') {
             window.gtag('event', 'conversion', {
-              send_to: 'AW-10923232152',
+              send_to: 'AW-10923232152/0JfKCMna-e8YEJiXzdgo',
               value: 60.0,
               currency: 'THB'
             });
@@ -449,7 +470,7 @@ Notes: ${specialInst}`.trim();
               </button>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className={styles.formGrid}>
+            <form id="gform_1" onSubmit={handleSubmit} className={styles.formGrid}>
               
               <div className={styles.fullWidth}>
                 <h3 style={{ fontSize: "1.5rem", color: "var(--primary)", marginBottom: "1rem", borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: "0.5rem" }}>
