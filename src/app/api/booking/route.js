@@ -25,7 +25,7 @@ ${text}
 
 Instructions:
 1. Translate all non-English text (such as Thai or Chinese) into English.
-2. Keep the original structure of the booking details (e.g. Services, Address, Delivery, Pickup Method, Time, Notes).
+2. Keep the original structure of the booking details (e.g. Services, Promo Code, Address, Delivery, Pickup Method, Time, Payment Method, Express Service, Notes).
 3. If the text is already entirely in English, return it exactly as it is without any changes.
 4. Output ONLY the translated text. Do not include markdown code block backticks (like \`\`\`), "Here is the translation:", or any extra commentary.`;
 
@@ -55,7 +55,9 @@ function parseServiceDetails(serviceStr) {
     notes: "",
     promoCode: "",
     roomNo: "",
-    deliveryRoomNo: ""
+    deliveryRoomNo: "",
+    expressService: "",
+    paymentMethod: ""
   };
   
   if (!serviceStr) return details;
@@ -91,6 +93,10 @@ function parseServiceDetails(serviceStr) {
       details.notes = trimmed.replace("Notes:", "").trim();
     } else if (trimmed.startsWith("Promo Code:")) {
       details.promoCode = trimmed.replace("Promo Code:", "").trim();
+    } else if (trimmed.startsWith("Express Service:")) {
+      details.expressService = trimmed.replace("Express Service:", "").trim();
+    } else if (trimmed.startsWith("Payment Method:")) {
+      details.paymentMethod = trimmed.replace("Payment Method:", "").trim();
     }
   });
 
@@ -289,6 +295,29 @@ async function sendConfirmationEmail(booking) {
                 ${serviceBadgesHtml}
               </div>
             </div>
+
+            <!-- Express Service Option -->
+            <div style="margin-bottom: 25px;">
+              <div style="font-size: 11px; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">
+                Express Service Option
+              </div>
+              <div style="background: ${details.expressService && details.expressService.toLowerCase().includes('express') ? '#eff6ff' : '#f8fafc'}; border: 1px solid ${details.expressService && details.expressService.toLowerCase().includes('express') ? '#bfdbfe' : '#e2e8f0'}; border-left: 4px solid ${details.expressService && details.expressService.toLowerCase().includes('express') ? '#2563eb' : '#64748b'}; border-radius: 8px; padding: 12px 16px;">
+                <div style="font-size: 13px; color: ${details.expressService && details.expressService.toLowerCase().includes('express') ? '#1e40af' : '#1e293b'}; font-weight: 700; line-height: 1.4;">
+                  ${details.expressService && details.expressService.toLowerCase().includes('express') ? '⚡' : '🕒'} ${details.expressService || 'Standard: Next Day Deliver Any Time Before 18:00 (No Fixed Time)'}
+                </div>
+              </div>
+            </div>
+
+            <!-- Payment Method -->
+            ${details.paymentMethod ? `
+            <div style="margin-bottom: 25px;">
+              <div style="font-size: 11px; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">
+                Preferred Payment Method
+              </div>
+              <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 14px; font-size: 13px; color: #1e293b; font-weight: 600;">
+                💳 ${details.paymentMethod}
+              </div>
+            </div>` : ''}
 
             <!-- Promo Code -->
             ${details.promoCode ? `
