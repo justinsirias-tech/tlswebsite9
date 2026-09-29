@@ -48,9 +48,11 @@ async function getPromotions() {
   }
 }
 
-export default async function PromotionsPage({ params }) {
+export default async function PromotionsPage({ params, searchParams }) {
   const resolvedParams = await params;
+  const resolvedSearchParams = searchParams ? await searchParams : {};
   const locale = resolvedParams.locale || 'en';
+  const initialPromoKey = resolvedSearchParams?.promo || resolvedSearchParams?.code || resolvedSearchParams?.deal || resolvedSearchParams?.id || null;
 
   const dbPromotions = await getPromotions();
 
@@ -100,7 +102,7 @@ export default async function PromotionsPage({ params }) {
 
       <section className="section" style={{ backgroundColor: "#f8fafc" }}>
         <div className={styles.promoContainer}>
-          <PromotionsClient locale={locale} initialPromotions={dbPromotions} />
+          <PromotionsClient locale={locale} initialPromotions={dbPromotions} initialPromoKey={initialPromoKey} />
         </div>
       </section>
     </>

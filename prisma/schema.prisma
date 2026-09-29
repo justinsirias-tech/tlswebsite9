@@ -161,13 +161,37 @@ model Promotion {
   imageUrl    String?
   category    String   @default("monthly")
   validUntil  String?
-  bookUrl     String?
-  lineUrl     String?
-  whatsappUrl String?
-  isActive    Boolean  @default(true)
-  sortOrder   Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  bookUrl          String?
+  lineUrl          String?
+  whatsappUrl      String?
+  reviewContent    String?
+  reviewContent_th String?
+  reviewContent_cn String?
+  reviewUrl        String?
+  clicksBook       Int              @default(0)
+  clicksLine       Int              @default(0)
+  clicksWhatsapp   Int              @default(0)
+  clicksReview     Int              @default(0)
+  clicks           PromotionClick[]
+  isActive         Boolean  @default(true)
+  sortOrder        Int      @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model PromotionClick {
+  id          String    @id @default(uuid())
+  promotionId String
+  promotion   Promotion @relation(fields: [promotionId], references: [id], onDelete: Cascade)
+  buttonType  String    // "book" | "line" | "whatsapp" | "review"
+  locale      String?   @default("th")
+  referrer    String?
+  device      String?
+  createdAt   DateTime  @default(now())
+
+  @@index([promotionId])
+  @@index([buttonType])
+  @@index([createdAt])
 }
 
 model PromoCode {

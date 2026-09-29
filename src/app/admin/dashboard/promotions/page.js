@@ -43,6 +43,14 @@ export default function AdminPromotionsPage() {
     bookUrl: "",
     lineUrl: "",
     whatsappUrl: "",
+    reviewContent: "",
+    reviewContent_th: "",
+    reviewContent_cn: "",
+    reviewUrl: "",
+    clicksBook: 0,
+    clicksLine: 0,
+    clicksWhatsapp: 0,
+    clicksReview: 0,
     isActive: true,
     sortOrder: 0
   };
@@ -98,6 +106,14 @@ export default function AdminPromotionsPage() {
       bookUrl: promo.bookUrl || "",
       lineUrl: promo.lineUrl || "",
       whatsappUrl: promo.whatsappUrl || "",
+      reviewContent: promo.reviewContent || "",
+      reviewContent_th: promo.reviewContent_th || "",
+      reviewContent_cn: promo.reviewContent_cn || "",
+      reviewUrl: promo.reviewUrl || "",
+      clicksBook: promo.clicksBook || 0,
+      clicksLine: promo.clicksLine || 0,
+      clicksWhatsapp: promo.clicksWhatsapp || 0,
+      clicksReview: promo.clicksReview || 0,
       isActive: promo.isActive !== undefined ? promo.isActive : true,
       sortOrder: promo.sortOrder || 0
     });
@@ -106,6 +122,52 @@ export default function AdminPromotionsPage() {
     setImageError("");
     setUploadingImage(false);
     setShowModal(true);
+  };
+
+  const handleResetStats = async (promoId) => {
+    if (!window.confirm("คุณแน่ใจหรือไม่ว่าต้องการรีเซ็ตสถิติการคลิกของโปรโมชั่นนี้กลับเป็น 0?")) return;
+    try {
+      const res = await fetch(`/api/admin/promotions/${promoId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          clicksBook: 0,
+          clicksLine: 0,
+          clicksWhatsapp: 0,
+          clicksReview: 0
+        })
+      });
+      if (res.ok) {
+        setFormData(prev => ({
+          ...prev,
+          clicksBook: 0,
+          clicksLine: 0,
+          clicksWhatsapp: 0,
+          clicksReview: 0
+        }));
+        setPromotions(prev => prev.map(p => p.id === promoId ? {
+          ...p,
+          clicksBook: 0,
+          clicksLine: 0,
+          clicksWhatsapp: 0,
+          clicksReview: 0
+        } : p));
+        setSuccess("รีเซ็ตสถิติการคลิกกลับเป็น 0 สำเร็จ");
+      } else {
+        setError("ไม่สามารถรีเซ็ตสถิติได้");
+      }
+    } catch (err) {
+      console.error("Failed to reset stats:", err);
+      setError("เกิดข้อผิดพลาดในการรีเซ็ตสถิติ");
+    }
+  };
+
+  const handleCopyDirectLink = (promo) => {
+    if (!promo || typeof window === "undefined") return;
+    const key = promo.code || promo.id;
+    const shareUrl = `${window.location.origin}/th/promotions?promo=${encodeURIComponent(key)}`;
+    navigator.clipboard.writeText(shareUrl);
+    setSuccess(`คัดลอกลิงก์โปรโมชั่น (${promo.code || promo.title}) เรียบร้อยแล้ว: ${shareUrl}`);
   };
 
   const handleImageUpload = async (e) => {
@@ -260,6 +322,49 @@ export default function AdminPromotionsPage() {
           <i className="fa-solid fa-plus" style={{ marginRight: "0.5rem" }}></i>
           Add New Promotion
         </button>
+      </div>
+
+      {/* Quick KPI Overview Cards */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "1rem", marginBottom: "2rem" }}>
+        <div style={{ background: "#ffffff", padding: "1.25rem 1.5rem", borderRadius: "14px", border: "1px solid #e2e8f0", boxShadow: "0 2px 6px rgba(0,0,0,0.02)" }}>
+          <div style={{ fontSize: "0.8rem", color: "#64748b", fontWeight: "700", textTransform: "uppercase" }}>Total Offers</div>
+          <div style={{ fontSize: "1.75rem", fontWeight: "800", color: "#222945", marginTop: "0.25rem" }}>
+            {promotions.length}
+          </div>
+          <div style={{ fontSize: "0.78rem", color: "#16a34a", marginTop: "0.25rem", fontWeight: "600" }}>
+            ● {promotions.filter(p => p.isActive).length} Active now
+          </div>
+        </div>
+
+        <div style={{ background: "#ffffff", padding: "1.25rem 1.5rem", borderRadius: "14px", border: "1px solid #e2e8f0", boxShadow: "0 2px 6px rgba(0,0,0,0.02)" }}>
+          <div style={{ fontSize: "0.8rem", color: "#64748b", fontWeight: "700", textTransform: "uppercase" }}>Total Button Clicks</div>
+          <div style={{ fontSize: "1.75rem", fontWeight: "800", color: "#2563eb", marginTop: "0.25rem" }}>
+            {promotions.reduce((sum, p) => sum + (p.clicksBook || 0) + (p.clicksLine || 0) + (p.clicksWhatsapp || 0) + (p.clicksReview || 0), 0).toLocaleString()}
+          </div>
+          <div style={{ fontSize: "0.78rem", color: "#64748b", marginTop: "0.25rem" }}>
+            สถิติกดทั้ง 4 ปุ่มรวมกัน
+          </div>
+        </div>
+
+        <div style={{ background: "#ffffff", padding: "1.25rem 1.5rem", borderRadius: "14px", border: "1px solid #e2e8f0", boxShadow: "0 2px 6px rgba(0,0,0,0.02)" }}>
+          <div style={{ fontSize: "0.8rem", color: "#64748b", fontWeight: "700", textTransform: "uppercase" }}>Book Online Clicks</div>
+          <div style={{ fontSize: "1.75rem", fontWeight: "800", color: "#1d4ed8", marginTop: "0.25rem" }}>
+            {promotions.reduce((sum, p) => sum + (p.clicksBook || 0), 0).toLocaleString()}
+          </div>
+          <div style={{ fontSize: "0.78rem", color: "#64748b", marginTop: "0.25rem" }}>
+            🛒 คลิกจองทางหน้าเว็บ
+          </div>
+        </div>
+
+        <div style={{ background: "#ffffff", padding: "1.25rem 1.5rem", borderRadius: "14px", border: "1px solid #e2e8f0", boxShadow: "0 2px 6px rgba(0,0,0,0.02)" }}>
+          <div style={{ fontSize: "0.8rem", color: "#64748b", fontWeight: "700", textTransform: "uppercase" }}>Social & Review Clicks</div>
+          <div style={{ fontSize: "1.75rem", fontWeight: "800", color: "#15803d", marginTop: "0.25rem" }}>
+            {promotions.reduce((sum, p) => sum + (p.clicksLine || 0) + (p.clicksWhatsapp || 0) + (p.clicksReview || 0), 0).toLocaleString()}
+          </div>
+          <div style={{ fontSize: "0.78rem", color: "#64748b", marginTop: "0.25rem" }}>
+            💬 LINE, WA & Review
+          </div>
+        </div>
       </div>
 
       {error && (
@@ -617,18 +722,34 @@ export default function AdminPromotionsPage() {
                 <div style={{ background: "#eff6ff", border: "1px solid #bfdbfe", padding: "0.65rem 0.9rem", borderRadius: "8px", marginBottom: "0.85rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
                   <i className="fa-solid fa-circle-info" style={{ color: "#2563eb", fontSize: "1rem" }}></i>
                   <span style={{ color: "#1e40af", fontSize: "0.83rem", fontWeight: "600" }}>
-                    หากไม่ใส่อะไร (เว้นว่างไว้) ระบบจะใช้ค่า Default เดิมโดยอัตโนมัติทั้งหมดครับ
+                    ช่องไหนหากไม่ใส่ข้อมูล (เว้นว่างไว้) ปุ่มนั้นจะไม่ขึ้นมาแสดงผลบนหน้าต่างโปรโมชั่นครับ
                   </span>
                 </div>
 
                 <div style={{ display: "grid", gap: "0.75rem" }}>
                   <div>
-                    <label style={{ display: "block", color: "#334155", fontWeight: "600", fontSize: "0.85rem", marginBottom: "0.25rem" }}>
-                      1. Book Online Button URL <span style={{ color: "#64748b", fontWeight: "400", fontSize: "0.8rem" }}>(เว้นว่าง = ค่าเดิม: จองทางเว็บพร้อมใส่โค้ด)</span>
-                    </label>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.25rem", flexWrap: "wrap", gap: "0.4rem" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                        <label style={{ color: "#334155", fontWeight: "700", fontSize: "0.85rem", margin: 0 }}>
+                          1. Book Online Button URL <span style={{ color: "#64748b", fontWeight: "400", fontSize: "0.78rem" }}>(เว้นว่าง = ไม่แสดงปุ่มนี้)</span>
+                        </label>
+                        {editingId && (
+                          <span style={{ background: "#dbeafe", color: "#1e40af", padding: "0.12rem 0.45rem", borderRadius: "10px", fontSize: "0.72rem", fontWeight: "700" }}>
+                            <i className="fa-solid fa-chart-simple" style={{ marginRight: "0.2rem" }}></i>คลิก {formData.clicksBook || 0}
+                          </span>
+                        )}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setFormData(prev => ({ ...prev, bookUrl: `/[locale]/booking${prev.code ? `?promo=${prev.code}` : ""}` }))}
+                        style={{ background: "#f1f5f9", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "0.72rem", padding: "0.15rem 0.45rem", cursor: "pointer", color: "#2563eb", fontWeight: "600" }}
+                      >
+                        + ใช้ลิงก์จองหน้าเว็บของร้าน
+                      </button>
+                    </div>
                     <input 
                       type="text" 
-                      placeholder="ค่าเดิม: /[locale]/booking?promo=CODE (หรือใส่ URL อื่นตามต้องการ)"
+                      placeholder="เช่น /[locale]/booking?promo=CODE หรือ https://... (เว้นว่าง = ไม่แสดงปุ่มจอง)"
                       value={formData.bookUrl}
                       onChange={(e) => setFormData(prev => ({ ...prev, bookUrl: e.target.value }))}
                       style={{ width: "100%", padding: "0.65rem 0.8rem", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#ffffff", color: "#222945", fontSize: "0.85rem" }}
@@ -637,13 +758,29 @@ export default function AdminPromotionsPage() {
 
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
                     <div>
-                      <label style={{ display: "block", color: "#00B900", fontWeight: "700", fontSize: "0.85rem", marginBottom: "0.25rem" }}>
-                        <i className="fa-brands fa-line" style={{ marginRight: "0.35rem" }}></i>
-                        2. LINE OA URL <span style={{ color: "#64748b", fontWeight: "400", fontSize: "0.78rem" }}>(เว้นว่าง = LINE ทางการ)</span>
-                      </label>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.25rem", flexWrap: "wrap", gap: "0.4rem" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
+                          <label style={{ color: "#00B900", fontWeight: "700", fontSize: "0.85rem", margin: 0 }}>
+                            <i className="fa-brands fa-line" style={{ marginRight: "0.35rem" }}></i>
+                            2. LINE OA URL <span style={{ color: "#64748b", fontWeight: "400", fontSize: "0.78rem" }}>(เว้นว่าง = ไม่แสดง)</span>
+                          </label>
+                          {editingId && (
+                            <span style={{ background: "#dcfce7", color: "#15803d", padding: "0.12rem 0.45rem", borderRadius: "10px", fontSize: "0.72rem", fontWeight: "700" }}>
+                              <i className="fa-solid fa-chart-simple" style={{ marginRight: "0.2rem" }}></i>คลิก {formData.clicksLine || 0}
+                            </span>
+                          )}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setFormData(prev => ({ ...prev, lineUrl: "https://lin.ee/B2monGQ" }))}
+                          style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: "6px", fontSize: "0.72rem", padding: "0.15rem 0.45rem", cursor: "pointer", color: "#15803d", fontWeight: "600" }}
+                        >
+                          + LINE ของร้าน
+                        </button>
+                      </div>
                       <input 
                         type="text" 
-                        placeholder="ค่าเดิม: LINE OA ทางการ @ThatLaundryShop"
+                        placeholder="เช่น https://line.me/R/ti/p/... (เว้นว่าง = ไม่แสดงปุ่ม LINE)"
                         value={formData.lineUrl}
                         onChange={(e) => setFormData(prev => ({ ...prev, lineUrl: e.target.value }))}
                         style={{ width: "100%", padding: "0.65rem 0.8rem", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#ffffff", color: "#222945", fontSize: "0.85rem" }}
@@ -651,19 +788,226 @@ export default function AdminPromotionsPage() {
                     </div>
 
                     <div>
-                      <label style={{ display: "block", color: "#25D366", fontWeight: "700", fontSize: "0.85rem", marginBottom: "0.25rem" }}>
-                        <i className="fa-brands fa-whatsapp" style={{ marginRight: "0.35rem" }}></i>
-                        3. WhatsApp URL <span style={{ color: "#64748b", fontWeight: "400", fontSize: "0.78rem" }}>(เว้นว่าง = WhatsApp ทางการ)</span>
-                      </label>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.25rem", flexWrap: "wrap", gap: "0.4rem" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
+                          <label style={{ color: "#25D366", fontWeight: "700", fontSize: "0.85rem", margin: 0 }}>
+                            <i className="fa-brands fa-whatsapp" style={{ marginRight: "0.35rem" }}></i>
+                            3. WhatsApp URL <span style={{ color: "#64748b", fontWeight: "400", fontSize: "0.78rem" }}>(เว้นว่าง = ไม่แสดง)</span>
+                          </label>
+                          {editingId && (
+                            <span style={{ background: "#dcfce7", color: "#15803d", padding: "0.12rem 0.45rem", borderRadius: "10px", fontSize: "0.72rem", fontWeight: "700" }}>
+                              <i className="fa-solid fa-chart-simple" style={{ marginRight: "0.2rem" }}></i>คลิก {formData.clicksWhatsapp || 0}
+                            </span>
+                          )}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setFormData(prev => ({ ...prev, whatsappUrl: "https://wa.me/message/7BO67YACZI6SH1" }))}
+                          style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: "6px", fontSize: "0.72rem", padding: "0.15rem 0.45rem", cursor: "pointer", color: "#15803d", fontWeight: "600" }}
+                        >
+                          + WhatsApp ของร้าน
+                        </button>
+                      </div>
                       <input 
                         type="text" 
-                        placeholder="ค่าเดิม: WhatsApp ทางการของร้าน"
+                        placeholder="เช่น https://wa.me/... (เว้นว่าง = ไม่แสดงปุ่ม WhatsApp)"
                         value={formData.whatsappUrl}
                         onChange={(e) => setFormData(prev => ({ ...prev, whatsappUrl: e.target.value }))}
                         style={{ width: "100%", padding: "0.65rem 0.8rem", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#ffffff", color: "#222945", fontSize: "0.85rem" }}
                       />
                     </div>
                   </div>
+
+                  {/* 4. Click To Review Button (Optional) */}
+                  <div style={{ marginTop: "0.4rem", padding: "0.85rem 1rem", background: "#f0f7ff", border: "1.5px solid #bfdbfe", borderRadius: "10px" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.35rem", flexWrap: "wrap", gap: "0.4rem" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                        <label style={{ display: "flex", alignItems: "center", gap: "0.4rem", color: "#1e40af", fontWeight: "700", fontSize: "0.88rem", margin: 0 }}>
+                          <i className="fa-solid fa-file-lines" style={{ color: "#2563eb" }}></i>
+                          4. "Click To Review" Button (Popup Information)
+                        </label>
+                        {editingId && (
+                          <span style={{ background: "rgba(37, 99, 235, 0.12)", color: "#1d4ed8", border: "1px solid rgba(37, 99, 235, 0.25)", padding: "0.12rem 0.45rem", borderRadius: "10px", fontSize: "0.72rem", fontWeight: "700" }}>
+                            <i className="fa-solid fa-chart-simple" style={{ marginRight: "0.2rem" }}></i>คลิก {formData.clicksReview || 0}
+                          </span>
+                        )}
+                      </div>
+                      <span style={{ color: "#2563eb", fontWeight: "500", fontSize: "0.76rem" }}>
+                        (เว้นว่างไว้ = ไม่แสดงปุ่มนี้บนหน้าเว็บ)
+                      </span>
+                    </div>
+                    <p style={{ color: "#1e3a8a", fontSize: "0.8rem", margin: "0 0 0.65rem 0", lineHeight: "1.4" }}>
+                      ระบุข้อมูลรีวิวหรือความประทับใจของลูกค้า เมื่อผู้ใช้กดปุ่ม <strong>"Click To Review"</strong> บนหน้าเว็บ ระบบจะเปิด Popup แสดงข้อมูลที่ใส่ไว้ข้างในนี้ขึ้นมาครับ
+                    </p>
+
+                    <div style={{ display: "grid", gap: "0.65rem" }}>
+                      <div>
+                        <label style={{ display: "block", color: "#1e40af", fontWeight: "600", fontSize: "0.8rem", marginBottom: "0.25rem" }}>
+                          Review Information / Content (Popup Text - English)
+                        </label>
+                        <textarea 
+                          rows={3}
+                          placeholder="e.g. Highly recommended! Beautiful tailoring and fantastic service from Sarto di Moda. Excellent fabrics and on-time delivery."
+                          value={formData.reviewContent}
+                          onChange={(e) => setFormData(prev => ({ ...prev, reviewContent: e.target.value }))}
+                          style={{ width: "100%", padding: "0.65rem 0.8rem", borderRadius: "8px", border: "1px solid #bfdbfe", background: "#ffffff", color: "#222945", fontSize: "0.85rem", lineHeight: "1.5" }}
+                        />
+                      </div>
+
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.65rem" }}>
+                        <div>
+                          <label style={{ display: "block", color: "#1e40af", fontWeight: "600", fontSize: "0.78rem", marginBottom: "0.25rem" }}>
+                            Review Content (Thai) - ข้อมูลรีวิวภาษาไทย
+                          </label>
+                          <textarea 
+                            rows={2}
+                            placeholder="ข้อความรีวิวภาษาไทย..."
+                            value={formData.reviewContent_th}
+                            onChange={(e) => setFormData(prev => ({ ...prev, reviewContent_th: e.target.value }))}
+                            style={{ width: "100%", padding: "0.55rem 0.75rem", borderRadius: "8px", border: "1px solid #bfdbfe", background: "#ffffff", color: "#222945", fontSize: "0.82rem", lineHeight: "1.4" }}
+                          />
+                        </div>
+                        <div>
+                          <label style={{ display: "block", color: "#1e40af", fontWeight: "600", fontSize: "0.78rem", marginBottom: "0.25rem" }}>
+                            Review Content (Chinese) - 评价内容（中文）
+                          </label>
+                          <textarea 
+                            rows={2}
+                            placeholder="中文评价信息..."
+                            value={formData.reviewContent_cn}
+                            onChange={(e) => setFormData(prev => ({ ...prev, reviewContent_cn: e.target.value }))}
+                            style={{ width: "100%", padding: "0.55rem 0.75rem", borderRadius: "8px", border: "1px solid #bfdbfe", background: "#ffffff", color: "#222945", fontSize: "0.82rem", lineHeight: "1.4" }}
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label style={{ display: "block", color: "#1e40af", fontWeight: "600", fontSize: "0.8rem", marginBottom: "0.25rem" }}>
+                          <i className="fa-solid fa-link" style={{ marginRight: "0.35rem", fontSize: "0.75rem" }}></i>
+                          Review Link URL (Optional - e.g. Google Maps Review หรือลิงก์รีวิวภายนอก)
+                        </label>
+                        <input 
+                          type="text" 
+                          placeholder="e.g. https://maps.app.goo.gl/... หรือ https://facebook.com/..."
+                          value={formData.reviewUrl}
+                          onChange={(e) => setFormData(prev => ({ ...prev, reviewUrl: e.target.value }))}
+                          style={{ width: "100%", padding: "0.6rem 0.8rem", borderRadius: "8px", border: "1px solid #bfdbfe", background: "#ffffff", color: "#222945", fontSize: "0.85rem" }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Click Statistics Summary for this promotion */}
+                  {editingId && (
+                    <div style={{
+                      marginTop: "0.75rem",
+                      padding: "0.75rem 1rem",
+                      background: "#ffffff",
+                      borderRadius: "10px",
+                      border: "1px solid #e2e8f0",
+                      boxShadow: "0 2px 6px rgba(0,0,0,0.03)",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      flexWrap: "wrap",
+                      gap: "0.75rem"
+                    }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", flexWrap: "wrap" }}>
+                        <span style={{ fontSize: "0.86rem", fontWeight: "700", color: "#1e293b", display: "flex", alignItems: "center", gap: "0.4rem" }}>
+                          <i className="fa-solid fa-chart-pie" style={{ color: "#2563eb" }}></i> สถิติการกดปุ่ม (Click Stats):
+                        </span>
+                        <div style={{ display: "flex", gap: "0.4rem", flexWrap: "wrap" }}>
+                          <span style={{ fontSize: "0.76rem", background: "#eff6ff", color: "#1e40af", border: "1px solid #dbeafe", padding: "0.2rem 0.5rem", borderRadius: "6px", fontWeight: "600" }}>
+                            🛒 Book: <strong>{formData.clicksBook || 0}</strong>
+                          </span>
+                          <span style={{ fontSize: "0.76rem", background: "#f0fdf4", color: "#166534", border: "1px solid #bbf7d0", padding: "0.2rem 0.5rem", borderRadius: "6px", fontWeight: "600" }}>
+                            💬 LINE: <strong>{formData.clicksLine || 0}</strong>
+                          </span>
+                          <span style={{ fontSize: "0.76rem", background: "#f0fdf4", color: "#166534", border: "1px solid #bbf7d0", padding: "0.2rem 0.5rem", borderRadius: "6px", fontWeight: "600" }}>
+                            📱 WA: <strong>{formData.clicksWhatsapp || 0}</strong>
+                          </span>
+                          <span style={{ fontSize: "0.76rem", background: "rgba(37, 99, 235, 0.08)", color: "#2563eb", border: "1px solid rgba(37, 99, 235, 0.25)", padding: "0.2rem 0.5rem", borderRadius: "6px", fontWeight: "600", display: "inline-flex", alignItems: "center", gap: "0.25rem" }}>
+                            <i className="fa-solid fa-file-lines" style={{ fontSize: "0.72rem" }}></i> Review: <strong>{formData.clicksReview || 0}</strong>
+                          </span>
+                        </div>
+                        <span style={{ background: "#0f172a", color: "#ffffff", padding: "0.2rem 0.6rem", borderRadius: "6px", fontSize: "0.78rem", fontWeight: "700" }}>
+                          รวม: {(formData.clicksBook || 0) + (formData.clicksLine || 0) + (formData.clicksWhatsapp || 0) + (formData.clicksReview || 0)} ครั้ง
+                        </span>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => handleResetStats(editingId)}
+                        style={{
+                          background: "#fff1f2",
+                          border: "1px solid #fecdd3",
+                          color: "#be123c",
+                          padding: "0.3rem 0.65rem",
+                          borderRadius: "6px",
+                          fontSize: "0.75rem",
+                          fontWeight: "700",
+                          cursor: "pointer",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "0.3rem"
+                        }}
+                        title="รีเซ็ตสถิติปุ่มของโปรโมชั่นนี้เป็น 0"
+                      >
+                        <i className="fa-solid fa-rotate-left"></i>
+                        รีเซ็ตสถิติเป็น 0
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Direct Link Share Helper */}
+                  {editingId && (
+                    <div style={{
+                      marginTop: "0.6rem",
+                      padding: "0.65rem 0.9rem",
+                      background: "#f0fdf4",
+                      border: "1px dashed #86efac",
+                      borderRadius: "8px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      gap: "0.6rem",
+                      flexWrap: "wrap"
+                    }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "0.45rem", minWidth: 0, flex: 1 }}>
+                        <i className="fa-solid fa-link" style={{ color: "#16a34a", fontSize: "0.85rem" }}></i>
+                        <span style={{ fontSize: "0.8rem", color: "#166534", fontWeight: "700", whiteSpace: "nowrap" }}>
+                          ลิงก์ตรง (Direct URL):
+                        </span>
+                        <span style={{ fontSize: "0.78rem", color: "#15803d", fontFamily: "monospace", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                          {typeof window !== "undefined" ? window.location.origin : ""}/th/promotions?promo={formData.code || editingId}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const link = `${window.location.origin}/th/promotions?promo=${encodeURIComponent(formData.code || editingId)}`;
+                          navigator.clipboard.writeText(link);
+                          setSuccess(`คัดลอกลิงก์ตรงเรียบร้อยแล้ว: ${link}`);
+                        }}
+                        style={{
+                          background: "#16a34a",
+                          color: "#ffffff",
+                          border: "none",
+                          borderRadius: "6px",
+                          padding: "0.3rem 0.7rem",
+                          fontSize: "0.76rem",
+                          fontWeight: "700",
+                          cursor: "pointer",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "0.3rem"
+                        }}
+                      >
+                        <i className="fa-regular fa-copy"></i>
+                        คัดลอกลิงก์แชร์
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -760,6 +1104,7 @@ export default function AdminPromotionsPage() {
                 <th style={{ padding: "1rem 1.25rem" }}>Promo Code</th>
                 <th style={{ padding: "1rem 1.25rem" }}>Category</th>
                 <th style={{ padding: "1rem 1.25rem" }}>Validity</th>
+                <th style={{ padding: "1rem 1.25rem" }}>Click Stats</th>
                 <th style={{ padding: "1rem 1.25rem" }}>Status</th>
                 <th style={{ padding: "1rem 1.25rem", textAlign: "right" }}>Actions</th>
               </tr>
@@ -814,8 +1159,25 @@ export default function AdminPromotionsPage() {
                         </span>
                       )}
                       <div>
-                        <div style={{ fontWeight: "700", color: "#222945", fontSize: "1rem" }}>{promo.title}</div>
-                        <div style={{ color: "#64748b", fontSize: "0.85rem", marginTop: "0.2rem" }}>{promo.description}</div>
+                        <div style={{ fontWeight: "700", color: "#222945", fontSize: "0.95rem", lineHeight: "1.4" }}>{promo.title}</div>
+                        {(promo.reviewContent || promo.reviewUrl) && (
+                          <div style={{ marginTop: "0.4rem" }}>
+                            <span style={{ 
+                              display: "inline-flex", 
+                              alignItems: "center", 
+                              gap: "0.35rem", 
+                              background: "rgba(37, 99, 235, 0.08)", 
+                              border: "1px solid rgba(37, 99, 235, 0.25)", 
+                              color: "#2563eb", 
+                              fontSize: "0.72rem", 
+                              fontWeight: "700", 
+                              padding: "0.15rem 0.5rem", 
+                              borderRadius: "6px" 
+                            }}>
+                              <i className="fa-solid fa-file-lines"></i> Click To Review
+                            </span>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </td>
@@ -839,6 +1201,50 @@ export default function AdminPromotionsPage() {
                   </td>
 
                   <td style={{ padding: "1.25rem" }}>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "0.35rem", flexWrap: "wrap" }}>
+                        {promo.bookUrl && (
+                          <span style={{ fontSize: "0.72rem", background: "#eff6ff", color: "#1e40af", border: "1px solid #dbeafe", padding: "0.15rem 0.45rem", borderRadius: "6px", fontWeight: "600" }} title="คลิกปุ่ม Book Online">
+                            🛒 Book: {promo.clicksBook || 0}
+                          </span>
+                        )}
+                        {promo.lineUrl && (
+                          <span style={{ fontSize: "0.72rem", background: "#f0fdf4", color: "#166534", border: "1px solid #bbf7d0", padding: "0.15rem 0.45rem", borderRadius: "6px", fontWeight: "600" }} title="คลิกปุ่ม LINE OA">
+                            💬 LINE: {promo.clicksLine || 0}
+                          </span>
+                        )}
+                        {promo.whatsappUrl && (
+                          <span style={{ fontSize: "0.72rem", background: "#f0fdf4", color: "#166534", border: "1px solid #bbf7d0", padding: "0.15rem 0.45rem", borderRadius: "6px", fontWeight: "600" }} title="คลิกปุ่ม WhatsApp">
+                            📱 WA: {promo.clicksWhatsapp || 0}
+                          </span>
+                        )}
+                        {(promo.reviewContent || promo.reviewUrl) && (
+                          <span style={{ 
+                            fontSize: "0.72rem", 
+                            background: "rgba(37, 99, 235, 0.08)", 
+                            color: "#2563eb", 
+                            border: "1px solid rgba(37, 99, 235, 0.25)", 
+                            padding: "0.15rem 0.45rem", 
+                            borderRadius: "6px", 
+                            fontWeight: "600",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "0.25rem"
+                          }} title="คลิกปุ่ม Click To Review">
+                            <i className="fa-solid fa-file-lines" style={{ fontSize: "0.72rem" }}></i> Review: {promo.clicksReview || 0}
+                          </span>
+                        )}
+                        {!promo.bookUrl && !promo.lineUrl && !promo.whatsappUrl && !promo.reviewContent && !promo.reviewUrl && (
+                          <span style={{ fontSize: "0.75rem", color: "#94a3b8" }}>ไม่มีปุ่ม</span>
+                        )}
+                      </div>
+                      <div style={{ fontSize: "0.78rem", color: "#64748b", fontWeight: "600" }}>
+                        รวม: <strong style={{ color: "#0f172a" }}>{(promo.clicksBook || 0) + (promo.clicksLine || 0) + (promo.clicksWhatsapp || 0) + (promo.clicksReview || 0)}</strong> ครั้ง
+                      </div>
+                    </div>
+                  </td>
+
+                  <td style={{ padding: "1.25rem" }}>
                     <button 
                       onClick={() => handleToggleActive(promo.id, promo.isActive)}
                       style={{
@@ -858,7 +1264,15 @@ export default function AdminPromotionsPage() {
                   </td>
 
                   <td style={{ padding: "1.25rem", textAlign: "right" }}>
-                    <div style={{ display: "inline-flex", gap: "0.5rem" }}>
+                    <div style={{ display: "inline-flex", gap: "0.4rem" }}>
+                      <button 
+                        onClick={() => handleCopyDirectLink(promo)}
+                        style={{ padding: "0.4rem 0.65rem", borderRadius: "6px", background: "#f0fdf4", color: "#166534", border: "1px solid #bbf7d0", fontWeight: "600", cursor: "pointer", fontSize: "0.82rem", display: "inline-flex", alignItems: "center", gap: "0.3rem" }}
+                        title="คัดลอกลิงก์ตรงที่เปิดโปรโมชั่นนี้ทันที"
+                      >
+                        <i className="fa-solid fa-link"></i>
+                        <span>Link</span>
+                      </button>
                       <button 
                         onClick={() => handleOpenEdit(promo)}
                         style={{ padding: "0.4rem 0.8rem", borderRadius: "6px", background: "#f1f5f9", color: "#222945", border: "1px solid #cbd5e1", fontWeight: "600", cursor: "pointer", fontSize: "0.85rem" }}

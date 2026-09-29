@@ -4,18 +4,26 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import styles from "./page.module.css";
 
-export default function PromotionsClient({ locale, initialPromotions = [] }) {
+export default function PromotionsClient({ locale, initialPromotions = [], initialPromoKey = null }) {
   const [activeCategory, setActiveCategory] = useState("all");
   const [copiedCode, setCopiedCode] = useState(null);
   const [selectedPromo, setSelectedPromo] = useState(null);
+  const [expandedImage, setExpandedImage] = useState(null);
+  const [showReviewModal, setShowReviewModal] = useState(false);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === "Escape") {
-        setSelectedPromo(null);
+        if (showReviewModal) {
+          setShowReviewModal(false);
+        } else if (expandedImage) {
+          setExpandedImage(null);
+        } else if (selectedPromo) {
+          setSelectedPromo(null);
+        }
       }
     };
-    if (selectedPromo) {
+    if (selectedPromo || expandedImage || showReviewModal) {
       document.body.style.overflow = "hidden";
       window.addEventListener("keydown", handleKeyDown);
     } else {
@@ -25,9 +33,48 @@ export default function PromotionsClient({ locale, initialPromotions = [] }) {
       document.body.style.overflow = "";
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [selectedPromo]);
+  }, [selectedPromo, expandedImage, showReviewModal]);
 
   const displayPromotions = Array.isArray(initialPromotions) ? initialPromotions : [];
+
+  // Deep Link / Direct URL: Auto-open modal if ?promo=CODE or ?id=... is in URL
+  useEffect(() => {
+    let key = initialPromoKey;
+    if (!key && typeof window !== "undefined") {
+      const sp = new URLSearchParams(window.location.search);
+      key = sp.get("promo") || sp.get("code") || sp.get("deal") || sp.get("id");
+    }
+    if (key && displayPromotions.length > 0) {
+      const clean = key.trim().toLowerCase();
+      const match = displayPromotions.find(p =>
+        (p.code && p.code.toLowerCase() === clean) ||
+        (p.id && p.id.toLowerCase() === clean)
+      );
+      if (match) {
+        setSelectedPromo(match);
+      }
+    }
+  }, [initialPromoKey, displayPromotions]);
+
+  // Synchronize browser address bar with current open modal & dismiss global announcement popup
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const url = new URL(window.location.href);
+    if (selectedPromo) {
+      window.dispatchEvent(new CustomEvent("dismiss_popup_banner"));
+      const key = selectedPromo.code || selectedPromo.id;
+      url.searchParams.set("promo", key);
+      window.history.replaceState(null, "", url.toString());
+    } else {
+      if (url.searchParams.has("promo") || url.searchParams.has("code") || url.searchParams.has("deal") || url.searchParams.has("id")) {
+        url.searchParams.delete("promo");
+        url.searchParams.delete("code");
+        url.searchParams.delete("deal");
+        url.searchParams.delete("id");
+        window.history.replaceState(null, "", url.pathname + (url.search ? url.search : ""));
+      }
+    }
+  }, [selectedPromo]);
 
   const handleCopyCode = (code) => {
     if (!code) return;
@@ -56,6 +103,26 @@ export default function PromotionsClient({ locale, initialPromotions = [] }) {
   const getSocialWhatsappUrl = (code) => {
     const msg = encodeURIComponent(`Hello! I would like to use promo code: ${code || 'TLSDEAL'}`);
     return `https://wa.me/message/7BO67YACZI6SH1?text=${msg}`;
+  };
+
+  const handleTrackClick = (promoId, buttonType) => {
+    if (!promoId || !buttonType) return;
+    try {
+      const payload = JSON.stringify({ button: buttonType, locale });
+      if (typeof navigator !== "undefined" && navigator.sendBeacon) {
+        const blob = new Blob([payload], { type: "application/json" });
+        navigator.sendBeacon(`/api/promotions/${promoId}/click`, blob);
+      } else {
+        fetch(`/api/promotions/${promoId}/click`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: payload,
+          keepalive: true
+        }).catch(() => {});
+      }
+    } catch (e) {
+      // Fail silently to never interrupt user interaction
+    }
   };
 
   return (
@@ -264,12 +331,28 @@ export default function PromotionsClient({ locale, initialPromotions = [] }) {
 
               {/* Banner Image */}
               {selectedPromo.imageUrl && (
-                <div className={styles.modalImageWrapper}>
+                <div 
+                  className={styles.modalImageWrapper}
+                  onClick={() => setExpandedImage({ url: selectedPromo.imageUrl, title: modalTitle })}
+                  title={locale === "th" ? "คลิกเพื่อขยายรูปเต็มจอ" : locale === "cn" ? "点击全屏查看大图" : "Click to view full screen"}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      setExpandedImage({ url: selectedPromo.imageUrl, title: modalTitle });
+                    }
+                  }}
+                >
                   <img 
                     src={selectedPromo.imageUrl} 
                     alt={modalTitle} 
                     className={styles.modalImage}
                   />
+                  <div className={styles.imageZoomBadge}>
+                    <i className="fa-solid fa-magnifying-glass-plus"></i>
+                    <span>{locale === "th" ? "ขยายรูปเต็มจอ" : locale === "cn" ? "查看大图" : "Zoom"}</span>
+                  </div>
                 </div>
               )}
 
@@ -326,10 +409,12 @@ export default function PromotionsClient({ locale, initialPromotions = [] }) {
                   </div>
                 )}
 
-                {/* Primary Booking Action */}
+                {/* Primary Booking Action (Only if bookUrl is provided) */}
                 {(() => {
-                  const defaultBookUrl = `/${locale}/booking${selectedPromo.code ? `?promo=${selectedPromo.code}` : ""}`;
-                  const targetBookUrl = (selectedPromo.bookUrl && selectedPromo.bookUrl.trim()) ? selectedPromo.bookUrl.trim() : defaultBookUrl;
+                  const rawBookUrl = (selectedPromo.bookUrl || "").trim();
+                  if (!rawBookUrl) return null;
+
+                  const targetBookUrl = rawBookUrl.replace(/\[locale\]/g, locale);
                   const isExternal = targetBookUrl.startsWith("http://") || targetBookUrl.startsWith("https://");
 
                   if (isExternal) {
@@ -338,6 +423,7 @@ export default function PromotionsClient({ locale, initialPromotions = [] }) {
                         href={targetBookUrl}
                         target="_blank"
                         rel="noopener noreferrer"
+                        onClick={() => handleTrackClick(selectedPromo.id, "book")}
                         className={styles.bookBtn}
                         style={{ marginBottom: "0.5rem", padding: "0.75rem", fontSize: "0.9rem", textDecoration: "none", display: "flex", alignItems: "center", justifyContent: "center" }}
                       >
@@ -352,7 +438,10 @@ export default function PromotionsClient({ locale, initialPromotions = [] }) {
                       href={targetBookUrl}
                       className={styles.bookBtn}
                       style={{ marginBottom: "0.5rem", padding: "0.75rem", fontSize: "0.9rem" }}
-                      onClick={() => setSelectedPromo(null)}
+                      onClick={() => {
+                        handleTrackClick(selectedPromo.id, "book");
+                        setSelectedPromo(null);
+                      }}
                     >
                       <span>{locale === "th" ? "จองทางเว็บพร้อมโค้ดนี้" : locale === "cn" ? "官网使用优惠码预订" : "Book Online With Code"}</span>
                       <i className="fa-solid fa-arrow-right"></i>
@@ -360,30 +449,250 @@ export default function PromotionsClient({ locale, initialPromotions = [] }) {
                   );
                 })()}
 
-                {/* Social Quick Claim */}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.6rem" }}>
-                  <a 
-                    href={selectedPromo.lineUrl?.trim() || getSocialLineUrl(selectedPromo.code)}
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className={styles.socialClaimBtn}
-                    style={{ background: "rgba(0, 185, 0, 0.08)", color: "#00B900", border: "1px solid rgba(0, 185, 0, 0.2)", padding: "0.55rem" }}
-                  >
-                    <i className="fa-brands fa-line" style={{ fontSize: "1.1rem" }}></i>
-                    <span>LINE OA</span>
-                  </a>
-                  <a 
-                    href={selectedPromo.whatsappUrl?.trim() || getSocialWhatsappUrl(selectedPromo.code)}
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className={styles.socialClaimBtn}
-                    style={{ background: "rgba(37, 211, 102, 0.08)", color: "#25D366", border: "1px solid rgba(37, 211, 102, 0.2)", padding: "0.55rem" }}
-                  >
-                    <i className="fa-brands fa-whatsapp" style={{ fontSize: "1.1rem" }}></i>
-                    <span>WhatsApp</span>
-                  </a>
+                {/* Secondary Actions (LINE OA, WhatsApp, Click To Review) */}
+                {(() => {
+                  const hasLine = Boolean(selectedPromo.lineUrl && selectedPromo.lineUrl.trim());
+                  const hasWhatsapp = Boolean(selectedPromo.whatsappUrl && selectedPromo.whatsappUrl.trim());
+                  const hasReview = Boolean(
+                    (selectedPromo.reviewContent && selectedPromo.reviewContent.trim()) || 
+                    (selectedPromo.reviewUrl && selectedPromo.reviewUrl.trim())
+                  );
+
+                  const buttons = [];
+
+                  if (hasLine) {
+                    buttons.push(
+                      <a 
+                        key="line"
+                        href={selectedPromo.lineUrl.trim()}
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        onClick={() => handleTrackClick(selectedPromo.id, "line")}
+                        className={styles.socialClaimBtn}
+                        style={{ width: "100%", background: "rgba(0, 185, 0, 0.08)", color: "#00B900", border: "1px solid rgba(0, 185, 0, 0.2)", padding: "0.55rem" }}
+                      >
+                        <i className="fa-brands fa-line" style={{ fontSize: "1.1rem" }}></i>
+                        <span>LINE OA</span>
+                      </a>
+                    );
+                  }
+
+                  if (hasWhatsapp) {
+                    buttons.push(
+                      <a 
+                        key="whatsapp"
+                        href={selectedPromo.whatsappUrl.trim()}
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        onClick={() => handleTrackClick(selectedPromo.id, "whatsapp")}
+                        className={styles.socialClaimBtn}
+                        style={{ width: "100%", background: "rgba(37, 211, 102, 0.08)", color: "#25D366", border: "1px solid rgba(37, 211, 102, 0.2)", padding: "0.55rem" }}
+                      >
+                        <i className="fa-brands fa-whatsapp" style={{ fontSize: "1.1rem" }}></i>
+                        <span>WhatsApp</span>
+                      </a>
+                    );
+                  }
+
+                  if (hasReview) {
+                    buttons.push(
+                      <button
+                        key="review"
+                        type="button"
+                        onClick={() => {
+                          handleTrackClick(selectedPromo.id, "review");
+                          setShowReviewModal(true);
+                        }}
+                        className={styles.socialClaimBtn}
+                        style={{ 
+                          width: "100%", 
+                          background: "rgba(37, 99, 235, 0.08)", 
+                          color: "#2563eb", 
+                          border: "1px solid rgba(37, 99, 235, 0.25)", 
+                          padding: "0.55rem",
+                          cursor: "pointer",
+                          outline: "none"
+                        }}
+                        aria-label="Click To Review"
+                      >
+                        <i className="fa-solid fa-file-lines" style={{ fontSize: "1rem" }}></i>
+                        <span>Click To Review</span>
+                      </button>
+                    );
+                  }
+
+                  if (buttons.length === 0) return null;
+
+                  if (buttons.length === 1) {
+                    return (
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "0.6rem" }}>
+                        {buttons[0]}
+                      </div>
+                    );
+                  }
+
+                  if (buttons.length === 2) {
+                    return (
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.6rem" }}>
+                        {buttons[0]}
+                        {buttons[1]}
+                      </div>
+                    );
+                  }
+
+                  // 3 buttons: row of 2, row of 1 full width
+                  return (
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.6rem" }}>
+                      {buttons[0]}
+                      {buttons[1]}
+                      <div style={{ gridColumn: "span 2" }}>
+                        {buttons[2]}
+                      </div>
+                    </div>
+                  );
+                })()}
+
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* Fullscreen Lightbox Modal */}
+      {expandedImage && (
+        <div 
+          className={styles.lightboxOverlay}
+          onClick={() => setExpandedImage(null)}
+          role="dialog"
+          aria-modal="true"
+        >
+          {/* Header Bar */}
+          <div 
+            className={styles.lightboxHeader}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className={styles.lightboxTitle}>
+              <i className="fa-regular fa-image" style={{ color: "#38bdf8" }}></i>
+              <span>{expandedImage.title || (locale === "th" ? "รูปโปรโมชั่น" : locale === "cn" ? "优惠海报" : "Promotion Poster")}</span>
+            </div>
+
+            <div className={styles.lightboxActions}>
+              <a 
+                href={expandedImage.url} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className={styles.lightboxActionBtn}
+                title={locale === "th" ? "เปิดรูปต้นฉบับในแท็บใหม่" : locale === "cn" ? "在新标签页打开原图" : "Open original image in new tab"}
+              >
+                <i className="fa-solid fa-arrow-up-right-from-square"></i>
+                <span>{locale === "th" ? "รูปต้นฉบับ" : locale === "cn" ? "查看原图" : "Original"}</span>
+              </a>
+
+              <button 
+                type="button"
+                className={styles.lightboxCloseBtn}
+                onClick={() => setExpandedImage(null)}
+                aria-label="Close fullscreen preview (Esc)"
+                title={locale === "th" ? "ปิด (Esc)" : locale === "cn" ? "关闭 (Esc)" : "Close (Esc)"}
+              >
+                <i className="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+          </div>
+
+          {/* Lightbox Image */}
+          <div 
+            className={styles.lightboxImageContainer}
+            onClick={() => setExpandedImage(null)}
+            title={locale === "th" ? "คลิกเพื่อปิด" : locale === "cn" ? "点击关闭" : "Click to close"}
+          >
+            <img 
+              src={expandedImage.url} 
+              alt={expandedImage.title || "Preview"} 
+              className={styles.lightboxImage}
+              onClick={(e) => {
+                e.stopPropagation();
+                setExpandedImage(null);
+              }}
+            />
+          </div>
+
+          <div className={styles.lightboxHint}>
+            <i className="fa-solid fa-circle-info" style={{ marginRight: "0.35rem" }}></i>
+            {locale === "th" ? "คลิกที่รูปหรือกด Esc เพื่อปิด" : locale === "cn" ? "点击图片或按 Esc 关闭" : "Click image or press Esc to close"}
+          </div>
+        </div>
+      )}
+
+      {/* Review Information Pop Up Modal */}
+      {showReviewModal && selectedPromo && (() => {
+        const reviewText = getLocalizedField(selectedPromo, "reviewContent") || selectedPromo.reviewContent || "";
+        const promoTitle = getLocalizedField(selectedPromo, "title");
+
+        return (
+          <div 
+            className={styles.reviewModalOverlay}
+            onClick={() => setShowReviewModal(false)}
+            role="dialog"
+            aria-modal="true"
+          >
+            <div 
+              className={styles.reviewModalContent}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header */}
+              <div className={styles.reviewModalHeader}>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.65rem", flex: 1, minWidth: 0 }}>
+                  <div className={styles.reviewIconWrapper}>
+                    <i className="fa-solid fa-file-lines"></i>
+                  </div>
+                  <h3 className={styles.reviewModalTitle}>
+                    {promoTitle}
+                  </h3>
                 </div>
 
+                <button 
+                  type="button"
+                  className={styles.reviewModalCloseBtn}
+                  onClick={() => setShowReviewModal(false)}
+                  aria-label="Close review modal (Esc)"
+                  title={locale === "th" ? "ปิด (Esc)" : locale === "cn" ? "关闭 (Esc)" : "Close (Esc)"}
+                >
+                  <i className="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+
+              {/* Body */}
+              <div className={styles.reviewModalBody}>
+                {reviewText && (
+                  <div className={styles.reviewTextBox}>
+                    {reviewText}
+                  </div>
+                )}
+
+                {/* External Review URL if provided */}
+                {selectedPromo.reviewUrl && (
+                  <a 
+                    href={selectedPromo.reviewUrl} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className={styles.reviewExternalBtn}
+                  >
+                    <i className="fa-solid fa-arrow-up-right-from-square"></i>
+                    <span>{locale === "th" ? "เปิดดูข้อมูลเพิ่มเติม / ลิงก์ต้นทาง" : locale === "cn" ? "查看更多信息 / 来源链接" : "Open More Information / Link"}</span>
+                  </a>
+                )}
+              </div>
+
+              {/* Footer */}
+              <div className={styles.reviewModalFooter}>
+                <button
+                  type="button"
+                  className={styles.reviewModalOkBtn}
+                  onClick={() => setShowReviewModal(false)}
+                >
+                  {locale === "th" ? "ปิดหน้าต่าง" : locale === "cn" ? "关闭" : "Close"}
+                </button>
               </div>
             </div>
           </div>

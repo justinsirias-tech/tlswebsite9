@@ -44,6 +44,14 @@ export async function PUT(request, { params }) {
     if (data.bookUrl !== undefined) updateData.bookUrl = data.bookUrl && data.bookUrl.trim() ? data.bookUrl.trim() : null;
     if (data.lineUrl !== undefined) updateData.lineUrl = data.lineUrl && data.lineUrl.trim() ? data.lineUrl.trim() : null;
     if (data.whatsappUrl !== undefined) updateData.whatsappUrl = data.whatsappUrl && data.whatsappUrl.trim() ? data.whatsappUrl.trim() : null;
+    if (data.reviewContent !== undefined) updateData.reviewContent = data.reviewContent && data.reviewContent.trim() ? data.reviewContent.trim() : null;
+    if (data.reviewContent_th !== undefined) updateData.reviewContent_th = data.reviewContent_th && data.reviewContent_th.trim() ? data.reviewContent_th.trim() : null;
+    if (data.reviewContent_cn !== undefined) updateData.reviewContent_cn = data.reviewContent_cn && data.reviewContent_cn.trim() ? data.reviewContent_cn.trim() : null;
+    if (data.reviewUrl !== undefined) updateData.reviewUrl = data.reviewUrl && data.reviewUrl.trim() ? data.reviewUrl.trim() : null;
+    if (data.clicksBook !== undefined) updateData.clicksBook = parseInt(data.clicksBook) || 0;
+    if (data.clicksLine !== undefined) updateData.clicksLine = parseInt(data.clicksLine) || 0;
+    if (data.clicksWhatsapp !== undefined) updateData.clicksWhatsapp = parseInt(data.clicksWhatsapp) || 0;
+    if (data.clicksReview !== undefined) updateData.clicksReview = parseInt(data.clicksReview) || 0;
     if (data.isActive !== undefined) updateData.isActive = Boolean(data.isActive);
     if (data.sortOrder !== undefined) updateData.sortOrder = parseInt(data.sortOrder);
 

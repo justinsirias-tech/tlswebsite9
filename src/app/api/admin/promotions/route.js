@@ -69,6 +69,10 @@ export async function POST(request) {
         bookUrl: data.bookUrl && data.bookUrl.trim() ? data.bookUrl.trim() : null,
         lineUrl: data.lineUrl && data.lineUrl.trim() ? data.lineUrl.trim() : null,
         whatsappUrl: data.whatsappUrl && data.whatsappUrl.trim() ? data.whatsappUrl.trim() : null,
+        reviewContent: data.reviewContent && data.reviewContent.trim() ? data.reviewContent.trim() : null,
+        reviewContent_th: data.reviewContent_th && data.reviewContent_th.trim() ? data.reviewContent_th.trim() : null,
+        reviewContent_cn: data.reviewContent_cn && data.reviewContent_cn.trim() ? data.reviewContent_cn.trim() : null,
+        reviewUrl: data.reviewUrl && data.reviewUrl.trim() ? data.reviewUrl.trim() : null,
         isActive: data.isActive !== undefined ? Boolean(data.isActive) : true,
         sortOrder: data.sortOrder ? parseInt(data.sortOrder) : 0
       }

@@ -5,10 +5,32 @@ import { useEffect, useState } from "react";
 export default function PopupBanner() {
   const [popup, setPopup] = useState(null);
   const [isVisible, setIsVisible] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  useEffect(() => {
+    // Dismiss popup banner if promotion modal is opened
+    const handleDismiss = () => {
+      setIsVisible(false);
+      setIsExpanded(false);
+    };
+    window.addEventListener("dismiss_popup_banner", handleDismiss);
+    return () => window.removeEventListener("dismiss_popup_banner", handleDismiss);
+  }, []);
 
   useEffect(() => {
     async function checkActivePopup() {
       try {
+        if (typeof window !== "undefined") {
+          const urlParams = new URLSearchParams(window.location.search);
+          const hasPromoParam = urlParams.has("promo") || urlParams.has("code") || urlParams.has("deal") || urlParams.has("id");
+          const isPromotionsPage = window.location.pathname.includes("/promotions");
+
+          // Suppress website announcement popup if visiting via a direct promotion link or on promotions page
+          if (hasPromoParam || isPromotionsPage) {
+            return;
+          }
+        }
+
         const now = Date.now();
         const cachedData = localStorage.getItem("popup_check_cache");
         const cachedTime = localStorage.getItem("popup_check_time");
@@ -53,7 +75,26 @@ export default function PopupBanner() {
       sessionStorage.setItem(`closed_popup_${popup.id}`, "true");
     }
     setIsVisible(false);
+    setIsExpanded(false);
   };
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        if (isExpanded) {
+          setIsExpanded(false);
+        } else {
+          handleClose();
+        }
+      }
+    };
+    if (isVisible) {
+      window.addEventListener("keydown", handleKeyDown);
+    }
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isVisible, isExpanded]);
 
   if (!isVisible || !popup) return null;
 
@@ -65,67 +106,143 @@ export default function PopupBanner() {
         left: 0,
         right: 0,
         bottom: 0,
-        backgroundColor: "rgba(0, 0, 0, 0.75)",
-        backdropFilter: "blur(5px)",
-        WebkitBackdropFilter: "blur(5px)",
+        backgroundColor: isExpanded ? "rgba(0, 0, 0, 0.9)" : "rgba(0, 0, 0, 0.75)",
+        backdropFilter: "blur(6px)",
+        WebkitBackdropFilter: "blur(6px)",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
         zIndex: 99999,
-        padding: "20px",
+        padding: "16px",
+        transition: "background-color 0.25s ease",
       }}
       onClick={handleClose}
     >
       <div 
         style={{
           position: "relative",
-          maxWidth: "480px",
+          maxWidth: isExpanded ? "95vw" : "480px",
           width: "100%",
           borderRadius: "16px",
           overflow: "hidden",
-          boxShadow: "0 20px 40px rgba(0, 0, 0, 0.3)",
+          boxShadow: isExpanded ? "0 25px 60px rgba(0, 0, 0, 0.6)" : "0 20px 40px rgba(0, 0, 0, 0.3)",
           backgroundColor: "transparent",
+          transition: "max-width 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        <button 
-          onClick={handleClose}
+        {/* Top Control Buttons */}
+        <div 
           style={{
             position: "absolute",
             top: "12px",
             right: "12px",
-            width: "36px",
-            height: "36px",
-            borderRadius: "50%",
-            backgroundColor: "rgba(0, 0, 0, 0.6)",
-            color: "#ffffff",
-            border: "2px solid rgba(255, 255, 255, 0.8)",
-            cursor: "pointer",
             display: "flex",
-            justifyContent: "center",
             alignItems: "center",
-            fontSize: "18px",
+            gap: "8px",
             zIndex: 100000,
-            transition: "all 0.2s ease",
-            outline: "none",
           }}
-          aria-label="Close announcement popup"
         >
-          ✕
-        </button>
-        {popup.imageUrl ? (
-          <img 
-            src={popup.imageUrl} 
-            alt={popup.name || "Announcement"} 
+          <button
+            onClick={() => setIsExpanded(prev => !prev)}
             style={{
-              width: "100%",
-              height: "auto",
-              display: "block",
-              maxHeight: "80vh",
-              objectFit: "contain",
-              borderRadius: "16px",
+              width: "36px",
+              height: "36px",
+              borderRadius: "50%",
+              backgroundColor: "rgba(0, 0, 0, 0.65)",
+              color: "#ffffff",
+              border: "2px solid rgba(255, 255, 255, 0.8)",
+              cursor: "pointer",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              fontSize: "14px",
+              transition: "all 0.2s ease",
+              outline: "none",
             }}
-          />
+            title={isExpanded ? "Collapse" : "Expand to fullscreen"}
+            aria-label={isExpanded ? "Collapse" : "Expand to fullscreen"}
+          >
+            {isExpanded ? "🗗" : "⛶"}
+          </button>
+          <button 
+            onClick={handleClose}
+            style={{
+              width: "36px",
+              height: "36px",
+              borderRadius: "50%",
+              backgroundColor: "rgba(0, 0, 0, 0.65)",
+              color: "#ffffff",
+              border: "2px solid rgba(255, 255, 255, 0.8)",
+              cursor: "pointer",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              fontSize: "18px",
+              transition: "all 0.2s ease",
+              outline: "none",
+            }}
+            aria-label="Close announcement popup"
+          >
+            ✕
+          </button>
+        </div>
+
+        {popup.imageUrl ? (
+          <div
+            style={{
+              position: "relative",
+              width: "100%",
+              cursor: isExpanded ? "zoom-out" : "zoom-in",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+            onClick={() => setIsExpanded(prev => !prev)}
+            title={isExpanded ? "Click to collapse" : "Click to view fullscreen"}
+          >
+            <img 
+              src={popup.imageUrl} 
+              alt={popup.name || "Announcement"} 
+              style={{
+                width: isExpanded ? "auto" : "100%",
+                maxWidth: isExpanded ? "95vw" : "100%",
+                maxHeight: isExpanded ? "88vh" : "80vh",
+                height: "auto",
+                display: "block",
+                objectFit: "contain",
+                borderRadius: "16px",
+                transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
+              }}
+            />
+            {!isExpanded && (
+              <div 
+                style={{
+                  position: "absolute",
+                  bottom: "12px",
+                  right: "14px",
+                  background: "rgba(15, 23, 42, 0.75)",
+                  backdropFilter: "blur(4px)",
+                  WebkitBackdropFilter: "blur(4px)",
+                  color: "#ffffff",
+                  fontSize: "12px",
+                  fontWeight: "600",
+                  padding: "4px 10px",
+                  borderRadius: "20px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "5px",
+                  pointerEvents: "none",
+                  border: "1px solid rgba(255, 255, 255, 0.3)",
+                }}
+              >
+                🔍 ขยายรูป
+              </div>
+            )}
+          </div>
         ) : null}
       </div>
     </div>
