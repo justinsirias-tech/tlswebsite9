@@ -19,6 +19,17 @@ export default function PopupsAdminPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [localPreviewUrl, setLocalPreviewUrl] = useState("");
+  const [previewImage, setPreviewImage] = useState(null);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") setPreviewImage(null);
+    };
+    if (previewImage) {
+      window.addEventListener("keydown", handleKeyDown);
+      return () => window.removeEventListener("keydown", handleKeyDown);
+    }
+  }, [previewImage]);
 
   useEffect(() => {
     fetchPopups();
@@ -230,11 +241,41 @@ export default function PopupsAdminPage() {
               {(formData.imageUrl || localPreviewUrl) && (
                 <div style={{ marginTop: "1rem" }}>
                   <p style={{ color: "var(--text-light)", fontSize: "0.85rem", marginBottom: "0.5rem" }}>Image Preview:</p>
-                  <img 
-                    src={localPreviewUrl || formData.imageUrl} 
-                    alt="Upload preview" 
-                    style={{ maxHeight: "200px", maxWidth: "100%", borderRadius: "8px", border: "1px solid rgba(255, 255, 255, 0.1)" }}
-                  />
+                  <div
+                    onClick={() => setPreviewImage({ url: localPreviewUrl || formData.imageUrl, title: formData.name || "Popup Banner Preview" })}
+                    title="Click to preview full image"
+                    style={{
+                      position: "relative",
+                      display: "inline-block",
+                      cursor: "pointer",
+                      borderRadius: "8px",
+                      overflow: "hidden"
+                    }}
+                  >
+                    <img 
+                      src={localPreviewUrl || formData.imageUrl} 
+                      alt="Upload preview" 
+                      style={{ maxHeight: "200px", maxWidth: "100%", borderRadius: "8px", border: "1px solid rgba(255, 255, 255, 0.1)", display: "block" }}
+                    />
+                    <div 
+                      style={{
+                        position: "absolute",
+                        inset: 0,
+                        background: "rgba(0,0,0,0.35)",
+                        opacity: 0,
+                        transition: "opacity 0.2s ease",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: "#ffffff",
+                        fontSize: "1.3rem"
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.opacity = "1"}
+                      onMouseLeave={(e) => e.currentTarget.style.opacity = "0"}
+                    >
+                      <i className="fa-solid fa-magnifying-glass-plus"></i>
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
@@ -309,11 +350,43 @@ export default function PopupsAdminPage() {
                 return (
                   <tr key={popup.id}>
                     <td>
-                      <img 
-                        src={popup.imageUrl} 
-                        alt={popup.name} 
-                        style={{ width: "50px", height: "50px", objectFit: "cover", borderRadius: "6px", border: "1px solid rgba(255,255,255,0.05)" }}
-                      />
+                      <div
+                        onClick={() => setPreviewImage({ url: popup.imageUrl, title: popup.name })}
+                        title="Click to preview full banner"
+                        style={{
+                          position: "relative",
+                          width: "50px",
+                          height: "50px",
+                          borderRadius: "6px",
+                          overflow: "hidden",
+                          border: "1px solid rgba(255,255,255,0.1)",
+                          cursor: "pointer"
+                        }}
+                      >
+                        <img 
+                          src={popup.imageUrl} 
+                          alt={popup.name} 
+                          style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                        />
+                        <div 
+                          style={{
+                            position: "absolute",
+                            inset: 0,
+                            background: "rgba(0,0,0,0.4)",
+                            opacity: 0,
+                            transition: "opacity 0.2s ease",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            color: "#ffffff",
+                            fontSize: "0.85rem"
+                          }}
+                          onMouseEnter={(e) => e.currentTarget.style.opacity = "1"}
+                          onMouseLeave={(e) => e.currentTarget.style.opacity = "0"}
+                        >
+                          <i className="fa-solid fa-magnifying-glass-plus"></i>
+                        </div>
+                      </div>
                     </td>
                     <td style={{ color: "white", fontWeight: "600" }}>{popup.name}</td>
                     <td style={{ color: "var(--text-light)" }}>{formatDateTime(popup.startDate)}</td>
@@ -357,6 +430,117 @@ export default function PopupsAdminPage() {
               })}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {/* Full Image Preview Lightbox Modal */}
+      {previewImage && (
+        <div 
+          onClick={() => setPreviewImage(null)}
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(15, 23, 42, 0.85)",
+            backdropFilter: "blur(5px)",
+            zIndex: 99999,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "1.5rem"
+          }}
+        >
+          {/* Top Controls */}
+          <div style={{ position: "absolute", top: "1.5rem", right: "1.5rem", display: "flex", gap: "0.75rem", zIndex: 10 }}>
+            {previewImage.url && (
+              <a
+                href={previewImage.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                style={{
+                  background: "rgba(255, 255, 255, 0.15)",
+                  color: "#ffffff",
+                  border: "1px solid rgba(255, 255, 255, 0.3)",
+                  borderRadius: "8px",
+                  padding: "0.5rem 0.9rem",
+                  fontSize: "0.85rem",
+                  fontWeight: "600",
+                  textDecoration: "none",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "0.4rem"
+                }}
+                title="Open original banner in new tab"
+              >
+                <i className="fa-solid fa-arrow-up-right-from-square"></i> Open Original
+              </a>
+            )}
+            <button
+              onClick={() => setPreviewImage(null)}
+              style={{
+                background: "rgba(255, 255, 255, 0.2)",
+                color: "#ffffff",
+                border: "none",
+                borderRadius: "50%",
+                width: "38px",
+                height: "38px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                fontSize: "1.1rem"
+              }}
+              title="Close preview (Esc)"
+            >
+              ✕
+            </button>
+          </div>
+
+          {/* Modal Content */}
+          <div 
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              maxWidth: "92vw",
+              maxHeight: "85vh",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              background: "#1e293b",
+              borderRadius: "16px",
+              overflow: "hidden",
+              boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.6)",
+              border: "1px solid rgba(255, 255, 255, 0.15)"
+            }}
+          >
+            <div style={{ maxWidth: "90vw", maxHeight: "72vh", overflow: "auto", display: "flex", alignItems: "center", justifyContent: "center", background: "#0b0f19", padding: "0.5rem" }}>
+              <img
+                src={previewImage.url}
+                alt={previewImage.title || "Preview"}
+                style={{
+                  maxWidth: "100%",
+                  maxHeight: "70vh",
+                  objectFit: "contain",
+                  display: "block"
+                }}
+              />
+            </div>
+            {previewImage.title && (
+              <div style={{
+                width: "100%",
+                padding: "0.85rem 1.25rem",
+                background: "#0f172a",
+                borderTop: "1px solid rgba(255,255,255,0.1)",
+                textAlign: "center",
+                fontWeight: "700",
+                color: "#f8fafc",
+                fontSize: "0.95rem"
+              }}>
+                {previewImage.title}
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>

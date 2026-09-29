@@ -13,7 +13,18 @@ export default function AdminPromotionsPage() {
   const [imageError, setImageError] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [previewImage, setPreviewImage] = useState(null);
   const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") setPreviewImage(null);
+    };
+    if (previewImage) {
+      window.addEventListener("keydown", handleKeyDown);
+      return () => window.removeEventListener("keydown", handleKeyDown);
+    }
+  }, [previewImage]);
 
   const initialForm = {
     title: "",
@@ -471,11 +482,34 @@ export default function AdminPromotionsPage() {
                       borderRadius: "8px",
                       background: "#f8fafc"
                     }}>
-                      <img 
-                        src={formData.imageUrl} 
-                        alt="Preview" 
-                        style={{ width: "42px", height: "42px", objectFit: "cover", borderRadius: "6px", border: "1px solid #e2e8f0", flexShrink: 0 }} 
-                      />
+                      <div
+                        onClick={() => setPreviewImage({ url: formData.imageUrl, title: formData.title || "Promotion Banner Preview" })}
+                        title="Click to preview full image"
+                        style={{ position: "relative", width: "42px", height: "42px", borderRadius: "6px", overflow: "hidden", border: "1px solid #cbd5e1", flexShrink: 0, cursor: "pointer" }}
+                      >
+                        <img 
+                          src={formData.imageUrl} 
+                          alt="Preview" 
+                          style={{ width: "100%", height: "100%", objectFit: "cover" }} 
+                        />
+                        <div style={{
+                          position: "absolute",
+                          inset: 0,
+                          background: "rgba(0,0,0,0.4)",
+                          opacity: 0,
+                          transition: "opacity 0.2s ease",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          color: "#ffffff",
+                          fontSize: "0.8rem"
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.opacity = "1"}
+                        onMouseLeave={(e) => e.currentTarget.style.opacity = "0"}
+                        >
+                          <i className="fa-solid fa-magnifying-glass-plus"></i>
+                        </div>
+                      </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ fontSize: "0.8rem", color: "#166534", fontWeight: "700", display: "flex", alignItems: "center", gap: "0.3rem" }}>
                           <i className="fa-solid fa-circle-check"></i> Image Uploaded
@@ -736,11 +770,43 @@ export default function AdminPromotionsPage() {
                   <td style={{ padding: "1.25rem" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
                       {promo.imageUrl && (
-                        <img 
-                          src={promo.imageUrl} 
-                          alt="" 
-                          style={{ width: "48px", height: "48px", objectFit: "cover", borderRadius: "8px", border: "1px solid #e2e8f0", flexShrink: 0 }}
-                        />
+                        <div
+                          onClick={() => setPreviewImage({ url: promo.imageUrl, title: promo.title })}
+                          title="Click to preview full image"
+                          style={{
+                            position: "relative",
+                            width: "48px",
+                            height: "48px",
+                            borderRadius: "8px",
+                            overflow: "hidden",
+                            border: "1px solid #e2e8f0",
+                            flexShrink: 0,
+                            cursor: "pointer"
+                          }}
+                        >
+                          <img 
+                            src={promo.imageUrl} 
+                            alt="" 
+                            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                          />
+                          <div style={{
+                            position: "absolute",
+                            inset: 0,
+                            background: "rgba(0,0,0,0.4)",
+                            opacity: 0,
+                            transition: "opacity 0.2s ease",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            color: "#ffffff",
+                            fontSize: "0.85rem"
+                          }}
+                          onMouseEnter={(e) => e.currentTarget.style.opacity = "1"}
+                          onMouseLeave={(e) => e.currentTarget.style.opacity = "0"}
+                          >
+                            <i className="fa-solid fa-magnifying-glass-plus"></i>
+                          </div>
+                        </div>
                       )}
                       {promo.badge && (
                         <span style={{ background: "#222945", color: "#ffffff", fontWeight: "700", fontSize: "0.75rem", padding: "0.25rem 0.6rem", borderRadius: "6px", whiteSpace: "nowrap" }}>
@@ -811,6 +877,117 @@ export default function AdminPromotionsPage() {
               ))}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {/* Full Image Preview Lightbox Modal */}
+      {previewImage && (
+        <div 
+          onClick={() => setPreviewImage(null)}
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(15, 23, 42, 0.85)",
+            backdropFilter: "blur(5px)",
+            zIndex: 99999,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "1.5rem"
+          }}
+        >
+          {/* Top Controls */}
+          <div style={{ position: "absolute", top: "1.5rem", right: "1.5rem", display: "flex", gap: "0.75rem", zIndex: 10 }}>
+            {previewImage.url && (
+              <a
+                href={previewImage.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                style={{
+                  background: "rgba(255, 255, 255, 0.15)",
+                  color: "#ffffff",
+                  border: "1px solid rgba(255, 255, 255, 0.3)",
+                  borderRadius: "8px",
+                  padding: "0.5rem 0.9rem",
+                  fontSize: "0.85rem",
+                  fontWeight: "600",
+                  textDecoration: "none",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "0.4rem"
+                }}
+                title="Open original image in new tab"
+              >
+                <i className="fa-solid fa-arrow-up-right-from-square"></i> Open Original
+              </a>
+            )}
+            <button
+              onClick={() => setPreviewImage(null)}
+              style={{
+                background: "rgba(255, 255, 255, 0.2)",
+                color: "#ffffff",
+                border: "none",
+                borderRadius: "50%",
+                width: "38px",
+                height: "38px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                fontSize: "1.1rem"
+              }}
+              title="Close preview (Esc)"
+            >
+              ✕
+            </button>
+          </div>
+
+          {/* Modal Content */}
+          <div 
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              maxWidth: "92vw",
+              maxHeight: "85vh",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              background: "#ffffff",
+              borderRadius: "16px",
+              overflow: "hidden",
+              boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)",
+              border: "1px solid rgba(255, 255, 255, 0.15)"
+            }}
+          >
+            <div style={{ maxWidth: "90vw", maxHeight: "72vh", overflow: "auto", display: "flex", alignItems: "center", justifyContent: "center", background: "#0b0f19", padding: "0.5rem" }}>
+              <img
+                src={previewImage.url}
+                alt={previewImage.title || "Preview"}
+                style={{
+                  maxWidth: "100%",
+                  maxHeight: "70vh",
+                  objectFit: "contain",
+                  display: "block"
+                }}
+              />
+            </div>
+            {previewImage.title && (
+              <div style={{
+                width: "100%",
+                padding: "0.85rem 1.25rem",
+                background: "#f8fafc",
+                borderTop: "1px solid #e2e8f0",
+                textAlign: "center",
+                fontWeight: "700",
+                color: "#1e293b",
+                fontSize: "0.95rem"
+              }}>
+                {previewImage.title}
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>

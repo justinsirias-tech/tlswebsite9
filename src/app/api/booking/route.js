@@ -25,7 +25,7 @@ ${text}
 
 Instructions:
 1. Translate all non-English text (such as Thai or Chinese) into English.
-2. Keep the original structure of the booking details (e.g. Services, Promo Code, Address, Delivery, Pickup Method, Time, Payment Method, Express Service, Notes).
+2. Keep the original structure and field keys of the booking details (e.g. Services, Promo Code, Address, Delivery, Pickup Method, Time, Payment Method, Express Service, Notes).
 3. If the text is already entirely in English, return it exactly as it is without any changes.
 4. Output ONLY the translated text. Do not include markdown code block backticks (like \`\`\`), "Here is the translation:", or any extra commentary.`;
 
@@ -52,6 +52,8 @@ function parseServiceDetails(serviceStr) {
     delivery: "",
     pickupMethod: "",
     time: "",
+    paymentMethod: "",
+    expressService: "",
     notes: "",
     promoCode: "",
     roomNo: "",
@@ -89,6 +91,12 @@ function parseServiceDetails(serviceStr) {
       details.pickupMethod = trimmed.replace("Pickup Method:", "").trim();
     } else if (trimmed.startsWith("Time:")) {
       details.time = trimmed.replace("Time:", "").trim();
+    } else if (trimmed.startsWith("Payment Method:")) {
+      details.paymentMethod = trimmed.replace("Payment Method:", "").trim();
+    } else if (trimmed.startsWith("Express Service:")) {
+      details.expressService = trimmed.replace("Express Service:", "").trim();
+    } else if (/^express\s*(service)?\s*:/i.test(trimmed)) {
+      details.expressService = trimmed.replace(/^express\s*(service)?\s*:/i, "").trim();
     } else if (trimmed.startsWith("Notes:")) {
       details.notes = trimmed.replace("Notes:", "").trim();
     } else if (trimmed.startsWith("Promo Code:")) {
@@ -215,6 +223,7 @@ async function sendConfirmationEmail(booking) {
 
     const details = parseServiceDetails(booking.service);
     const serviceList = parseServiceList(details.services);
+    const isExpress = !!(details.expressService && /express/i.test(details.expressService));
 
     const serviceBadgesHtml = serviceList.length > 0
       ? serviceList.map(service => `
@@ -255,10 +264,10 @@ async function sendConfirmationEmail(booking) {
             </p>
             
             <!-- Date / Method Grid -->
-            <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse; margin-bottom: 25px;">
+            <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse; margin-bottom: 20px;">
               <tr>
                 <td width="50%" valign="top" style="padding-right: 8px;">
-                  <div style="background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #edf2f7; min-height: 75px;">
+                  <div style="background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #edf2f7; min-height: 80px;">
                     <div style="font-size: 10px; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">
                       Scheduled Pickup
                     </div>
@@ -271,7 +280,7 @@ async function sendConfirmationEmail(booking) {
                   </div>
                 </td>
                 <td width="50%" valign="top" style="padding-left: 8px;">
-                  <div style="background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #edf2f7; min-height: 75px;">
+                  <div style="background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #edf2f7; min-height: 80px;">
                     <div style="font-size: 10px; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">
                       Pickup Method
                     </div>
@@ -281,10 +290,57 @@ async function sendConfirmationEmail(booking) {
                     <div style="font-size: 12px; color: #475569; margin-top: 3px;">
                       Contact: <strong>${booking.phone.split(" |")[0]}</strong>
                     </div>
+                    ${details.paymentMethod ? `
+                    <div style="font-size: 12px; color: #475569; margin-top: 3px;">
+                      Payment: <strong>${details.paymentMethod}</strong>
+                    </div>` : ''}
                   </div>
                 </td>
               </tr>
             </table>
+
+            <!-- Service Speed / Express Card -->
+            ${isExpress ? `
+            <div style="background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%); border: 1.5px solid #fb923c; padding: 14px 16px; border-radius: 10px; margin-bottom: 25px; box-shadow: 0 2px 6px rgba(234, 88, 12, 0.08);">
+              <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse;">
+                <tr>
+                  <td valign="middle">
+                    <div style="font-size: 11px; color: #c2410c; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">
+                      ⚡ Service Speed (Express Option)
+                    </div>
+                    <div style="font-size: 14px; color: #7c2d12; font-weight: 700; line-height: 1.4;">
+                      ${details.expressService}
+                    </div>
+                  </td>
+                  <td align="right" valign="middle" style="width: 100px; padding-left: 10px;">
+                    <span style="display: inline-block; background: #ea580c; color: #ffffff; padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap; box-shadow: 0 2px 4px rgba(234, 88, 12, 0.3);">
+                      ⚡ EXPRESS
+                    </span>
+                  </td>
+                </tr>
+              </table>
+            </div>
+            ` : `
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px 16px; border-radius: 10px; margin-bottom: 25px;">
+              <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse;">
+                <tr>
+                  <td valign="middle">
+                    <div style="font-size: 10px; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">
+                      Service Speed / Turnaround
+                    </div>
+                    <div style="font-size: 13px; color: #334155; font-weight: 600; line-height: 1.4;">
+                      ${details.expressService || 'Standard: Next Day Deliver Any Time Before 18:00 (No Fixed Time)'}
+                    </div>
+                  </td>
+                  <td align="right" valign="middle" style="width: 90px; padding-left: 10px;">
+                    <span style="display: inline-block; background: #f1f5f9; border: 1px solid #cbd5e1; color: #475569; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap;">
+                      STANDARD
+                    </span>
+                  </td>
+                </tr>
+              </table>
+            </div>
+            `}
 
             <!-- Services Requested -->
             <div style="margin-bottom: 25px;">
@@ -406,7 +462,7 @@ async function sendConfirmationEmail(booking) {
     const customerMailOptions = {
       from: fromAddress,
       to: booking.email,
-      subject: "Your Laundry Booking Request Received - That Laundry Shop",
+      subject: `${isExpress ? '⚡ [Express] ' : ''}Your Laundry Booking Request Received - That Laundry Shop`,
       html: emailHtml,
     };
     
@@ -422,7 +478,7 @@ async function sendConfirmationEmail(booking) {
           "thatlaundryshopbooking@gmail.com",
           "thatlaundryshopcso@gmail.com"
         ],
-        subject: `[New Booking] ${booking.customerName} - That Laundry Shop`,
+        subject: `${isExpress ? '⚡ [EXPRESS] ' : ''}[New Booking] ${booking.customerName} - That Laundry Shop`,
         html: emailHtml,
       };
       
@@ -528,7 +584,7 @@ export async function POST(req) {
             status: "tba",
             scheduledAt: new Date(data.pickupDate),
             source: "website",
-            remark: `Booking ID: ${booking.id}\nServices: ${details.services || "Not specified"}\nNotes: ${details.notes || "None"}`
+            remark: `Booking ID: ${booking.id}\nServices: ${details.services || "Not specified"}\nSpeed: ${details.expressService || "Standard"}\nNotes: ${details.notes || "None"}`
           }
         });
       } catch (jobError) {

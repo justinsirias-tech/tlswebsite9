@@ -8,21 +8,6 @@ export default function PartnerCodesPage() {
   const [loading, setLoading] = useState(true);
   const [copiedCode, setCopiedCode] = useState(null);
   const [copiedLink, setCopiedLink] = useState(null);
-  const [togglingId, setTogglingId] = useState(null);
-
-  const getPromoStatus = (pc) => {
-    if (!pc.isActive) {
-      return { label: "Disabled", color: "#64748b", bg: "#f1f5f9", border: "#cbd5e1" };
-    }
-    const now = new Date();
-    if (pc.startDate && new Date(pc.startDate) > now) {
-      return { label: "Upcoming", color: "#0284c7", bg: "#f0f9ff", border: "#bae6fd" };
-    }
-    if (pc.endDate && new Date(pc.endDate) < now) {
-      return { label: "Expired", color: "#dc2626", bg: "#fef2f2", border: "#fecaca" };
-    }
-    return { label: "Active", color: "#166534", bg: "#dcfce7", border: "#bbf7d0" };
-  };
 
   const formatSchedule = (pc) => {
     if (!pc.startDate && !pc.endDate) {
@@ -84,45 +69,6 @@ export default function PartnerCodesPage() {
     setTimeout(() => setCopiedLink(null), 2500);
   };
 
-  const handleToggleActive = async (id, currentStatus) => {
-    const newStatus = !currentStatus;
-    // Optimistic UI update
-    setTogglingId(id);
-    setCodes((prev) =>
-      prev.map((c) => (c.id === id ? { ...c, isActive: newStatus } : c))
-    );
-
-    try {
-      const res = await fetch(`/api/partner/codes/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ isActive: newStatus })
-      });
-
-      if (!res.ok) {
-        // Rollback on error
-        setCodes((prev) =>
-          prev.map((c) => (c.id === id ? { ...c, isActive: currentStatus } : c))
-        );
-      } else {
-        const data = await res.json();
-        if (data.success && data.partnerCode) {
-          setCodes((prev) =>
-            prev.map((c) => (c.id === id ? { ...c, ...data.partnerCode } : c))
-          );
-        }
-      }
-    } catch (err) {
-      console.error(err);
-      // Rollback on network failure
-      setCodes((prev) =>
-        prev.map((c) => (c.id === id ? { ...c, isActive: currentStatus } : c))
-      );
-    } finally {
-      setTogglingId(null);
-    }
-  };
-
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
       {/* Top Header */}
@@ -158,7 +104,7 @@ export default function PartnerCodesPage() {
             </h1>
           </div>
           <p style={{ fontSize: "0.85rem", color: "#64748b", margin: "0.3rem 0 0 0" }}>
-            Manage active status of promo codes and copy direct referral booking links for your guests.
+            View promo codes, discount rates, schedule validity, and copy direct referral booking links for your guests.
           </p>
         </div>
 
@@ -223,16 +169,12 @@ export default function PartnerCodesPage() {
                   <th style={{ padding: "1rem 1.25rem", textAlign: "left" }}>Discount Rate</th>
                   <th style={{ padding: "1rem 1.25rem", textAlign: "left" }}>Schedule / Validity</th>
                   <th style={{ padding: "1rem 1.25rem", textAlign: "center" }}>Orders Used</th>
-                  <th style={{ padding: "1rem 1.25rem", textAlign: "left" }}>Status</th>
                 </tr>
               </thead>
               <tbody>
                 {codes.map((pc) => {
-                  const status = getPromoStatus(pc);
                   const isCopied = copiedCode === pc.code;
                   const isLinkCopied = copiedLink === pc.code;
-                  const isToggling = togglingId === pc.id;
-                  const isCurrentlyActive = Boolean(pc.isActive);
 
                   return (
                     <tr key={pc.id} style={{ borderBottom: "1px solid #f1f5f9" }}>
@@ -329,104 +271,6 @@ export default function PartnerCodesPage() {
                       <td style={{ padding: "1rem 1.25rem", textAlign: "center", fontWeight: "800", color: "#0f172a" }}>
                         {pc._count?.sales ?? pc.usedCount ?? 0} {pc.usageLimit ? `/ ${pc.usageLimit}` : "orders"}
                       </td>
-
-                      {/* Status Toggle Button */}
-                      <td style={{ padding: "1rem 1.25rem" }}>
-                        <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem", alignItems: "flex-start" }}>
-                          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-                            {/* Interactive ON / OFF Toggle Switch */}
-                            <button
-                              type="button"
-                              role="switch"
-                              aria-checked={isCurrentlyActive}
-                              disabled={isToggling}
-                              onClick={() => handleToggleActive(pc.id, isCurrentlyActive)}
-                              style={{
-                                position: "relative",
-                                width: "48px",
-                                height: "26px",
-                                borderRadius: "9999px",
-                                background: isCurrentlyActive ? "#10b981" : "#cbd5e1",
-                                border: "none",
-                                cursor: isToggling ? "wait" : "pointer",
-                                transition: "background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
-                                padding: "2px",
-                                display: "inline-flex",
-                                alignItems: "center",
-                                outline: "none",
-                                boxShadow: isCurrentlyActive
-                                  ? "0 2px 8px rgba(16, 185, 129, 0.35)"
-                                  : "inset 0 1px 2px rgba(0, 0, 0, 0.1)",
-                                flexShrink: 0
-                              }}
-                              title={isCurrentlyActive ? "Click to disable this code" : "Click to enable this code"}
-                            >
-                              <span
-                                style={{
-                                  width: "22px",
-                                  height: "22px",
-                                  borderRadius: "50%",
-                                  background: "#ffffff",
-                                  boxShadow: "0 1px 4px rgba(0, 0, 0, 0.25)",
-                                  transform: isCurrentlyActive ? "translateX(22px)" : "translateX(0px)",
-                                  transition: "transform 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "center",
-                                  fontSize: "0.65rem",
-                                  color: isCurrentlyActive ? "#10b981" : "#94a3b8"
-                                }}
-                              >
-                                {isToggling ? (
-                                  <i className="fa-solid fa-spinner fa-spin" style={{ fontSize: "0.6rem" }}></i>
-                                ) : (
-                                  <i
-                                    className={`fa-solid ${isCurrentlyActive ? "fa-check" : "fa-power-off"}`}
-                                    style={{ fontSize: "0.55rem" }}
-                                  ></i>
-                                )}
-                              </span>
-                            </button>
-
-                            {/* Status label beside toggle */}
-                            <span style={{
-                              fontSize: "0.85rem",
-                              fontWeight: "700",
-                              color: isCurrentlyActive ? "#059669" : "#64748b",
-                              display: "inline-flex",
-                              alignItems: "center",
-                              gap: "0.35rem"
-                            }}>
-                              <span style={{
-                                width: "7px",
-                                height: "7px",
-                                borderRadius: "50%",
-                                background: isCurrentlyActive ? "#10b981" : "#94a3b8"
-                              }}></span>
-                              {isCurrentlyActive ? "Active" : "Disabled"}
-                            </span>
-                          </div>
-
-                          {/* Extra scheduled badge if active but not currently ongoing */}
-                          {isCurrentlyActive && (status.label === "Upcoming" || status.label === "Expired") && (
-                            <span style={{
-                              background: status.bg,
-                              color: status.color,
-                              border: `1px solid ${status.border}`,
-                              padding: "0.15rem 0.55rem",
-                              borderRadius: "9999px",
-                              fontSize: "0.7rem",
-                              fontWeight: "700",
-                              display: "inline-flex",
-                              alignItems: "center",
-                              gap: "0.25rem"
-                            }}>
-                              <i className="fa-regular fa-clock" style={{ fontSize: "0.65rem" }}></i>
-                              <span>{status.label}</span>
-                            </span>
-                          )}
-                        </div>
-                      </td>
                     </tr>
                   );
                 })}
@@ -438,5 +282,6 @@ export default function PartnerCodesPage() {
     </div>
   );
 }
+
 
 

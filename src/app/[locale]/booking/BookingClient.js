@@ -338,43 +338,7 @@ Notes: ${specialInst}`.trim();
             {t("subtitle")}
           </p>
 
-          <div className={styles.contactCards}>
-            <div className={styles.contactCard}>
-              <div className={styles.cardIcon}>
-                <i className="fa-solid fa-clock"></i>
-              </div>
-              <div className={styles.cardText}>
-                <h4>{t("fastTurnaround")}</h4>
-                <p>{t("fastTurnaroundDesc")}</p>
-              </div>
-            </div>
-
-            <div className={styles.contactCard}>
-              <div className={styles.cardIcon}>
-                <i className="fa-solid fa-truck-fast"></i>
-              </div>
-              <div className={styles.cardText}>
-                <h4>{t("doorToDoor")}</h4>
-                <p>{t("doorToDoorDesc")}</p>
-              </div>
-            </div>
-
-            <div className={styles.contactCard}>
-              <div className={styles.cardIcon}>
-                <i className="fa-solid fa-headset"></i>
-              </div>
-              <div className={styles.cardText}>
-                <h4>{t("needAssistance")}</h4>
-                <p>
-                  {t.rich("needAssistanceDesc", {
-                    phone: (chunks) => <a href="tel:+66946916668" style={{ color: "var(--accent)" }}>{chunks}</a>
-                  })}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div style={{ background: "rgba(58, 123, 213, 0.05)", padding: "1.5rem", borderRadius: "var(--radius)", border: "1px solid rgba(58, 123, 213, 0.2)", marginTop: "2rem", fontSize: "0.9rem", color: "var(--text-light)" }}>
+          <div style={{ background: "rgba(58, 123, 213, 0.05)", padding: "1.5rem", borderRadius: "var(--radius)", border: "1px solid rgba(58, 123, 213, 0.2)", marginBottom: "1.5rem", fontSize: "0.9rem", color: "var(--text-light)" }}>
             <h4 style={{ color: "var(--primary)", marginBottom: "1rem", fontSize: "1.1rem" }}>
               <i className="fa-solid fa-circle-info" style={{ color: "var(--accent)", marginRight: "8px" }}></i> 
               {t("disclaimerTitle")}
@@ -427,6 +391,42 @@ Notes: ${specialInst}`.trim();
                 </ul>
                 <p style={{ marginTop: "0.8rem", fontStyle: "italic", fontSize: "0.85rem", opacity: 0.9 }}>
                   {t("disclaimerLogisticsExample")}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.contactCards}>
+            <div className={styles.contactCard}>
+              <div className={styles.cardIcon}>
+                <i className="fa-solid fa-clock"></i>
+              </div>
+              <div className={styles.cardText}>
+                <h4>{t("fastTurnaround")}</h4>
+                <p>{t("fastTurnaroundDesc")}</p>
+              </div>
+            </div>
+
+            <div className={styles.contactCard}>
+              <div className={styles.cardIcon}>
+                <i className="fa-solid fa-truck-fast"></i>
+              </div>
+              <div className={styles.cardText}>
+                <h4>{t("doorToDoor")}</h4>
+                <p>{t("doorToDoorDesc")}</p>
+              </div>
+            </div>
+
+            <div className={styles.contactCard}>
+              <div className={styles.cardIcon}>
+                <i className="fa-solid fa-headset"></i>
+              </div>
+              <div className={styles.cardText}>
+                <h4>{t("needAssistance")}</h4>
+                <p>
+                  {t.rich("needAssistanceDesc", {
+                    phone: (chunks) => <a href="tel:+66946916668" style={{ color: "var(--accent)" }}>{chunks}</a>
+                  })}
                 </p>
               </div>
             </div>
@@ -871,9 +871,9 @@ Notes: ${specialInst}`.trim();
                     <input 
                       type="radio" 
                       name="expressService" 
-                      value="Express 50: Deliver Same Day Before at 18:00 (Pickup before 12:00)" 
-                      checked={expressService === "Express 50: Deliver Same Day Before at 18:00 (Pickup before 12:00)" || expressService === "Express 50: Same Day before 18:00"}
-                      onChange={() => setExpressService("Express 50: Deliver Same Day Before at 18:00 (Pickup before 12:00)")}
+                      value="Express 50: Deliver Same Day Before at 18:00 (+50% Surcharge, if picked up before 12:00)" 
+                      checked={expressService === "Express 50: Deliver Same Day Before at 18:00 (+50% Surcharge, if picked up before 12:00)" || expressService === "Express 50: Deliver Same Day Before at 18:00 (Pickup before 12:00)" || expressService === "Express 50: Same Day before 18:00"}
+                      onChange={() => setExpressService("Express 50: Deliver Same Day Before at 18:00 (+50% Surcharge, if picked up before 12:00)")}
                     />
                     <span className={styles.checkmark}></span>
                     <span className={styles.labelName} style={{ display: "flex", flexDirection: "column", gap: "0.25rem", width: "100%" }}>
@@ -888,9 +888,9 @@ Notes: ${specialInst}`.trim();
                     <input 
                       type="radio" 
                       name="expressService" 
-                      value="Express 50: Deliver (Next Day) at 12:00" 
-                      checked={expressService === "Express 50: Deliver (Next Day) at 12:00" || expressService === "Express 50 (Next Day): Next Day at 12:00"}
-                      onChange={() => setExpressService("Express 50: Deliver (Next Day) at 12:00")}
+                      value="Express 50: Deliver (Next Day) at 12:00 (+50% Surcharge, if picked up before 16:00)" 
+                      checked={expressService === "Express 50: Deliver (Next Day) at 12:00 (+50% Surcharge, if picked up before 16:00)" || expressService === "Express 50: Deliver (Next Day) at 12:00" || expressService === "Express 50 (Next Day): Next Day at 12:00"}
+                      onChange={() => setExpressService("Express 50: Deliver (Next Day) at 12:00 (+50% Surcharge, if picked up before 16:00)")}
                     />
                     <span className={styles.checkmark}></span>
                     <span className={styles.labelName} style={{ display: "flex", flexDirection: "column", gap: "0.25rem", width: "100%" }}>
@@ -1019,7 +1019,7 @@ Notes: ${specialInst}`.trim();
                     <input 
                       type="text" 
                       name="promoCode"
-                      placeholder={locale === "th" ? "ใส่โค้ดส่วนลด (เช่น TLSWELCOME15)" : locale === "cn" ? "请输入优惠码 (例如 TLSWELCOME15)" : "Enter promo code (e.g. TLSWELCOME15)"}
+                      placeholder={locale === "th" ? "ใส่โค้ดส่วนลด" : locale === "cn" ? "请输入优惠码" : "Enter promo code"}
                       value={promoCode}
                       onChange={(e) => {
                         setPromoCode(e.target.value.toUpperCase());
