@@ -171,6 +171,31 @@ export default function AdminPartnersPage() {
     }
   };
 
+  const handleDeletePartner = async (partnerId, partnerName) => {
+    if (!window.confirm(`Are you sure you want to delete partner "${partnerName}"?\nAll associated promo codes and sales records will also be permanently deleted.`)) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/admin/partners/${partnerId}?force=true`, {
+        method: "DELETE"
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.error || "Failed to delete partner.");
+        return;
+      }
+      fetchPartners();
+      fetchAllSales();
+      if (selectedPartnerForDashboard?.id === partnerId) {
+        setSelectedPartnerForDashboard(null);
+      }
+    } catch (err) {
+      console.error("Failed to delete partner:", err);
+      alert("Unable to connect to the server.");
+    }
+  };
+
   const handleSubmitCreateCode = async (e) => {
     e.preventDefault();
     if (!selectedPartnerForCodes) return;
@@ -2209,6 +2234,25 @@ export default function AdminPartnersPage() {
                           >
                             Edit
                           </button>
+                          <button
+                            onClick={() => handleDeletePartner(p.id, p.companyName)}
+                            title="Delete Partner"
+                            style={{
+                              padding: "0.4rem 0.65rem",
+                              borderRadius: "6px",
+                              background: "#fff1f2",
+                              color: "#be123c",
+                              border: "1px solid #fecdd3",
+                              fontWeight: "700",
+                              fontSize: "0.8rem",
+                              cursor: "pointer",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "0.3rem"
+                            }}
+                          >
+                            <i className="fa-solid fa-trash-can"></i>
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -2586,21 +2630,49 @@ export default function AdminPartnersPage() {
                 </label>
               </div>
 
-              <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.75rem", marginTop: "1rem" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "0.75rem", marginTop: "1rem" }}>
                 <button
                   type="button"
-                  onClick={() => setIsEditModalOpen(false)}
-                  style={{ padding: "0.75rem 1.25rem", borderRadius: "8px", background: "#f1f5f9", border: "1px solid #cbd5e1", color: "#475569", fontWeight: "700", cursor: "pointer" }}
+                  onClick={() => {
+                    if (editingPartner) {
+                      const p = editingPartner;
+                      setIsEditModalOpen(false);
+                      handleDeletePartner(p.id, p.companyName);
+                    }
+                  }}
+                  style={{
+                    padding: "0.75rem 1rem",
+                    borderRadius: "8px",
+                    background: "#fff1f2",
+                    border: "1px solid #fecdd3",
+                    color: "#be123c",
+                    fontWeight: "700",
+                    cursor: "pointer",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "0.4rem",
+                    fontSize: "0.85rem"
+                  }}
                 >
-                  Cancel
+                  <i className="fa-solid fa-trash-can"></i>
+                  Delete Partner
                 </button>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  style={{ padding: "0.75rem 1.5rem", borderRadius: "8px", background: "#222945", border: "none", color: "#ffffff", fontWeight: "700", cursor: "pointer", opacity: isSubmitting ? 0.7 : 1 }}
-                >
-                  {isSubmitting ? "Saving..." : "Save Changes"}
-                </button>
+                <div style={{ display: "flex", gap: "0.75rem" }}>
+                  <button
+                    type="button"
+                    onClick={() => setIsEditModalOpen(false)}
+                    style={{ padding: "0.75rem 1.25rem", borderRadius: "8px", background: "#f1f5f9", border: "1px solid #cbd5e1", color: "#475569", fontWeight: "700", cursor: "pointer" }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    style={{ padding: "0.75rem 1.5rem", borderRadius: "8px", background: "#222945", border: "none", color: "#ffffff", fontWeight: "700", cursor: "pointer", opacity: isSubmitting ? 0.7 : 1 }}
+                  >
+                    {isSubmitting ? "Saving..." : "Save Changes"}
+                  </button>
+                </div>
               </div>
             </form>
           </div>

@@ -85,10 +85,12 @@ export async function DELETE(request, { params }) {
     }
 
     const { id } = await params;
+    const { searchParams } = new URL(request.url);
+    const force = searchParams.get("force") === "true";
 
     // Check if partner has sales
     const salesCount = await prisma.partnerSale.count({ where: { partnerId: id } });
-    if (salesCount > 0) {
+    if (salesCount > 0 && !force) {
       // Soft-disable instead of hard delete to preserve sales records
       await prisma.partner.update({
         where: { id },
@@ -97,6 +99,12 @@ export async function DELETE(request, { params }) {
       return NextResponse.json({
         success: true,
         message: "This partner has sales records and has been deactivated instead of deleted to preserve history."
+      });
+    }
+
+    if (salesCount > 0 && force) {
+      await prisma.partnerSale.deleteMany({
+        where: { partnerId: id }
       });
     }
 
