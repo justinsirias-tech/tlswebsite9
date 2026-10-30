@@ -23,6 +23,8 @@ export default function BookingClient() {
   const [promoError, setPromoError] = useState("");
   const [promoInfo, setPromoInfo] = useState(null);
   const [isValidatingPromo, setIsValidatingPromo] = useState(false);
+  const [formLoadedAt] = useState(() => Date.now());
+  const [honeypot, setHoneypot] = useState("");
 
   const handleApplyPromo = async (codeToApply) => {
     const code = (codeToApply || promoCode).trim().toUpperCase();
@@ -244,13 +246,20 @@ Notes: ${specialInst}`.trim();
         }
       }
 
+      const websiteHp = e.target.elements.website_hp?.value || honeypot || '';
+      const nicknameHp = e.target.elements.user_nickname_hp?.value || '';
+      const formDuration = Date.now() - formLoadedAt;
+
       const bookingData = {
         customerName: e.target.elements.customerName.value,
         email: e.target.elements.email.value,
         phone: `${countryCode} ${phoneNumber} ${isWhatsapp ? '(WhatsApp)' : ''} ${thaiMobile ? `| TH: ${thaiMobile}` : ''}`,
         pickupDate: formattedDate.toISOString(),
         service: fullServiceDesc,
-        memberId: member ? member.id : null
+        memberId: member ? member.id : null,
+        website_hp: websiteHp,
+        user_nickname_hp: nicknameHp,
+        formDuration: formDuration
       };
 
       const res = await fetch('/api/booking', {
@@ -471,6 +480,28 @@ Notes: ${specialInst}`.trim();
             </div>
           ) : (
             <form id="gform_1" onSubmit={handleSubmit} className={styles.formGrid}>
+              {/* Anti-Bot Honeypot trap (Hidden from real human users, traps automated scrapers) */}
+              <div style={{ opacity: 0, position: 'absolute', top: 0, left: '-9999px', height: 0, width: 0, zIndex: -1, overflow: 'hidden' }} aria-hidden="true" tabIndex={-1}>
+                <label htmlFor="user_nickname_hp">Do not fill this field</label>
+                <input 
+                  type="text" 
+                  id="user_nickname_hp" 
+                  name="user_nickname_hp" 
+                  tabIndex={-1} 
+                  autoComplete="off" 
+                  defaultValue=""
+                />
+                <label htmlFor="website_hp">Leave this empty</label>
+                <input 
+                  type="text" 
+                  id="website_hp" 
+                  name="website_hp" 
+                  value={honeypot}
+                  onChange={(e) => setHoneypot(e.target.value)}
+                  tabIndex={-1} 
+                  autoComplete="off" 
+                />
+              </div>
               
               <div className={styles.fullWidth}>
                 <h3 style={{ fontSize: "1.5rem", color: "var(--primary)", marginBottom: "1rem", borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: "0.5rem" }}>

@@ -10,6 +10,10 @@ const isAuthenticated = async () => {
 };
 
 export async function POST(request) {
+  if (!(await isAuthenticated())) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
     const data = await request.json();
     

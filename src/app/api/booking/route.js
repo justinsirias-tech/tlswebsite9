@@ -501,12 +501,98 @@ async function sendConfirmationEmail(booking) {
   }
 }
 
+/**
+ * 4-Layer Anti-Bot & Spam Protection Shield
+ * Layer 1: Honeypot trap check (hidden input populated by bots)
+ * Layer 2: Pickup date sanity validation (rejects year 1970 or past dates)
+ * Layer 3: Gibberish & abnormal casing name detection
+ * Layer 4: Time-trap duration check (rejects instant bot submissions)
+ */
+function validateAntiSpam(data) {
+  // Layer 1: Honeypot trap check
+  if (data.website_hp || data.user_nickname_hp || data.company_hp) {
+    return { isSpam: true, reason: "Honeypot trap triggered" };
+  }
+
+  // Layer 2: Server-side Pickup Date validation
+  if (!data.pickupDate) {
+    return { isSpam: true, reason: "Missing pickup date" };
+  }
+  const pickupTime = new Date(data.pickupDate).getTime();
+  if (isNaN(pickupTime)) {
+    return { isSpam: true, reason: "Invalid pickup date format" };
+  }
+  const now = Date.now();
+  // Reject dates older than 48 hours ago (e.g. Year 1970)
+  if (pickupTime < now - (48 * 60 * 60 * 1000)) {
+    return { isSpam: true, reason: `Past pickup date (${data.pickupDate})` };
+  }
+  // Reject dates too far in the future (> 120 days)
+  if (pickupTime > now + (120 * 24 * 60 * 60 * 1000)) {
+    return { isSpam: true, reason: `Pickup date too far in future (${data.pickupDate})` };
+  }
+
+  // Layer 3: Gibberish & Name Pattern detection
+  const name = (data.customerName || "").trim();
+  if (!name || name.length < 2) {
+    return { isSpam: true, reason: "Customer name missing or too short" };
+  }
+  if (name.length > 70) {
+    return { isSpam: true, reason: "Customer name exceeds character limit" };
+  }
+  // Detect single-word latin gibberish strings with abnormal casing (e.g. bzkifXewPVCohYqVSCqr, MqyToRvCrcXXZEFIDs)
+  if (/^[A-Za-z]{15,}$/.test(name)) {
+    const internalUpper = (name.slice(1).match(/[A-Z]/g) || []).length;
+    if (internalUpper >= 3) {
+      return { isSpam: true, reason: `Random mixed-case gibberish name (${name})` };
+    }
+    const vowels = (name.match(/[aeiouy]/gi) || []).length;
+    if (vowels / name.length < 0.15) {
+      return { isSpam: true, reason: `Low vowel ratio gibberish name (${name})` };
+    }
+  }
+
+  // Layer 4: Time-trap validation (humans take > 1.8 seconds)
+  if (typeof data.formDuration === 'number' && data.formDuration > 0 && data.formDuration < 1800) {
+    return { isSpam: true, reason: `Form submitted unnaturally fast (${data.formDuration}ms)` };
+  }
+
+  // Phone number basic validation (at least 7 digits)
+  const phoneDigits = (data.phone || "").replace(/\D/g, "");
+  if (phoneDigits.length < 7) {
+    return { isSpam: true, reason: "Phone number has insufficient digits" };
+  }
+
+  return { isSpam: false };
+}
+
 export async function POST(req) {
   try {
     const data = await req.json();
 
     if (!data.email) {
       return NextResponse.json({ error: "Email is required" }, { status: 400 });
+    }
+
+    // 4-Layer Anti-Bot Shield Protection
+    const spamCheck = validateAntiSpam(data);
+    if (spamCheck.isSpam) {
+      console.warn(`[ANTI-BOT SHIELD] Blocked bot booking: ${spamCheck.reason}`, {
+        name: data.customerName,
+        email: data.email,
+        phone: data.phone,
+        pickupDate: data.pickupDate
+      });
+
+      // Return simulated 200 success response so automated scrapers don't mutate or retry attacks
+      return NextResponse.json({ 
+        success: true, 
+        message: "Booking request processed.",
+        booking: {
+          id: "guard-" + Date.now(),
+          status: "REJECTED"
+        }
+      });
     }
 
     // Translate the service details to English if needed
