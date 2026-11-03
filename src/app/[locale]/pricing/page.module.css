@@ -129,7 +129,8 @@
 
 .categoryBanner {
   position: relative;
-  height: 300px;
+  min-height: 280px;
+  height: auto;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -138,6 +139,8 @@
   text-align: center;
   color: white;
   margin-bottom: 2rem;
+  padding: 3rem 2rem;
+  border-radius: var(--radius-lg);
 }
 
 .categoryBanner::before {
@@ -175,6 +178,26 @@
   flex-wrap: wrap;
   gap: 2rem;
   margin-top: 1rem;
+  padding: 0 2rem;
+}
+
+.minChargeWrapper {
+  margin-top: 0.75rem;
+}
+
+.minChargeBadge {
+  display: inline-block;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  padding: 0.35rem 1rem;
+  border-radius: 9999px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .priceCard {
@@ -270,36 +293,66 @@
 @media (max-width: 768px) {
   .tabsContainer {
     border-radius: var(--radius);
-    padding: 1rem;
+    padding: 0.75rem;
     flex-direction: column;
+    margin-bottom: 1.5rem;
   }
 
   .tabButton {
     border-radius: var(--radius);
-    padding: 1rem;
+    padding: 0.85rem 1rem;
     text-align: center;
     width: 100%;
+    font-size: 0.95rem;
   }
 
   .cardGrid {
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 1.25rem;
+    padding: 0;
   }
   
   .categorySection {
-    padding: 1.5rem;
+    padding: 0;
     background: transparent;
     box-shadow: none;
     border: none;
   }
 
   .categoryBanner {
-    height: 200px;
-    margin-bottom: 1rem;
+    min-height: 200px;
+    height: auto;
+    padding: 2.25rem 1.25rem;
+    margin-bottom: 1.5rem;
+    border-radius: var(--radius, 12px);
+  }
+
+  .categoryBannerContent {
+    padding: 0;
+    width: 100%;
   }
 
   .categoryBannerTitle {
-    font-size: 2rem;
+    font-size: 1.75rem;
+    line-height: 1.25;
+    margin-bottom: 0.5rem;
+  }
+
+  .categoryBannerDesc {
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+
+  .minChargeWrapper {
+    margin-top: 0.65rem;
+  }
+
+  .minChargeBadge {
+    display: inline-block;
+    font-size: 0.92rem;
+    padding: 0.35rem 0.85rem;
+    line-height: 1.35;
+    max-width: 100%;
   }
 
   .heroBannerPrice {

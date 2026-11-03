@@ -192,15 +192,17 @@ export default function PricingTabs({ priceData, locale }) {
               <h2 className={styles.categoryBannerTitle}>{currentCategory.title}</h2>
               <p className={styles.categoryBannerDesc}>
                 {currentCategory.desc}
-                {activeTab === "weight" && (
-                  <strong style={{ fontSize: "1.45rem", fontWeight: "800", color: "#fff", display: "inline-block", marginLeft: "8px" }}>
+              </p>
+              {activeTab === "weight" && (
+                <div className={styles.minChargeWrapper}>
+                  <strong className={styles.minChargeBadge}>
                     ({t("minChargeWeight")})
                   </strong>
-                )}
-              </p>
+                </div>
+              )}
             </div>
           </div>
-          <div className={styles.cardGrid} style={{ padding: "0 2rem" }}>
+          <div className={styles.cardGrid}>
             {currentCategory.data && currentCategory.data.length > 0 ? (
               currentCategory.data.map((item, idx) => (
                 <PriceCard key={idx} item={item} />
