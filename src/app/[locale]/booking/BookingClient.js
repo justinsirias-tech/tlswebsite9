@@ -121,18 +121,219 @@ export default function BookingClient() {
   const [deliveryRoomNo, setDeliveryRoomNo] = useState("");
   const [deliveryFullAddress, setDeliveryFullAddress] = useState("");
 
-  const [pickupDate, setPickupDate] = useState("");
+  const getBangkokState = () => {
+    const now = new Date();
+    const fmt = new Intl.DateTimeFormat("en-GB", {
+      timeZone: "Asia/Bangkok",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false
+    });
+    const parts = fmt.formatToParts(now);
+    const map = {};
+    parts.forEach(p => { map[p.type] = p.value; });
+    const h = parseInt(map.hour || "0", 10) % 24;
+    const m = parseInt(map.minute || "0", 10);
+
+    // Also compute Tomorrow in Bangkok
+    const tomorrowDate = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+    const tParts = fmt.formatToParts(tomorrowDate);
+    const tMap = {};
+    tParts.forEach(p => { tMap[p.type] = p.value; });
+
+    return {
+      day: map.day,
+      month: map.month,
+      year: map.year,
+      hours: h,
+      minutes: m,
+      totalMinutes: h * 60 + m,
+      timeFormatted: `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`,
+      todayDMY: `${map.day}/${map.month}/${map.year}`,
+      todayISO: `${map.year}-${map.month}-${map.day}`,
+      tomorrowDMY: `${tMap.day}/${tMap.month}/${tMap.year}`,
+      tomorrowISO: `${tMap.year}-${tMap.month}-${tMap.day}`
+    };
+  };
+
+  const [bangkokNow, setBangkokNow] = useState(getBangkokState);
+  const [pickupDate, setPickupDate] = useState(() => {
+    const init = getBangkokState();
+    // If past 17:15 in Bangkok (45 mins before 18:00), all today's slots have closed -> default to Tomorrow
+    return init.totalMinutes >= 17 * 60 + 15 ? init.tomorrowDMY : init.todayDMY;
+  });
   const [pickupTime, setPickupTime] = useState("");
   const [pickupMethod, setPickupMethod] = useState("");
   const [expressService, setExpressService] = useState("Standard: Next Day Deliver Any Time Before 18:00 (No Fixed Time)");
+  const [expressNotice, setExpressNotice] = useState("");
 
-  const generateTimeSlots = () => {
-    return [
-      "10:30 - 13:00",
-      "13:30 - 16:00",
-      "16:30 - 18:00"
+  useEffect(() => {
+    const updateClock = () => {
+      setBangkokNow(getBangkokState());
+    };
+    updateClock();
+    const timer = setInterval(updateClock, 30000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Check if selected pickupDate is Today or in the Past (Bangkok Time)
+  const dateStatus = (() => {
+    if (!pickupDate || pickupDate.length < 10) {
+      return { isToday: false, isPast: false, isValid: false };
+    }
+    const [dStr, mStr, yStr] = pickupDate.split("/");
+    const d = parseInt(dStr, 10);
+    const m = parseInt(mStr, 10);
+    const y = parseInt(yStr, 10);
+    if (!d || !m || !y || y < 2024) return { isToday: false, isPast: false, isValid: false };
+
+    const selVal = y * 10000 + m * 100 + d;
+    const todayVal = parseInt(bangkokNow.year, 10) * 10000 + parseInt(bangkokNow.month, 10) * 100 + parseInt(bangkokNow.day, 10);
+    return {
+      isToday: selVal === todayVal,
+      isPast: selVal < todayVal,
+      isValid: true
+    };
+  })();
+
+  // If date isToday (or not yet filled with a valid future date), enforce Today's real-time cutoffs
+  const isEffectiveToday = !dateStatus.isValid || dateStatus.isToday;
+
+  // Time slots with real-time same-day dispatch cutoff (45 mins before slot ends)
+  const getTimeSlotOptions = () => {
+    const slots = [
+      { value: "10:30 - 13:00", cutoffMinutes: 12 * 60 + 15 }, // Book by 12:15 for 10:30-13:00
+      { value: "13:30 - 16:00", cutoffMinutes: 15 * 60 + 15 }, // Book by 15:15 for 13:30-16:00
+      { value: "16:30 - 18:00", cutoffMinutes: 17 * 60 + 15 }  // Book by 17:15 for 16:30-18:00
     ];
+    return slots.map(slot => {
+      const disabled = dateStatus.isPast || (isEffectiveToday && bangkokNow.totalMinutes >= slot.cutoffMinutes);
+      return { ...slot, disabled };
+    });
   };
+
+  // Express option eligibility rules (includes 45-minute rider travel buffer for same-day pickups)
+  // Express 50 Same Day: Rider must pick up BEFORE 12:00 -> Online booking cutoff for Today is 11:15 AM, and must use 10:30 - 13:00 slot
+  // Express 100 Same Day: Rider must pick up BEFORE 15:00 -> Online booking cutoff for Today is 14:15 (2:15 PM), cannot use 16:30 - 18:00 slot
+  // Express 50 Next Day 12:00: Rider must pick up BEFORE 16:00 -> Online booking cutoff for Today is 15:15 (3:15 PM), cannot use 16:30 - 18:00 slot
+  const getExpressEligibility = () => {
+    const isAfternoonSlot = pickupTime === "13:30 - 16:00";
+    const isEveningSlot = pickupTime === "16:30 - 18:00";
+
+    // 1. Express 50 Same Day (Pickup before 12:00 -> Book by 11:15 if Today)
+    let exp50SameDayDisabled = false;
+    let exp50SameDayReason = "";
+    if (isEffectiveToday && bangkokNow.totalMinutes >= 11 * 60 + 15) {
+      exp50SameDayDisabled = true;
+      exp50SameDayReason = locale === "th"
+        ? "ปิดรับสำหรับวันนี้ (ต้องจองก่อน 11:15 น. เพื่อให้ไรเดอร์ถึงโรงแรมก่อน 12:00 น.)"
+        : locale === "cn"
+        ? "今日已截止（需在 11:15 前预订，以便骑手在 12:00 前到达取件）"
+        : "Cutoff passed for today (Must book before 11:15 AM so rider arrives before 12:00)";
+    } else if (isAfternoonSlot || isEveningSlot) {
+      exp50SameDayDisabled = true;
+      exp50SameDayReason = locale === "th"
+        ? "ต้องเลือกเวลารับผ้ารอบเช้า 10:30 - 13:00 น. (รับผ้าก่อน 12:00 น.)"
+        : locale === "cn"
+        ? "仅限 10:30 - 13:00 取件时段（需在 12:00 前取件）"
+        : "Requires 10:30 - 13:00 morning slot (Pickup before 12:00)";
+    }
+
+    // 2. Express 100 Same Day (Pickup before 15:00 -> Book by 14:15 if Today)
+    let exp100SameDayDisabled = false;
+    let exp100SameDayReason = "";
+    if (isEffectiveToday && bangkokNow.totalMinutes >= 14 * 60 + 15) {
+      exp100SameDayDisabled = true;
+      exp100SameDayReason = locale === "th"
+        ? "ปิดรับสำหรับวันนี้ (ต้องจองก่อน 14:15 น. เพื่อให้ไรเดอร์ถึงโรงแรมก่อน 15:00 น.)"
+        : locale === "cn"
+        ? "今日已截止（需在 14:15 前预订，以便骑手在 15:00 前到达取件）"
+        : "Cutoff passed for today (Must book before 14:15 so rider arrives before 15:00)";
+    } else if (isEveningSlot) {
+      exp100SameDayDisabled = true;
+      exp100SameDayReason = locale === "th"
+        ? "ไม่รองรับรอบ 16:30 - 18:00 น. (ต้องรับผ้าก่อน 15:00 น.)"
+        : locale === "cn"
+        ? "不适用于 16:30 - 18:00 时段（需在 15:00 前取件）"
+        : "Unavailable for 16:30 - 18:00 slot (Requires pickup before 15:00)";
+    }
+
+    // 3. Express 50 Next Day at 12:00 (Pickup before 16:00 -> Book by 15:15 if Today)
+    let exp50NextDayDisabled = false;
+    let exp50NextDayReason = "";
+    if (isEffectiveToday && bangkokNow.totalMinutes >= 15 * 60 + 15) {
+      exp50NextDayDisabled = true;
+      exp50NextDayReason = locale === "th"
+        ? "ปิดรับสำหรับวันนี้ (ต้องจองก่อน 15:15 น. เพื่อรับผ้าก่อน 16:00 น.)"
+        : locale === "cn"
+        ? "今日已截止（需在 15:15 前预订以确保 16:00 前取件）"
+        : "Cutoff passed for today (Must book before 15:15 so rider arrives before 16:00)";
+    } else if (isEveningSlot) {
+      exp50NextDayDisabled = true;
+      exp50NextDayReason = locale === "th"
+        ? "ไม่รองรับรอบ 16:30 - 18:00 น. (ต้องรับผ้าก่อน 16:00 น.)"
+        : locale === "cn"
+        ? "不适用于 16:30 - 18:00 时段（需在 16:00 前取件）"
+        : "Unavailable for 16:30 - 18:00 slot (Requires pickup before 16:00)";
+    }
+
+    return {
+      exp50SameDay: { disabled: exp50SameDayDisabled, reason: exp50SameDayReason },
+      exp100SameDay: { disabled: exp100SameDayDisabled, reason: exp100SameDayReason },
+      exp50NextDay: { disabled: exp50NextDayDisabled, reason: exp50NextDayReason }
+    };
+  };
+
+  const expressEligibility = getExpressEligibility();
+
+  // Auto-correct pickupTime if user switches pickupDate to Today and selected slot is already past cutoff
+  useEffect(() => {
+    if (!pickupTime) return;
+    const slotObj = getTimeSlotOptions().find(s => s.value === pickupTime);
+    if (slotObj && slotObj.disabled) {
+      const nextValid = getTimeSlotOptions().find(s => !s.disabled);
+      setPickupTime(nextValid ? nextValid.value : "");
+    }
+  }, [pickupDate, bangkokNow.totalMinutes]);
+
+  // Auto-correct expressService if current selection becomes unavailable due to Date, Time Slot, or Real-Time Clock
+  useEffect(() => {
+    const isExp50Same = expressService.includes("Express 50: Deliver Same Day");
+    const isExp100Same = expressService.includes("Express 100:");
+    const isExp50Next = expressService.includes("Express 50: Deliver (Next Day)");
+
+    if (isExp50Same && expressEligibility.exp50SameDay.disabled) {
+      setExpressService("Standard: Next Day Deliver Any Time Before 18:00 (No Fixed Time)");
+      setExpressNotice(
+        locale === "th"
+          ? `ระบบได้ปรับตัวเลือกเป็น "บริการมาตรฐาน (ส่งวันถัดไป)" เนื่องจาก Express 50 (ส่งวันเดียวกัน) ${expressEligibility.exp50SameDay.reason}`
+          : locale === "cn"
+          ? `已自动调整为“标准次日送达”，因为加急50（当日送达）：${expressEligibility.exp50SameDay.reason}`
+          : `"Express 50: Same Day" was automatically switched to Standard Next Day — ${expressEligibility.exp50SameDay.reason}.`
+      );
+    } else if (isExp100Same && expressEligibility.exp100SameDay.disabled) {
+      setExpressService("Standard: Next Day Deliver Any Time Before 18:00 (No Fixed Time)");
+      setExpressNotice(
+        locale === "th"
+          ? `ระบบได้ปรับตัวเลือกเป็น "บริการมาตรฐาน (ส่งวันถัดไป)" เนื่องจาก Express 100 (ส่งวันเดียวกัน) ${expressEligibility.exp100SameDay.reason}`
+          : locale === "cn"
+          ? `已自动调整为“标准次日送达”，因为加急100（当日送达）：${expressEligibility.exp100SameDay.reason}`
+          : `"Express 100: Same Day" was automatically switched to Standard Next Day — ${expressEligibility.exp100SameDay.reason}.`
+      );
+    } else if (isExp50Next && expressEligibility.exp50NextDay.disabled) {
+      setExpressService("Standard: Next Day Deliver Any Time Before 18:00 (No Fixed Time)");
+      setExpressNotice(
+        locale === "th"
+          ? `ระบบได้ปรับตัวเลือกเป็น "บริการมาตรฐาน (ส่งวันถัดไป)" เนื่องจาก Express 50 (ส่งวันถัดไป 12:00 น.) ${expressEligibility.exp50NextDay.reason}`
+          : locale === "cn"
+          ? `已自动调整为“标准次日送达”，因为加急50（次日12:00）：${expressEligibility.exp50NextDay.reason}`
+          : `"Express 50: Next Day at 12:00" was automatically switched to Standard Next Day — ${expressEligibility.exp50NextDay.reason}.`
+      );
+    }
+  }, [pickupDate, pickupTime, bangkokNow.totalMinutes, expressService, locale]);
 
   const initAutocomplete = () => {
     if (window.google && window.google.maps && window.google.maps.places) {
@@ -209,6 +410,21 @@ export default function BookingClient() {
     const paymentMethods = formData.getAll('paymentMethod');
     if (paymentMethods.length === 0) {
       alert(t("errorPaymentRequired") || "Please select at least one preferred payment method.");
+      return;
+    }
+
+    if (dateStatus.isPast) {
+      alert(locale === "th" ? "ไม่สามารถเลือกวันที่ผ่านมาแล้วได้ กรุณาเลือกวันนี้หรือวันถัดไป" : locale === "cn" ? "不能选择过去的日期，请选择今天或未来的日期。" : "Cannot book a date in the past. Please select today or a future date.");
+      return;
+    }
+
+    const currentEligibility = getExpressEligibility();
+    if (
+      (expressService.includes("Express 50: Deliver Same Day") && currentEligibility.exp50SameDay.disabled) ||
+      (expressService.includes("Express 100:") && currentEligibility.exp100SameDay.disabled) ||
+      (expressService.includes("Express 50: Deliver (Next Day)") && currentEligibility.exp50NextDay.disabled)
+    ) {
+      alert(locale === "th" ? "ตัวเลือกบริการด่วนที่คุณเลือกไม่รองรับสำหรับช่วงเวลารับผ้านี้ กรุณาเลือกตัวเลือกบริการอื่น" : locale === "cn" ? "所选加急服务不适用于当前取件时间，请选择其他服务选项。" : "The selected Express Service option is not available for your chosen pickup date/time. Please select a valid option.");
       return;
     }
 
@@ -665,7 +881,51 @@ Notes: ${specialInst}`.trim();
               </div>
 
               <div className={styles.inputGroup}>
-                <label>{t("date")}</label>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "8px", marginBottom: "0.5rem" }}>
+                  <label style={{ marginBottom: 0, whiteSpace: "nowrap" }}>{t("date")}</label>
+                  <div style={{ display: "flex", gap: "6px", flexShrink: 0 }}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPickupDate(bangkokNow.todayDMY);
+                        setExpressNotice("");
+                      }}
+                      disabled={bangkokNow.totalMinutes >= 17 * 60 + 15}
+                      style={{
+                        padding: "2px 8px",
+                        fontSize: "0.75rem",
+                        fontWeight: "600",
+                        borderRadius: "6px",
+                        border: pickupDate === bangkokNow.todayDMY ? "1px solid #222945" : "1px solid #cbd5e1",
+                        background: pickupDate === bangkokNow.todayDMY ? "#222945" : "#f8fafc",
+                        color: pickupDate === bangkokNow.todayDMY ? "#fff" : "#475569",
+                        cursor: bangkokNow.totalMinutes >= 17 * 60 + 15 ? "not-allowed" : "pointer",
+                        opacity: bangkokNow.totalMinutes >= 17 * 60 + 15 ? 0.5 : 1
+                      }}
+                    >
+                      {locale === "th" ? "วันนี้" : locale === "cn" ? "今天" : "Today"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPickupDate(bangkokNow.tomorrowDMY);
+                        setExpressNotice("");
+                      }}
+                      style={{
+                        padding: "2px 8px",
+                        fontSize: "0.75rem",
+                        fontWeight: "600",
+                        borderRadius: "6px",
+                        border: pickupDate === bangkokNow.tomorrowDMY ? "1px solid #222945" : "1px solid #cbd5e1",
+                        background: pickupDate === bangkokNow.tomorrowDMY ? "#222945" : "#f8fafc",
+                        color: pickupDate === bangkokNow.tomorrowDMY ? "#fff" : "#475569",
+                        cursor: "pointer"
+                      }}
+                    >
+                      {locale === "th" ? "พรุ่งนี้" : locale === "cn" ? "明天" : "Tomorrow"}
+                    </button>
+                  </div>
+                </div>
                 <div style={{ position: "relative" }}>
                   <input 
                     type="text" 
@@ -677,17 +937,25 @@ Notes: ${specialInst}`.trim();
                   />
                   <input 
                     type="date"
+                    min={bangkokNow.todayISO}
                     style={{ position: 'absolute', opacity: 0, right: 0, top: 0, bottom: 0, width: '50px', cursor: 'pointer', zIndex: 10 }}
                     onChange={(e) => {
                       const val = e.target.value; // YYYY-MM-DD
                       if(val) {
                         const [y, m, d] = val.split('-');
                         setPickupDate(`${d}/${m}/${y}`);
+                        setExpressNotice("");
                       }
                     }}
                   />
                   <i className="fa-regular fa-calendar" style={{ position: "absolute", right: "15px", top: "50%", transform: "translateY(-50%)", color: "var(--text-light)", pointerEvents: "none", zIndex: 5 }}></i>
                 </div>
+                {dateStatus.isPast && (
+                  <p style={{ fontSize: "0.8rem", color: "#dc2626", marginTop: "4px", fontWeight: "600" }}>
+                    <i className="fa-solid fa-triangle-exclamation"></i>{" "}
+                    {locale === "th" ? "กรุณาเลือกวันที่วันนี้หรือวันถัดไป" : locale === "cn" ? "请选择今天或未来的日期" : "Please select today or a future date."}
+                  </p>
+                )}
               </div>
 
               <div className={styles.inputGroup}>
@@ -695,7 +963,10 @@ Notes: ${specialInst}`.trim();
                 <div style={{ position: "relative" }}>
                   <select 
                     value={pickupTime}
-                    onChange={(e) => setPickupTime(e.target.value)}
+                    onChange={(e) => {
+                      setPickupTime(e.target.value);
+                      setExpressNotice("");
+                    }}
                     required
                     style={{
                       width: "100%",
@@ -710,8 +981,13 @@ Notes: ${specialInst}`.trim();
                     }}
                   >
                     <option value="" disabled hidden>{t("selectTimeSlot") || "Select a time slot"}</option>
-                    {generateTimeSlots().map(slot => (
-                      <option key={slot} value={slot}>{slot}</option>
+                    {getTimeSlotOptions().map(slot => (
+                      <option key={slot.value} value={slot.value} disabled={slot.disabled}>
+                        {slot.value}
+                        {slot.disabled
+                          ? (locale === "th" ? " (ปิดรับสำหรับวันนี้)" : locale === "cn" ? " (今日已截止)" : " (Cutoff passed for today)")
+                          : ""}
+                      </option>
                     ))}
                   </select>
                    <i className="fa-solid fa-chevron-down" style={{ position: "absolute", right: "15px", top: "50%", transform: "translateY(-50%)", color: "var(--text-light)", pointerEvents: "none", zIndex: 5 }}></i>
@@ -877,9 +1153,70 @@ Notes: ${specialInst}`.trim();
               </div>
 
               <div className={styles.fullWidth} style={{ marginTop: "1.5rem" }}>
-                <label style={{ fontSize: "1.1rem", fontWeight: "600", color: "var(--primary)", marginBottom: "1rem", display: "block" }}>
-                  {t("expressServiceLabel")}
-                </label>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "0.5rem", marginBottom: "0.75rem" }}>
+                  <label style={{ fontSize: "1.1rem", fontWeight: "600", color: "var(--primary)", margin: 0 }}>
+                    {t("expressServiceLabel")}
+                  </label>
+                  <span style={{ fontSize: "0.8rem", color: "#475569", background: "#f1f5f9", padding: "4px 10px", borderRadius: "20px", fontWeight: "500" }}>
+                    <i className="fa-regular fa-clock" style={{ marginRight: "5px", color: "var(--accent)" }}></i>
+                    {locale === "th"
+                      ? `เวลาปัจจุบัน: ${bangkokNow.timeFormatted} น. | วันรับผ้า: ${pickupDate || "-"}`
+                      : locale === "cn"
+                      ? `泰国当前时间: ${bangkokNow.timeFormatted} | 取件日期: ${pickupDate || "-"}`
+                      : `Thailand Time: ${bangkokNow.timeFormatted} | Pickup: ${pickupDate || "-"}`}
+                  </span>
+                </div>
+
+                {expressNotice && (
+                  <div style={{ marginBottom: "1rem", padding: "0.75rem 1rem", borderRadius: "10px", background: "#fffbeb", border: "1px solid #fde68a", color: "#92400e", fontSize: "0.88rem", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "0.75rem" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                      <i className="fa-solid fa-circle-info" style={{ color: "#d97706", fontSize: "1rem" }}></i>
+                      <span>{expressNotice}</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setExpressNotice("")}
+                      style={{ background: "none", border: "none", color: "#92400e", cursor: "pointer", fontSize: "1rem", padding: "2px 6px" }}
+                    >
+                      <i className="fa-solid fa-xmark"></i>
+                    </button>
+                  </div>
+                )}
+
+                {isEffectiveToday && (expressEligibility.exp50SameDay.disabled || expressEligibility.exp100SameDay.disabled) && (
+                  <div style={{ marginBottom: "1rem", padding: "0.75rem 1rem", borderRadius: "10px", background: "#f0f9ff", border: "1px solid #bae6fd", color: "#0369a1", fontSize: "0.85rem", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "0.5rem" }}>
+                    <span>
+                      <i className="fa-solid fa-motorcycle" style={{ marginRight: "6px" }}></i>
+                      {locale === "th"
+                        ? "หมายเหตุ: บริการด่วนส่งวันเดียวกันต้องจองล่วงหน้าอย่างน้อย 45 นาทีก่อนเวลารับผ้า เพื่อให้ไรเดอร์เดินทางไปถึงโรงแรมของท่านทันเวลา"
+                        : locale === "cn"
+                        ? "提示：当日加急服务需提前至少 45 分钟预订，以便骑手按时抵达您的酒店取件。"
+                        : "Note: Same-day Express options require booking at least 45 mins before the pickup cutoff so our rider can arrive at your hotel on time."}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPickupDate(bangkokNow.tomorrowDMY);
+                        setPickupTime("10:30 - 13:00");
+                        setExpressNotice("");
+                      }}
+                      style={{
+                        padding: "5px 12px",
+                        borderRadius: "6px",
+                        border: "none",
+                        background: "#0284c7",
+                        color: "white",
+                        fontSize: "0.78rem",
+                        fontWeight: "600",
+                        cursor: "pointer",
+                        whiteSpace: "nowrap"
+                      }}
+                    >
+                      {locale === "th" ? "เปลี่ยนเป็นพรุ่งนี้เช้า (ปลดล็อกทุกบริการด่วน)" : locale === "cn" ? "改为明天上午（解锁全部加急服务）" : "Book for Tomorrow Morning (Unlock All Express)"}
+                    </button>
+                  </div>
+                )}
+
                 <div className={styles.expressGrid}>
                   <label className={styles.checkboxItem}>
                     <input 
@@ -887,7 +1224,10 @@ Notes: ${specialInst}`.trim();
                       name="expressService" 
                       value="Standard: Next Day Deliver Any Time Before 18:00 (No Fixed Time)" 
                       checked={expressService === "Standard: Next Day Deliver Any Time Before 18:00 (No Fixed Time)" || expressService === "Standard: Next Day Deliver Any Time Before 18:00 (No Fix Time)" || expressService === "Regular: Next Day Deliver Any Time Before 18:00 (No Fix Time)" || expressService === "Regular: Next Day" || expressService === "Standard: Next Day"}
-                      onChange={() => setExpressService("Standard: Next Day Deliver Any Time Before 18:00 (No Fixed Time)")}
+                      onChange={() => {
+                        setExpressService("Standard: Next Day Deliver Any Time Before 18:00 (No Fixed Time)");
+                        setExpressNotice("");
+                      }}
                     />
                     <span className={styles.checkmark}></span>
                     <span className={styles.labelName} style={{ display: "flex", flexDirection: "column", gap: "0.25rem", width: "100%" }}>
@@ -898,13 +1238,19 @@ Notes: ${specialInst}`.trim();
                     </span>
                   </label>
 
-                  <label className={styles.checkboxItem}>
+                  <label className={`${styles.checkboxItem} ${expressEligibility.exp50SameDay.disabled ? styles.checkboxItemDisabled : ""}`}>
                     <input 
                       type="radio" 
                       name="expressService" 
-                      value="Express 50: Deliver Same Day Before at 18:00 (+50% Surcharge, if picked up before 12:00)" 
-                      checked={expressService === "Express 50: Deliver Same Day Before at 18:00 (+50% Surcharge, if picked up before 12:00)" || expressService === "Express 50: Deliver Same Day Before at 18:00 (Pickup before 12:00)" || expressService === "Express 50: Same Day before 18:00"}
-                      onChange={() => setExpressService("Express 50: Deliver Same Day Before at 18:00 (+50% Surcharge, if picked up before 12:00)")}
+                      value="Express 50: Deliver Same Day Before 19:00 (Pickup before 12:00)" 
+                      disabled={expressEligibility.exp50SameDay.disabled}
+                      checked={expressService === "Express 50: Deliver Same Day Before 19:00 (Pickup before 12:00)" || expressService === "Express 50: Deliver Same Day Before at 18:00 (Pickup before 12:00)" || expressService === "Express 50: Same Day before 18:00" || expressService === "Express 50: Same Day before 19:00"}
+                      onChange={() => {
+                        if (expressEligibility.exp50SameDay.disabled) return;
+                        setExpressService("Express 50: Deliver Same Day Before 19:00 (Pickup before 12:00)");
+                        if (!pickupTime) setPickupTime("10:30 - 13:00");
+                        setExpressNotice("");
+                      }}
                     />
                     <span className={styles.checkmark}></span>
                     <span className={styles.labelName} style={{ display: "flex", flexDirection: "column", gap: "0.25rem", width: "100%" }}>
@@ -912,16 +1258,26 @@ Notes: ${specialInst}`.trim();
                       {t("express50SameDaySub") && (
                         <span style={{ fontSize: "0.75rem", opacity: 0.8, fontStyle: "italic", fontWeight: "normal" }}>{t("express50SameDaySub")}</span>
                       )}
+                      {expressEligibility.exp50SameDay.disabled && (
+                        <span className={styles.unavailableBadge}>
+                          <i className="fa-solid fa-lock"></i> {expressEligibility.exp50SameDay.reason}
+                        </span>
+                      )}
                     </span>
                   </label>
 
-                  <label className={styles.checkboxItem}>
+                  <label className={`${styles.checkboxItem} ${expressEligibility.exp50NextDay.disabled ? styles.checkboxItemDisabled : ""}`}>
                     <input 
                       type="radio" 
                       name="expressService" 
-                      value="Express 50: Deliver (Next Day) at 12:00 (+50% Surcharge, if picked up before 16:00)" 
-                      checked={expressService === "Express 50: Deliver (Next Day) at 12:00 (+50% Surcharge, if picked up before 16:00)" || expressService === "Express 50: Deliver (Next Day) at 12:00" || expressService === "Express 50 (Next Day): Next Day at 12:00"}
-                      onChange={() => setExpressService("Express 50: Deliver (Next Day) at 12:00 (+50% Surcharge, if picked up before 16:00)")}
+                      value="Express 50: Deliver (Next Day) at 12:00" 
+                      disabled={expressEligibility.exp50NextDay.disabled}
+                      checked={expressService === "Express 50: Deliver (Next Day) at 12:00" || expressService === "Express 50 (Next Day): Next Day at 12:00"}
+                      onChange={() => {
+                        if (expressEligibility.exp50NextDay.disabled) return;
+                        setExpressService("Express 50: Deliver (Next Day) at 12:00");
+                        setExpressNotice("");
+                      }}
                     />
                     <span className={styles.checkmark}></span>
                     <span className={styles.labelName} style={{ display: "flex", flexDirection: "column", gap: "0.25rem", width: "100%" }}>
@@ -929,22 +1285,37 @@ Notes: ${specialInst}`.trim();
                       {t("express50NextDaySub") && (
                         <span style={{ fontSize: "0.75rem", opacity: 0.8, fontStyle: "italic", fontWeight: "normal" }}>{t("express50NextDaySub")}</span>
                       )}
+                      {expressEligibility.exp50NextDay.disabled && (
+                        <span className={styles.unavailableBadge}>
+                          <i className="fa-solid fa-lock"></i> {expressEligibility.exp50NextDay.reason}
+                        </span>
+                      )}
                     </span>
                   </label>
 
-                  <label className={styles.checkboxItem}>
+                  <label className={`${styles.checkboxItem} ${expressEligibility.exp100SameDay.disabled ? styles.checkboxItemDisabled : ""}`}>
                     <input 
                       type="radio" 
                       name="expressService" 
                       value="Express 100: Deliver Same Day Before 19:00 (+100% Surcharge Pickup anytime before 15:00-Subject to availability)" 
+                      disabled={expressEligibility.exp100SameDay.disabled}
                       checked={expressService === "Express 100: Deliver Same Day Before 19:00 (+100% Surcharge Pickup anytime before 15:00-Subject to availability)" || expressService === "Express 100: Same Day before 19:00"}
-                      onChange={() => setExpressService("Express 100: Deliver Same Day Before 19:00 (+100% Surcharge Pickup anytime before 15:00-Subject to availability)")}
+                      onChange={() => {
+                        if (expressEligibility.exp100SameDay.disabled) return;
+                        setExpressService("Express 100: Deliver Same Day Before 19:00 (+100% Surcharge Pickup anytime before 15:00-Subject to availability)");
+                        setExpressNotice("");
+                      }}
                     />
                     <span className={styles.checkmark}></span>
                     <span className={styles.labelName} style={{ display: "flex", flexDirection: "column", gap: "0.25rem", width: "100%" }}>
                       <span style={{ fontWeight: "600", fontSize: "0.95rem" }}>{t("express100SameDay4hTitle")}</span>
                       {t("express100SameDay4hSub") && (
                         <span style={{ fontSize: "0.75rem", opacity: 0.8, fontStyle: "italic", fontWeight: "normal" }}>{t("express100SameDay4hSub")}</span>
+                      )}
+                      {expressEligibility.exp100SameDay.disabled && (
+                        <span className={styles.unavailableBadge}>
+                          <i className="fa-solid fa-lock"></i> {expressEligibility.exp100SameDay.reason}
+                        </span>
                       )}
                     </span>
                   </label>

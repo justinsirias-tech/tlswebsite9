@@ -39,27 +39,22 @@ export default async function PricingPage({ params }) {
       allPricing = [];
     }
     
-    const sortPricingItems = (items) => {
-      const toppers = [];
-      const others = [];
-      (items || []).forEach(item => {
-        if (item.name && item.name.toLowerCase().includes("topper")) {
-          toppers.push(item);
-        } else {
-          others.push(item);
-        }
-      });
-      toppers.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
-      return [...others, ...toppers];
+    const sortAlphabetically = (items) => {
+      return [...(items || [])].sort((a, b) =>
+        (a.name || "").trim().localeCompare((b.name || "").trim(), undefined, {
+          numeric: true,
+          sensitivity: "base",
+        })
+      );
     };
 
-    // Group pricing by category for PricingTabs
+    // Group pricing by category for PricingTabs (strictly sorted alphabetically A-Z)
     const priceData = {
-      weight: allPricing.filter(p => p.category === "weight"),
-      garments: allPricing.filter(p => p.category === "garments"),
-      linen: sortPricingItems(allPricing.filter(p => p.category === "linen")),
-      ironing: allPricing.filter(p => p.category === "ironing"),
-      dryclean: allPricing.filter(p => p.category === "dryclean"),
+      weight: sortAlphabetically(allPricing.filter(p => p.category === "weight")),
+      garments: sortAlphabetically(allPricing.filter(p => p.category === "garments")),
+      linen: sortAlphabetically(allPricing.filter(p => p.category === "linen")),
+      ironing: sortAlphabetically(allPricing.filter(p => p.category === "ironing")),
+      dryclean: sortAlphabetically(allPricing.filter(p => p.category === "dryclean")),
     };
     
     // Dynamically build the SEO Schema

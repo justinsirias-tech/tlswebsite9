@@ -65,7 +65,7 @@ export default function Header() {
         maxWidth: "1400px"
       }}>
         <Link href="/" className="logo" style={{ marginRight: "3rem", flexShrink: 0 }}>
-          <Image src="/images/logo.webp" alt="That Laundry Shop" width={180} height={70} style={{ height: scrolled ? '55px' : '70px', width: 'auto', transition: 'height 0.3s ease' }} priority unoptimized />
+          <Image src="/images/logo.webp" alt="That Laundry Shop" width={99} height={70} style={{ height: scrolled ? '55px' : '70px', width: scrolled ? '78px' : '99px', objectFit: 'contain', transition: 'height 0.3s ease, width 0.3s ease' }} priority unoptimized />
         </Link>
         
         <nav className={`nav-links ${isMenuOpen ? "active glass" : ""}`}>

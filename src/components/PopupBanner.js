@@ -6,6 +6,7 @@ export default function PopupBanner() {
   const [popup, setPopup] = useState(null);
   const [isVisible, setIsVisible] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [imgDims, setImgDims] = useState({ width: 1080, height: 1080 });
 
   useEffect(() => {
     // Dismiss popup banner if promotion modal is opened
@@ -18,6 +19,41 @@ export default function PopupBanner() {
   }, []);
 
   useEffect(() => {
+    let isMounted = true;
+
+    const showPopupWhenImageReady = (popupData) => {
+      if (!popupData) return;
+      if (!popupData.imageUrl) {
+        if (isMounted) {
+          setPopup(popupData);
+          setIsVisible(true);
+        }
+        return;
+      }
+
+      // Preload and decode image in memory before mounting modal into DOM to prevent CLS
+      const img = new window.Image();
+      img.src = popupData.imageUrl;
+
+      const finalizeMount = () => {
+        if (!isMounted) return;
+        const w = img.naturalWidth || 1080;
+        const h = img.naturalHeight || 1080;
+        setImgDims({ width: w, height: h });
+        setPopup(popupData);
+        setIsVisible(true);
+      };
+
+      img.onload = () => {
+        if (typeof img.decode === "function") {
+          img.decode().then(finalizeMount).catch(finalizeMount);
+        } else {
+          finalizeMount();
+        }
+      };
+      img.onerror = () => {};
+    };
+
     async function checkActivePopup() {
       try {
         if (typeof window !== "undefined") {
@@ -41,8 +77,7 @@ export default function PopupBanner() {
           if (parsed.success && parsed.popup) {
             const closed = sessionStorage.getItem(`closed_popup_${parsed.popup.id}`);
             if (!closed) {
-              setPopup(parsed.popup);
-              setIsVisible(true);
+              showPopupWhenImageReady(parsed.popup);
             }
           }
           return;
@@ -59,8 +94,7 @@ export default function PopupBanner() {
         if (data.success && data.popup) {
           const closed = sessionStorage.getItem(`closed_popup_${data.popup.id}`);
           if (!closed) {
-            setPopup(data.popup);
-            setIsVisible(true);
+            showPopupWhenImageReady(data.popup);
           }
         }
       } catch (error) {
@@ -68,6 +102,10 @@ export default function PopupBanner() {
       }
     }
     checkActivePopup();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const handleClose = () => {
@@ -207,11 +245,14 @@ export default function PopupBanner() {
             <img 
               src={popup.imageUrl} 
               alt={popup.name || "Announcement"} 
+              width={imgDims.width}
+              height={imgDims.height}
               style={{
                 width: isExpanded ? "auto" : "100%",
                 maxWidth: isExpanded ? "95vw" : "100%",
                 maxHeight: isExpanded ? "88vh" : "80vh",
                 height: "auto",
+                aspectRatio: `${imgDims.width} / ${imgDims.height}`,
                 display: "block",
                 objectFit: "contain",
                 borderRadius: "16px",

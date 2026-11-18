@@ -427,3 +427,15 @@ input.gm-err-autocomplete {
   background-position: right 15px center !important;
 }
 
+/* Prevent Cumulative Layout Shift (CLS) while Font Awesome webfont loads */
+i.fa-solid,
+i.fa-regular,
+i.fa-brands {
+  display: inline-block;
+  min-width: 1em;
+  min-height: 1em;
+  line-height: 1;
+  text-align: center;
+}
+
+
