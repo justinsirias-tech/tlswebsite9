@@ -99,6 +99,11 @@ function getItemDescription(name, categoryId, locale) {
     if (locale === "cn") return "欧洲环保溶剂干洗，呵护娇贵面料与版型";
     return "European eco-solvent dry cleaning & bespoke hand finishing";
   }
+  if (categoryId === "others") {
+    if (locale === "th") return "บริการดูแลทำความสะอาดพิเศษตามความต้องการเฉพาะของลูกค้า";
+    if (locale === "cn") return "根据客户特殊需求的定制精细洗护服务";
+    return "Specialized custom care and tailored cleaning service";
+  }
   if (locale === "th") return "ซักแยกชิ้นอย่างพิถีพิถัน พร้อมรีดเรียบระดับพรีเมียม";
   if (locale === "cn") return "单件独立精细洗护与专业手工熨烫";
   return "Individual piece care, gentle wash & hand-pressed finish";
@@ -222,7 +227,8 @@ export default function PricingTabs({ priceData, locale }) {
     { id: "linens", label: t("tabLinens"), icon: "fa-bed" },
     { id: "ironing", label: t("tabIroning"), icon: "fa-temperature-high" },
     { id: "pcs", label: t("tabPcs"), icon: "fa-shirt" },
-    { id: "dryclean", label: t("tabDryclean"), icon: "fa-user-tie" }
+    { id: "dryclean", label: t("tabDryclean"), icon: "fa-user-tie" },
+    { id: "others", label: t("tabOthers"), icon: "fa-ellipsis" }
   ];
 
   const categoryInfo = {
@@ -255,6 +261,12 @@ export default function PricingTabs({ priceData, locale }) {
       title: t("tabDryclean"),
       desc: t("descDryclean"),
       data: priceData.dryclean
+    },
+    others: {
+      image: "https://images.unsplash.com/photo-1582735689369-4fe89db7114c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
+      title: t("tabOthers"),
+      desc: t("descOthers"),
+      data: priceData.others || []
     }
   };
 

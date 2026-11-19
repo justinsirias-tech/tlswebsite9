@@ -55,6 +55,7 @@ export default async function PricingPage({ params }) {
       linen: sortAlphabetically(allPricing.filter(p => p.category === "linen")),
       ironing: sortAlphabetically(allPricing.filter(p => p.category === "ironing")),
       dryclean: sortAlphabetically(allPricing.filter(p => p.category === "dryclean")),
+      others: sortAlphabetically(allPricing.filter(p => p.category === "others")),
     };
     
     // Dynamically build the SEO Schema
@@ -107,6 +108,17 @@ export default async function PricingPage({ params }) {
       });
     });
 
+    (priceData.others || []).forEach(item => {
+      const priceVal = typeof item.nonMember === 'number' ? item.nonMember.toFixed(2) : String(item.nonMember || '0');
+      schemaOffers.push({
+        "@type": "Offer",
+        "position": position++,
+        "name": `Other - ${locale === "th" && item.name_th ? item.name_th : item.name}`,
+        "price": priceVal,
+        "priceCurrency": "THB"
+      });
+    });
+
     const jsonLd = {
       "@context": "https://schema.org",
       "@type": "ItemList",
@@ -140,7 +152,7 @@ export default async function PricingPage({ params }) {
     );
   } catch (error) {
     console.error("Pricing page render error:", error);
-    const fallbackPriceData = { weight: [], garments: [], linen: [], ironing: [], dryclean: [] };
+    const fallbackPriceData = { weight: [], garments: [], linen: [], ironing: [], dryclean: [], others: [] };
     return (
       <section className="section" style={{ background: "var(--background)", minHeight: "60vh", paddingTop: "8rem" }}>
         <div className="container">

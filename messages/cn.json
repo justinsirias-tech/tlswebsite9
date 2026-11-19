@@ -102,7 +102,9 @@
     "descIroning": "完美熨烫，打造整洁专业的形象。",
     "descPcs": "为您的精致和结构性衣物提供个性化护理。",
     "descDryclean": "环保溶剂清洁，呵护您最珍贵的衣物。",
-    "noItems": "此类别暂无可用项目。"
+    "noItems": "此类别暂无可用项目。",
+    "tabOthers": "其他服务",
+    "descOthers": "特护洗涤、衣物修补、修改尺寸及其他定制服务。"
   },
   "Contact": {
     "metaTitle": "联系我们及分店 | That Laundry Shop",

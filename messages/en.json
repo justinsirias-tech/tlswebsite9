@@ -102,7 +102,9 @@
     "descIroning": "Immaculate pressing for a sharp, professional look.",
     "descPcs": "Individual care for your delicate and structured pieces.",
     "descDryclean": "Eco-friendly solvent cleaning for your most precious garments.",
-    "noItems": "No items available in this category."
+    "noItems": "No items available in this category.",
+    "tabOthers": "Others",
+    "descOthers": "Specialty laundry, alterations, and custom care services."
   },
   "Contact": {
     "metaTitle": "Contact Us & Branches | That Laundry Shop",

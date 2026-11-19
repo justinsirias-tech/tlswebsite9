@@ -53,7 +53,8 @@ export default function PricingAdminPage() {
     { id: "garments", label: "Garments" },
     { id: "linen", label: "Linen & Bedding" },
     { id: "ironing", label: "Ironing Only" },
-    { id: "dryclean", label: "Dry Cleaning" }
+    { id: "dryclean", label: "Dry Cleaning" },
+    { id: "others", label: "Others" }
   ];
 
   useEffect(() => {
